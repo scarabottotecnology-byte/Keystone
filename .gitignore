@@ -27,6 +27,7 @@ test-results
 
 # Supabase CLI
 supabase/.temp
+supabase/functions/**/.preview
 supabase/.branches
 
 # Editor

@@ -1,0 +1,15 @@
+{
+  "imports": {
+    "satori": "npm:satori@0.10.13",
+    "@resvg/resvg-wasm": "npm:@resvg/resvg-wasm@2.6.2"
+  },
+  "nodeModulesDir": "none",
+  "lint": {
+    "rules": {
+      "tags": ["recommended"]
+    }
+  },
+  "fmt": {
+    "lineWidth": 80
+  }
+}

@@ -5,7 +5,11 @@ import reactRefresh from "eslint-plugin-react-refresh";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["dist"] },
+  // As Edge Functions rodam em Deno: globais diferentes, importação por
+  // especificador `npm:` e resolução por mapa próprio. Passá-las por este
+  // ESLint, configurado para o navegador, só produziria ruído. Elas têm o
+  // `deno lint` do `supabase/functions/deno.json`.
+  { ignores: ["dist", "supabase/functions/**"] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ["**/*.{ts,tsx}"],

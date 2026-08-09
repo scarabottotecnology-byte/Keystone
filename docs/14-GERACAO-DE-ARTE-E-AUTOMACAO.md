@@ -67,10 +67,12 @@ render_jobs
 content_assets.media = [{storage_path, template, width, height, alt}]
 ```
 
-**Renderização:** o template é HTML+CSS com as fontes da marca embutidas,
-convertido em PNG por navegador headless — a mesma técnica usada para gerar os
-arquivos de marca em `public/brand/`. Texto sai como texto: nítido, correto,
-sempre na tipografia certa.
+**Renderização:** ~~HTML+CSS convertido em PNG por navegador headless~~ —
+**corrigido em 09/08**, ver [documento 16](./16-FATIA-VERTICAL-PUBLICACAO.md).
+Edge Function roda em Deno Deploy, que não permite subir navegador. O mecanismo
+real é **satori** (layout → SVG) mais **resvg-wasm** (SVG → PNG), ambos em
+WebAssembly, sem processo: 1080×1080 em ~270 ms, verificado. Texto sai como
+texto: nítido, correto, sempre na tipografia certa.
 
 **Alt text é obrigatório.** Gerado junto com a arte e gravado em `media[].alt`.
 Peça sem alt não avança na fila.
@@ -88,7 +90,11 @@ Peça sem alt não avança na fila.
 | `comercial` | CTA com botão | 1080×1080 |
 
 Templates são **dados**, não código: vivem em `content_templates`, com o spec em
-`jsonb`. Adicionar um formato não exige deploy.
+`jsonb`.
+
+> ⚠️ **Ressalva de implementação.** Hoje o *spec* é dado — zonas, limites, o que
+> precisa de lastro — mas o *layout* é código. Adicionar um formato ainda exige
+> deploy. Tornar o layout declarativo é projeto próprio dentro da FASE 5.
 
 ---
 

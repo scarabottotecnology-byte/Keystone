@@ -48,6 +48,7 @@ divergirem dos documentos acima, **eles prevalecem**.
 | 13 | [Execução da FASE 1](./13-EXECUCAO-FASE-1.md) | O que já foi construído e o que falta |
 | 14 | [Geração de arte e automação](./14-GERACAO-DE-ARTE-E-AUTOMACAO.md) | Correção: a arte é composta por template, não gerada por modelo. Altera a FASE 5 |
 | 15 | [Reversão do ADR-001](./15-REVERSAO-ADR-001-INFRAESTRUTURA.md) | ADR-013: infraestrutura própria. Tira o Cost Intelligence do escopo |
+| 16 | [Fatia vertical de publicação](./16-FATIA-VERTICAL-PUBLICACAO.md) | **Ordem de execução vigente.** Substitui a sequência fase a fase. Corrige o mecanismo de renderização do documento 14 |
 
 ---
 
