@@ -1,6 +1,7 @@
 # 15 — Reversão do ADR-001: infraestrutura própria para o Growth OS
 
-**Status:** decisão revista em 08/08/2026, a pedido do cliente.
+**Status:** decisão revista em 08/08/2026 e ajustada em 09/08/2026, a pedido do
+cliente.
 **Substitui:** ADR-001 do documento 10.
 
 ---
@@ -87,7 +88,7 @@ migra para o repositório novo. Nada se perde.
 
 | | Antes | Depois |
 |---|---|---|
-| Repositório | `centro-de-custos-inteligente` | novo, a criar |
+| Repositório | `centro-de-custos-inteligente` | `scarabottotecnology-byte/Keystone` |
 | Supabase | `hlvkkziiaeyqyenekdck` (Lovable) | novo, na org da Keystone |
 | FASE 2 | Tenancy + backfill + migração do Cost Intelligence + correção do C-01 | Tenancy em base limpa |
 | Módulo Cost Intelligence | Dentro do Growth OS | **Fora** — permanece produto separado |
@@ -96,6 +97,10 @@ migra para o repositório novo. Nada se perde.
 
 A FASE 2 encolhe porque some a parte mais delicada dela: migrar uma tabela com
 dados em produção enquanto se troca a política de segurança embaixo.
+
+As 51 semanas são o roadmap sem a FASE 5 revista. Com a semana que o documento
+14 acrescenta à fábrica de conteúdo — geração de arte, agente A10, motor de
+render — o total fica em **52**.
 
 ---
 
@@ -125,27 +130,50 @@ o resolve — apenas o move para fora do campo de visão.
 
 ---
 
-## Decisões confirmadas pelo cliente (08/08)
+## Decisões do cliente
 
-### O Cost Intelligence vai junto
+### 08/08 — o Cost Intelligence viria junto (revertido)
 
-O Centro de Custos **migra para o Growth OS** como módulo, com os dados indo
-para o Supabase novo.
+Ficou decidido que o Centro de Custos migraria para cá como módulo, o que
+resolveria o C-01 por construção. Essa decisão **foi revertida em 09/08**. Fica
+registrada só para explicar por que o código do módulo chegou a existir neste
+repositório e foi removido depois.
 
-**Isto resolve o C-01 por construção.** O achado crítico morre na migração: os
-dados chegam num banco onde a RLS nasce correta, e as políticas `anon` do
-projeto antigo deixam de importar assim que a aplicação antiga for aposentada.
-O risco não fica órfão — some.
+### 09/08 — o Cost Intelligence fica de fora, definitivo
 
-**Em troca, aparece uma dependência nova.** A migração agora é entre dois
-projetos Supabase distintos, e o de origem (`hlvkkziiaeyqyenekdck`) é gerenciado
-pela Lovable, fora do alcance das ferramentas da Keystone. Para exportar os
-dados é preciso: acesso ao painel da Lovable, ou um dump gerado por lá, ou uma
-exportação feita pela própria aplicação atual — que tem leitura anônima liberada
-e, ironicamente, permite extrair tudo sem credencial nenhuma.
+> "Este aplicativo tem um objetivo completamente diferente. Ele é um aplicativo
+> CRM evoluído com postagens automáticas, gerenciamento de redes sociais com
+> IA."
 
-A FASE 2 volta a **3 semanas**, e o roadmap a **52**. Migração entre projetos é
-mais delicada que o backfill original.
+O produto aqui é comercial: CRM, conteúdo, publicação automática, prospecção.
+Controladoria de custos não é uma parte menor dele — é outra coisa. Trazer o
+módulo para cá misturava dois produtos num repositório criado justamente para
+separá-los.
+
+**O que foi removido** no commit de correção: `src/modules/cost-intelligence/`
+(4 telas, hooks, mapeamento de campos), o grupo "Controladoria" da navegação, as
+rotas e redirecionamentos correspondentes, a migração legada em
+`supabase/legacy/`, os tipos gerados do banco antigo e a dependência `xlsx`.
+
+O bundle caiu de 1.431 kB para 399 kB — a maior parte era o `xlsx`, que só o
+importador de planilha usava.
+
+**Consequência colateral:** hoje nenhum módulo está `active`. Todos abrem a tela
+que declara em que fase chegam. É o estado honesto da FASE 1 — a fundação está
+pronta, o negócio não começou.
+
+### O C-01 volta a ser órfão
+
+Esta é a parte que não pode se perder na reversão.
+
+Com o Cost Intelligence fora do escopo, **a correção do C-01 sai do roadmap
+junto**. Vale de novo, na íntegra, a seção "⚠️ A consequência que não pode se
+perder" acima: o risco não diminuiu, apenas deixou de ter dono neste plano.
+
+Ele precisa ser tratado como tarefa isolada e urgente **no produto Centro de
+Custos**, com prazo próprio. São poucas horas de trabalho — remover as políticas
+`anon`, exigir autenticação — mas dependem de acesso ao projeto Supabase
+gerenciado pela Lovable.
 
 ### Terceira plataforma: Cloudflare
 
@@ -164,7 +192,7 @@ substitui ou complementa o Supabase Storage.
 |---|---|
 | **Supabase `keystone-growth-os`** | ✅ criado — ref `rplnjrqpzqznbxfascqs`, região `sa-east-1` (São Paulo), organização da Keystone, ativo |
 | **Repositório `scarabottotecnology-byte/Keystone`** | ✅ criado pelo Jefferson em 09/08, privado. É onde este documento está. |
-| **Fundação migrada** | ✅ commit `02f523c` — design system, shell, tema, identidade, Cost Intelligence, 16 documentos, 14 testes |
+| **Fundação migrada** | ✅ design system, shell, tema, identidade, 16 documentos, 14 testes |
 | Projeto Cloudflare | pendente, FASE 24 |
 
 **Região São Paulo** foi escolhida deliberadamente: latência para usuários
@@ -185,6 +213,7 @@ O código não veio intacto. Cinco ajustes:
 | | Antes | Agora | Por quê |
 |---|---|---|---|
 | `.env` | **rastreado pelo git** | ignorado; só `.env.example` | segredo não se versiona, mesmo o publicável |
+| Cost Intelligence | veio junto | **removido** | é outro produto — ver a reversão de 09/08 |
 | Chave | `anon` legada | `sb_publishable_...` | rotaciona sozinha, sem derrubar o resto |
 | Cliente Supabase | aceitava `undefined` | falha na carga | o erro aparecia depois, como `Failed to fetch` sem causa |
 | `lovable-tagger` | no build | removido | este repositório não é gerenciado pela Lovable |
@@ -194,22 +223,19 @@ Verificado depois da migração: lint sem erro, `tsc` limpo, 14 testes passando,
 build em 9,8 s, aplicação carregando contra o Supabase novo sem um único erro de
 console.
 
-A migração do Centro de Custos **não** foi aplicada. Está em `supabase/legacy/`
-como referência, com o motivo escrito lá: ela carrega o C-01.
+A migração do Centro de Custos não veio: nem aplicada, nem como referência.
+Ela pertence ao outro produto.
 
 ---
 
 ## Pendências
 
 1. **Preencher o `.env` local** a partir do `.env.example` — a chave publishable
-   está no painel do Supabase. (Já configurado nesta sessão; cada máquina
-   precisa do seu.)
-2. **Plano de exportação dos dados** do Supabase gerenciado pela Lovable.
-   É a dependência de entrada da FASE 2 e a única que não está sob controle
-   direto — precisa de acesso ao painel da Lovable ou de um dump gerado por lá.
-3. **Atualizar as fichas do ClickUp** — a FASE 2 muda de escopo: sai o backfill,
-   entra a migração entre projetos. A FASE 5 deve ser criada a partir do
-   documento 14, não do 12.
-4. **Aposentar a aplicação antiga** depois da migração. Enquanto ela existir com
-   as políticas `anon`, o C-01 continua explorável, mesmo com o dado já
-   duplicado no banco novo. Duplicar não fecha buraco — só desligar fecha.
+   está no painel do Supabase. Cada máquina precisa do seu.
+2. **Corrigir o C-01 no Centro de Custos**, como tarefa daquele produto. Não é
+   trabalho deste roadmap, mas continua sendo o risco aberto mais grave.
+3. **Atualizar as fichas do ClickUp** — a FASE 2 volta a ser tenancy em base
+   limpa, sem backfill e sem migração entre projetos. A FASE 5 deve ser criada
+   a partir do documento 14, não do 12.
+4. **Revisar os documentos 00 a 13** — foram escritos quando o Cost Intelligence
+   ainda estava no escopo. As referências a ele precisam sair.

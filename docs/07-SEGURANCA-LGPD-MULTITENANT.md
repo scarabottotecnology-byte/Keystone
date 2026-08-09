@@ -117,35 +117,27 @@ A distinção que importa é `analyst` × `operator`: **quem pode disparar efeit
 externo** (publicar, enviar). RLS isola organizações; RBAC limita o que cada
 pessoa faz dentro da sua.
 
-### O que muda em relação ao estado atual
-
-```sql
--- REMOVER (achado C-01)
-drop policy "Anon can read financial entries"   on financial_entries;
-drop policy "Anon can insert financial entries" on financial_entries;
-drop policy "Anon can delete financial entries" on financial_entries;
-drop policy "Auth can read financial entries"   on financial_entries;
-drop policy "Auth can insert financial entries" on financial_entries;
-drop policy "Auth can delete financial entries" on financial_entries;
-
--- e aplicar o padrão de tenancy acima
-```
+### A regra, sem exceção
 
 O papel `anon` não recebe `SELECT`, `INSERT`, `UPDATE` nem `DELETE` em nenhuma
 tabela de negócio. A única superfície pública de escrita é `lead-capture`, que é
 Edge Function com token próprio — não PostgREST.
 
-### Ordem obrigatória da migração da FASE 2
+### Ordem da FASE 2
 
-1. Criar `organizations`, `profiles`, `memberships` e a função.
-2. Criar a organização Keystone e vincular os usuários existentes.
-3. Adicionar `organization_id` **nullable** em `financial_entries`.
-4. Backfill de todas as linhas para a organização Keystone.
-5. `SET NOT NULL`.
-6. **Só então** derrubar as políticas antigas e criar as novas.
-7. Validar com o pacote de testes de RLS (`08 §4`) antes de liberar.
+O banco nasce vazio, então não há backfill nem convivência com política antiga —
+a sequência delicada de migrar dado em produção enquanto se troca a segurança
+embaixo não existe aqui. Sobra o essencial:
 
-Inverter os passos 6 e 4 derruba a aplicação em produção com dados órfãos.
+1. Criar `organizations`, `profiles`, `memberships` e `app.current_org_ids()`.
+2. Criar a organização Keystone e vincular os usuários.
+3. Criar as tabelas de negócio já com `organization_id NOT NULL`, `ENABLE` e
+   `FORCE ROW LEVEL SECURITY`, e a política de tenancy desde a primeira linha.
+4. Validar com o pacote de testes de RLS (`08 §4`) antes de liberar.
+
+A regra que não se negocia: **nenhuma tabela é criada antes da política dela.**
+Tabela que existe sem RLS, mesmo por uma migração, é uma janela aberta — e é
+exatamente assim que nasce um C-01.
 
 ---
 

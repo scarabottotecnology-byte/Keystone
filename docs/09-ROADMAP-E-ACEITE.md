@@ -43,7 +43,7 @@ grandeza para planejamento, não compromisso contratual.
 | Fase | Entrega | Est. | Dependência |
 |---|---|---|---|
 | **1** | Fundação técnica: estrutura de módulos, design system premium, CI, `_shared` de Edge Functions, `ai-gateway`, tabelas de IA e observabilidade | 2 | — |
-| **2** | Banco + auth + multi-tenant: `organizations`/`profiles`/`memberships`, RLS em tudo, **correção do C-01**, login, onboarding, migração do Cost Intelligence, RPCs de agregação (corrige H-02), import endurecido (H-03/H-04/H-05) | 3 | 1 |
+| **2** | Banco + auth + multi-tenant: `organizations`/`profiles`/`memberships`, RLS em tudo, login, onboarding, RPCs de agregação, convites e papéis | 3 | 1 |
 | **3** | Command Center: RPC agregada, KPIs, Growth Score, blocos AI Growth Insight e Next Best Action | 1,5 | 2 |
 
 **Na FASE 1, além do código:** abrir os pedidos de acesso ao LinkedIn Community
@@ -152,10 +152,8 @@ zero linhas da org B no teste automatizado" é.
 - [ ] Todas as tabelas com RLS habilitada **e** forçada
 - [ ] Suíte pgTAP: org A não lê, escreve, altera nem apaga dados da org B
 - [ ] Teste de regressão do C-01 no CI
-- [ ] `financial_entries` com `organization_id NOT NULL` e backfill íntegro
-- [ ] Dashboard de custos idêntico ao anterior, agora via RPC (H-02 resolvido)
-- [ ] Reimportar o mesmo arquivo não duplica linhas (H-03)
-- [ ] Import valida com `zod`; datas `DD/MM/YYYY` corretas; número não vira data (H-04, H-05)
+- [ ] Toda tabela nasce com `organization_id NOT NULL`
+- [ ] Agregação por RPC no servidor — nenhuma tela paginando para somar no cliente
 - [ ] Advisors de segurança do Supabase sem alerta aberto
 
 ### FASE 3 — Command Center

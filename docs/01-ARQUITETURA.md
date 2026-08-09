@@ -188,7 +188,6 @@ políticas, não o modelo de dados.
 │   │   ├── pipeline/
 │   │   ├── automations/
 │   │   ├── ai-insights/
-│   │   ├── cost-intelligence/     # módulo atual, preservado
 │   │   └── settings/
 │   ├── components/
 │   │   ├── ui/                    # shadcn — PRESERVADO
@@ -268,7 +267,6 @@ ordem do roadmap.
 | M13 | **Outreach Engine** | Campanhas, sequências, opt-out, envio, entrega | M12 | 14–15 |
 | M14 | **AI Core** | Gateway, prompts, RAG, custo, aprendizado, agentes | M00 | 1, 5, 19 |
 | M15 | **CRM & Attribution** | Pipeline, oportunidades, atribuição, receita | M09, M13 | 17–18 |
-| M16 | **Cost Intelligence** | Módulo atual de centro de custos — **preservado** | M00 | 2 |
 | M17 | **Automation & Observability** | Definições, execuções, logs, alertas | M00 | 20–21 |
 
 **Nota sobre M14 (AI Core).** Aparece na FASE 1 porque o `ai-gateway` e as tabelas
@@ -276,16 +274,11 @@ ordem do roadmap.
 de qualquer módulo. Construir o gateway depois significa refatorar todos os
 consumidores — e perder o histórico de custo dos primeiros meses.
 
-**Nota sobre M16.** O módulo de centro de custos não é legado a ser tolerado: é a
-prova viva de competência em controladoria da Keystone e uma fonte de conteúdo
-real (dados agregados e anonimizados viram insight de mercado). Fica.
-
 ---
 
 ## §5. Mapa de telas
 
-Sidebar conforme seção 43 do Master Prompt, com `Cost Intelligence` acrescentado
-para preservar o produto existente.
+Sidebar conforme seção 43 do Master Prompt.
 
 | Rota | Tela | Conteúdo principal | Fonte de dados | Fase |
 |---|---|---|---|---|
@@ -313,9 +306,6 @@ para preservar o produto existente.
 | `/automations` | Automações | Catálogo, cron, modo de aprovação, últimas execuções, taxa de erro | `automation_definitions`, `automation_runs` | 20 |
 | `/automations/runs/:id` | Execução | Timeline por passo, payload, erro, correlation ID | `automation_logs` | 21 |
 | `/ai-insights` | AI Insights | Feed de recomendações: problema, evidência, recomendação, impacto, botão **EXECUTAR** | `ai_recommendations` | 19 |
-| `/cost-intelligence` | Cost Intelligence | Dashboard de centro de custos **(tela atual preservada)** | `financial_entries` via RPC | 2 |
-| `/cost-intelligence/import` | Importação | Upload, mapeamento, preview, validação, idempotência | `import_batches` | 2 |
-| `/cost-intelligence/entries` | Lançamentos | Tabela filtrável e paginada no servidor | `financial_entries` | 2 |
 | `/settings/*` | Configurações | Organization, Brand, AI, Social, WhatsApp, Email, ICP, Automation, Notifications, Security, Billing | diversas | 2+ |
 
 ### Linguagem visual

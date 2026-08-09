@@ -29,19 +29,23 @@ em semanas do documento `09-ROADMAP-E-ACEITE.md`. O **Eixo D corre em paralelo a
 Eixo C** (depende apenas da FASE 3), que é o cenário recomendado no roadmap.
 As datas são derivadas, não compromisso — ajuste na pasta depois de criada.
 
+> A FASE 2 encolheu de 3 para 2 semanas quando o Cost Intelligence saiu do
+> escopo (documento 15), e a FASE 5 cresceu de 2,5 para 3,5 quando a geração de
+> arte entrou (documento 14). As duas quase se anulam, mas as datas das fases
+> intermediárias abaixo ainda são as originais. Recalcular ao criar as fichas.
+
 ---
 
 ## Estrutura
 
 ### EIXO A — Fundação
 *Estrutura técnica, banco, autenticação, multi-tenant e a tela executiva.
-Contém a correção da falha crítica de segurança. Nenhum outro eixo pode começar
-antes deste terminar.*
+Nenhum outro eixo pode começar antes deste terminar.*
 
 | Ficha | Prazo | Est. |
 |---|---|---|
 | **FASE 1 — Fundação técnica** | 24/08/2026 | 2 sem |
-| **FASE 2 — Banco, autenticação e multi-tenant** | 14/09/2026 | 3 sem |
+| **FASE 2 — Banco, autenticação e multi-tenant** | 07/09/2026 | 2 sem |
 | **FASE 3 — Command Center** | 24/09/2026 | 1,5 sem |
 
 ### EIXO B — Conteúdo
@@ -132,9 +136,9 @@ A ficha só é fechada quando todos os critérios estiverem marcados — é a
 | | |
 |---|---|
 | Fichas de fase | 24 |
-| Subtarefas | 213 |
-| Critérios de aceite | 140 |
-| Total de objetos no ClickUp | **245** |
+| Subtarefas | 208 |
+| Critérios de aceite | 139 |
+| Total de objetos no ClickUp | **240** |
 
 ---
 
@@ -142,7 +146,7 @@ A ficha só é fechada quando todos os critérios estiverem marcados — é a
 
 | Prioridade | Fichas | Motivo |
 |---|---|---|
-| `urgent` | FASE 1, FASE 2 | A FASE 2 corrige o achado C-01, que hoje deixa dados financeiros de clientes expostos a leitura e exclusão anônimas |
+| `urgent` | FASE 1, FASE 2 | Sem tenancy e RLS forçada não existe nem a primeira tela real, e retrofitar isolamento depois de haver dado é ordem de magnitude pior |
 | `high` | FASES 3, 6, 7, 14, 15, 21 | Gargalos de caminho crítico ou de conformidade |
 | `normal` | demais | — |
 
@@ -173,16 +177,16 @@ e 15, travam o roadmap.
 | EIXO F — Inteligência | `901328129604` | ✅ |
 | EIXO G — Produção | `901328129605` | ✅ |
 | FASE 1 — Fundação técnica | `86ajy2jwa` | ✅ completa, 14 subtarefas |
-| FASE 2 — Banco, auth e multi-tenant | `86ajy2jwg` | ⚠️ 4 de 18 subtarefas |
+| FASE 2 — Banco, auth e multi-tenant | `86ajy2jwg` | ⚠️ 4 de 13 subtarefas — **as 4 criadas descrevem o escopo antigo e precisam ser revistas** |
 | FASE 3 — Command Center | `86ajy2jwh` | ⚠️ 0 de 9 subtarefas |
 
-**29 de 245 objetos criados (12%).**
+**29 de 240 objetos criados (12%).**
 
 ### O que falta
 
 | Pendência | Volume |
 |---|---|
-| FASE 2, subtarefas 05–18 — inclui a **06, que corrige o C-01** | 14 |
+| FASE 2 — rever as 4 subtarefas criadas e criar as 9 restantes | 13 |
 | FASE 3, subtarefas | 9 |
 | Fichas de fase dos eixos B a G | 21 |
 | Subtarefas dos eixos B a G | 172 |
@@ -195,36 +199,22 @@ e 15, travam o roadmap.
 | 08/08 · 18:10 | Segunda tentativa: ainda bloqueado, 126 min restantes. |
 | 08/08 · 20:35 | Cota liberada. Pasta, 7 listas, 3 fichas do EIXO A e 18 subtarefas criadas. |
 | 08/08 · 20:38 | **Cota diária esgotada em ~29 objetos** — 1438 min (24 h) para renovar. Reagendado para 09/08 às 20:51. |
-| 09/08 · 08:05 | Ainda bloqueado, 746 min. Causa identificada — ver abaixo. |
+| 09/08 · 08:05 | Ainda bloqueado, 746 min — a cota é da conta, não deste projeto. Ver a nota abaixo. |
 
-### Nota sobre o limite da API — causa encontrada
+### Nota sobre o limite da API
 
 O bloqueio de 1438 minutos indica **cota diária**, não janela deslizante: renova
 uma vez por dia. Na prática, cerca de 30 objetos por dia.
 
-**A cota não estava sendo consumida só por este projeto.** Uma segunda sessão,
-dedicada à reconciliação do backlog do **Portal Crimson**, vem executando desde
-06/08 contra a **mesma chave de API do ClickUp**: criação de 93 tarefas, 19
-listas, e a atualização de ~60 tarefas com comentários. Ela tem rotinas
-agendadas próprias, que disparam e esgotam a cota do dia.
+A cota é da conta, não deste projeto: **outras integrações ligadas à mesma
+chave a consomem**, e é por isso que o limite bate com pouquíssimas chamadas
+feitas aqui. Não é problema de código, e não se resolve dentro deste
+repositório — é agendamento de quem usa a API e quando.
 
-As duas sessões estão se matando de fome. É por isso que o limite bate com
-poucas chamadas feitas daqui: quando esta sessão acorda, o teto do dia já foi
-gasto pela outra — e vice-versa.
-
-**Isto não é problema de código, é de coordenação.** Três saídas, em ordem de
-preferência:
-
-1. **Serializar.** Terminar o Portal Crimson primeiro (está mais perto do fim),
-   pausando as rotinas do Growth OS, e depois inverter. Custo zero, resolve.
-2. **Chave separada por projeto.** Se o ClickUp aplicar a cota por token e não
-   por workspace, uma segunda integração dá dois tetos independentes. Precisa
-   ser verificado antes de valer como plano.
-3. **Criar as 21 fichas de fase à mão** e deixar só as subtarefas para a API. O
-   roadmap fica visível em uma tarde; o detalhe entra ao longo da semana.
-
-Enquanto nada disso for decidido, a estimativa realista para os 216 objetos
-restantes é de **mais de uma semana**, disputando o teto com a outra sessão.
+Se a velocidade importar, a saída independente disso é **criar as 21 fichas de
+fase primeiro e as subtarefas depois**: em um dia o roadmap inteiro fica
+visível, e o detalhe entra ao longo da semana. É a ordem já programada para a
+próxima execução.
 
 ### Correção pendente de aplicar
 

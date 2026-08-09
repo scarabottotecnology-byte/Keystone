@@ -40,9 +40,9 @@ interface QueryStateProps {
  * Envelopa uma tela que depende de consulta ao servidor e garante os três
  * estados obrigatórios: carregando, erro e vazio.
  *
- * Existe porque o módulo de custos exibia "Carregando..." indefinidamente
- * quando o banco não respondia — o usuário não tinha como distinguir consulta
- * lenta de falha de conexão, e não havia caminho de recuperação.
+ * Existe porque a alternativa observada na prática é a tela que exibe
+ * "Carregando..." para sempre quando o banco não responde: o usuário não
+ * distingue consulta lenta de falha de conexão, e não tem como se recuperar.
  */
 export function QueryState({
   isLoading,

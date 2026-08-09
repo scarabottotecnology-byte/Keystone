@@ -42,14 +42,16 @@ describe("registro de navegação", () => {
     }
   });
 
-  it("módulo ativo aponta para rota do Cost Intelligence", () => {
-    // Único módulo em operação hoje. Se algo mais aparecer como 'active' sem
-    // implementação real, o produto passa a mentir sobre o próprio estado.
+  it("nenhum módulo se declara pronto sem rota no roteador", () => {
+    // O App só monta rota para PLANNED_ITEMS. Um item marcado 'active' sem
+    // rota correspondente cai no NotFound — a sidebar prometeria algo que não
+    // abre. Este teste falha de propósito quando o primeiro módulo for marcado
+    // como pronto, para lembrar de ligar a rota dele no App.
     const active = ALL_NAV_ITEMS.filter((i) => i.status === "active");
-    expect(active.length).toBeGreaterThan(0);
-    for (const item of active) {
-      expect(item.to.startsWith("/cost-intelligence")).toBe(true);
-    }
+    expect(
+      active.map((i) => i.to),
+      "item 'active' encontrado: registre a rota em App.tsx e ajuste este teste",
+    ).toEqual([]);
   });
 
   it("nenhum grupo fica vazio", () => {
@@ -59,7 +61,7 @@ describe("registro de navegação", () => {
   });
 
   it("findNavItem resolve rota conhecida e devolve undefined para desconhecida", () => {
-    expect(findNavItem("/cost-intelligence")?.label).toBe("Centro de Custos");
+    expect(findNavItem("/content")?.label).toBe("Content");
     expect(findNavItem("/")?.label).toBe("Command Center");
     expect(findNavItem("/rota-que-nao-existe")).toBeUndefined();
   });

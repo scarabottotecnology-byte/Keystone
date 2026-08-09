@@ -1,7 +1,5 @@
-import { ArrowRight, Check } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Check } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
-import { Button } from "@/components/ui/button";
 import type { NavItem } from "@/app/navigation";
 
 /**
@@ -62,17 +60,6 @@ export function ModulePlaceholder({ item }: { item: NavItem }) {
         )}
       </div>
 
-      <div className="flex flex-wrap items-center gap-3">
-        <Button asChild variant="outline" size="sm">
-          <Link to="/cost-intelligence">
-            Ir para o que já está no ar
-            <ArrowRight className="ml-1.5 size-4" aria-hidden="true" />
-          </Link>
-        </Button>
-        <span className="text-xs text-muted-foreground">
-          O módulo de Centro de Custos é a parte do sistema já em operação.
-        </span>
-      </div>
     </div>
   );
 }

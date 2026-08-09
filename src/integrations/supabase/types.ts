@@ -1,3 +1,8 @@
+// Gerado por `supabase gen types typescript`. Não edite à mão.
+//
+// O banco está vazio: o esquema nasce na FASE 2, multi-tenant desde a primeira
+// tabela (docs/02-MODELO-DE-DADOS.md). Regenerar depois de cada migração.
+
 export type Json =
   | string
   | number
@@ -10,94 +15,11 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.4"
+    PostgrestVersion: "14.15"
   }
   public: {
     Tables: {
-      financial_entries: {
-        Row: {
-          bu: string | null
-          bu_projeto: string | null
-          cca: string | null
-          ccs: string | null
-          cf: string | null
-          cod_cc: string | null
-          competencia: string | null
-          created_at: string
-          emissao: string | null
-          filial: string | null
-          fornecedor: string | null
-          grupo: string | null
-          historico: string | null
-          id: string
-          import_batch_id: string | null
-          lancamento: string | null
-          mes: string | null
-          numero: string | null
-          pagamento: string | null
-          projeto: string | null
-          razao_social: string | null
-          valor_negativo: number | null
-          valor_pago: number | null
-          valor_previsto: number | null
-          vencimento: string | null
-        }
-        Insert: {
-          bu?: string | null
-          bu_projeto?: string | null
-          cca?: string | null
-          ccs?: string | null
-          cf?: string | null
-          cod_cc?: string | null
-          competencia?: string | null
-          created_at?: string
-          emissao?: string | null
-          filial?: string | null
-          fornecedor?: string | null
-          grupo?: string | null
-          historico?: string | null
-          id?: string
-          import_batch_id?: string | null
-          lancamento?: string | null
-          mes?: string | null
-          numero?: string | null
-          pagamento?: string | null
-          projeto?: string | null
-          razao_social?: string | null
-          valor_negativo?: number | null
-          valor_pago?: number | null
-          valor_previsto?: number | null
-          vencimento?: string | null
-        }
-        Update: {
-          bu?: string | null
-          bu_projeto?: string | null
-          cca?: string | null
-          ccs?: string | null
-          cf?: string | null
-          cod_cc?: string | null
-          competencia?: string | null
-          created_at?: string
-          emissao?: string | null
-          filial?: string | null
-          fornecedor?: string | null
-          grupo?: string | null
-          historico?: string | null
-          id?: string
-          import_batch_id?: string | null
-          lancamento?: string | null
-          mes?: string | null
-          numero?: string | null
-          pagamento?: string | null
-          projeto?: string | null
-          razao_social?: string | null
-          valor_negativo?: number | null
-          valor_pago?: number | null
-          valor_previsto?: number | null
-          vencimento?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Views: {
       [_ in never]: never

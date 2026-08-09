@@ -10,7 +10,13 @@ este documento cumpre as duas coisas.
 
 ---
 
-## ADR-001 — Construir o Growth OS dentro deste repositório 🔴
+## ADR-001 — Construir o Growth OS dentro deste repositório 🔴 ~~SUPERADO~~
+
+> **Superado pelo [ADR-013](./15-REVERSAO-ADR-001-INFRAESTRUTURA.md) em
+> 08/08/2026, e reforçado em 09/08.** A premissa era falsa: o Supabase do Centro
+> de Custos não pertence à organização da Keystone, e os dois produtos não têm
+> fluxo de dado entre si. O Growth OS tem repositório e banco próprios; o Centro
+> de Custos permanece separado. O texto original fica abaixo como registro.
 
 **Contexto.** O repositório é um dashboard de centro de custos. O Growth OS é
 outro produto. Opções: repositório novo, ou expandir este.
@@ -250,6 +256,28 @@ ocasionalmente barrada para revisão). Preferível ao inverso.
 
 ---
 
+## ADR-013 — Infraestrutura própria, sem herança 🔴
+
+**Substitui o ADR-001.** O texto completo, com o achado que motivou a reversão,
+está em [`15-REVERSAO-ADR-001-INFRAESTRUTURA.md`](./15-REVERSAO-ADR-001-INFRAESTRUTURA.md).
+
+**Decisão.** O Growth OS tem repositório próprio, projeto Supabase próprio na
+organização da Keystone e ciclo de deploy próprio. Não herda nada de outro
+produto. O Centro de Custos permanece separado, e não vira módulo daqui.
+
+**Razão.** O ADR-001 assumia que o repositório e o banco pertenciam à Keystone e
+podiam ser compartilhados — nenhuma das duas coisas se confirmou. E, mais
+fundamental que isso: são produtos com objetivos diferentes. Este é comercial —
+CRM, conteúdo, publicação automática, prospecção. Compartilhar infraestrutura os
+acoplaria sem que houvesse fluxo de dado real entre eles.
+
+**Consequência.** Banco vazio, o que torna a FASE 2 materialmente mais simples:
+sem backfill, sem convivência com tabela legada, sem trocar política de segurança
+embaixo de dado em produção. Em troca, a correção do achado C-01 sai deste
+roadmap e precisa de dono no outro produto.
+
+---
+
 ## Decisões deliberadamente adiadas
 
 | Tema | Quando | Por quê agora não |
@@ -258,5 +286,4 @@ ocasionalmente barrada para revisão). Preferível ao inverso.
 | Provedor primário de LLM | FASE 1, revisável | O gateway torna a troca barata |
 | Hospedagem do n8n (cloud × self-hosted) | FASE 20 | Não afeta o desenho |
 | Modelo de billing para SaaS | pós-FASE 24 | Só a Keystone usa hoje |
-| Renomear o repositório | qualquer momento | Cosmético |
-| Padronizar gerenciador de pacotes (achado L-04) | FASE 1 | Trivial, mas precisa ser decidido |
+| Workers × Pages, e R2 × Supabase Storage | FASE 24 | Não afeta o desenho até o deploy |

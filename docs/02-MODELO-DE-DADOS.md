@@ -38,8 +38,8 @@ Aplica-se especialmente a `contacts` (seção 23 do Master Prompt).
 
 ## §2. Convenções
 
-- Nomes de tabela em `snake_case` plural, em inglês (o schema atual em português
-  é preservado apenas em `financial_entries`, por compatibilidade).
+- Nomes de tabela em `snake_case` plural, em inglês. Sem exceção — o banco nasce
+  vazio, então não há esquema legado para acomodar.
 - PK: `id uuid primary key default gen_random_uuid()`.
 - Auditoria padrão: `created_at timestamptz not null default now()`,
   `updated_at timestamptz not null default now()` (via trigger),
@@ -104,12 +104,9 @@ Aplica-se especialmente a `contacts` (seção 23 do Master Prompt).
 │  automation_definitions · automation_runs · automation_logs     │
 │  integration_logs · error_logs                                  │
 └─────────────────────────────────────────────────────────────────┘
-┌── COST INTELLIGENCE (preservado) ───────────────────────────────┐
-│  financial_entries · import_batches                             │
-└─────────────────────────────────────────────────────────────────┘
 ```
 
-Aproximadamente **62 tabelas**. Elas não nascem todas na FASE 2 — cada fase cria
+Aproximadamente **60 tabelas**. Elas não nascem todas na FASE 2 — cada fase cria
 apenas as suas (ver `09 §2`).
 
 ---
@@ -1293,59 +1290,6 @@ create table error_logs (
 ocorrência. Um erro em laço geraria milhares de linhas idênticas e afogaria o
 sinal — aqui ele vira uma linha com `occurrences = 4.312`, que é a informação que
 importa.
-
-### 4.11 Cost Intelligence (migração do existente)
-
-```sql
-alter table financial_entries
-  add column organization_id uuid references organizations(id) on delete cascade,
-  add column updated_at timestamptz not null default now(),
-  add column deleted_at timestamptz,
-  add column row_hash text;
-
--- backfill para a organização Keystone, depois:
-alter table financial_entries alter column organization_id set not null;
-
-create index on financial_entries (organization_id, competencia);
-create unique index on financial_entries (organization_id, row_hash)
-  where deleted_at is null;
-
-create table import_batches (
-  id              uuid primary key default gen_random_uuid(),
-  organization_id uuid not null references organizations(id) on delete cascade,
-  filename        text not null,
-  checksum        text not null,
-  row_count       int not null,
-  rows_inserted   int not null default 0,
-  rows_skipped    int not null default 0,
-  mapping         jsonb not null,
-  status          text not null default 'pending',
-  error           text,
-  created_by      uuid references auth.users(id),
-  created_at      timestamptz not null default now(),
-  unique (organization_id, checksum)
-);
-
-alter table financial_entries
-  add constraint fk_import_batch
-  foreign key (import_batch_id) references import_batches(id) on delete set null;
-```
-
-`row_hash` (hash das colunas de negócio) mais o índice único parcial resolvem o
-achado **H-03**: reimportar o mesmo arquivo passa a ser inofensivo. `checksum` em
-`import_batches` permite detectar o arquivo repetido antes mesmo de processar.
-
-E a correção crítica, que é o motivo da FASE 2 existir:
-
-```sql
-drop policy "Anon can read financial entries"   on financial_entries;
-drop policy "Anon can insert financial entries" on financial_entries;
-drop policy "Anon can delete financial entries" on financial_entries;
-drop policy "Auth can read financial entries"   on financial_entries;
-drop policy "Auth can insert financial entries" on financial_entries;
-drop policy "Auth can delete financial entries" on financial_entries;
--- substituídas pelo padrão de tenancy em 07 §2
-```
 
 ---
 

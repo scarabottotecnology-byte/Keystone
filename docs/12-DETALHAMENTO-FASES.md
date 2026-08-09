@@ -10,11 +10,11 @@ indica o STEP do método de execução (documento 09 §1): `[ANALYZE]`, `[DATABA
 `[VALIDATE]`, `[DOC]`. Etiquetas adicionais: `[SETUP]`, `[SEGURANÇA]`,
 `[EXTERNO]`, `[DECISÃO]`, `[INFRA]`, `[DATA]`, `[PERF]`.
 
-**Volume.** 24 fichas · 213 subtarefas · 140 critérios de aceite · 7 listas ·
-1 pasta = **245 objetos** a criar no ClickUp.
+**Volume.** 24 fichas · 208 subtarefas · 139 critérios de aceite · 7 listas ·
+1 pasta = **240 objetos** a criar no ClickUp.
 
 > **Nota sobre o rate limit.** A API do ClickUp já bloqueou com zero chamadas
-> feitas nesta conta hoje. 245 criações é volume alto e pode esbarrar no limite
+> feitas nesta conta hoje. 240 criações é volume alto e pode esbarrar no limite
 > de novo. A criação será feita em ordem de prioridade — pasta, listas, e as
 > fichas do EIXO A primeiro — de modo que uma interrupção deixe o projeto
 > utilizável a partir do que importa: as FASES 1 e 2. O progresso fica
@@ -54,16 +54,15 @@ travam o roadmap.
    migração nova.
 2. **[SETUP] Reestruturar `src/` em módulos**
    Criar `src/modules/` com um diretório por módulo de negócio, cada um com
-   `pages/`, `components/`, `hooks/`, `api/` e `types.ts`. Mover o código atual de
-   custos para `modules/cost-intelligence/`.
+   `pages/`, `components/`, `hooks/`, `api/` e `types.ts`.
 3. **[SETUP] Regra de lint que proíbe import entre módulos**
    Um módulo pode importar de `components/ui`, `lib` e `shared`; não pode importar
    de outro módulo. Configurar `eslint-plugin-boundaries` ou equivalente e fazer
    a violação quebrar o build.
 4. **[SETUP] Padronizar o gerenciador de pacotes**
-   Hoje coexistem `bun.lockb`, `bun.lock` e `package-lock.json`, com risco de
-   resolução divergente entre ambientes. Escolher um, remover os outros, documentar
-   no README.
+   Um único lockfile no repositório. Dois gerenciadores convivendo resolvem
+   versões diferentes em máquinas diferentes, e o bug só aparece em produção.
+   Documentar a escolha no README.
 5. **[SETUP] Proteger o `.env`**
    Adicionar ao `.gitignore`, criar `.env.example` sem valores e verificar o
    histórico do repositório antes de remover do índice. Registrar a regra: segredo
@@ -120,7 +119,7 @@ travam o roadmap.
 
 ## FASE 2 — Banco, autenticação e multi-tenant
 
-**Prazo** 14/09/2026 · **Estimativa** 3 semanas · **Prioridade** urgente
+**Prazo** 07/09/2026 · **Estimativa** 2 semanas · **Prioridade** urgente
 **Dependência** FASE 1 · **Referência** `02-MODELO-DE-DADOS.md`, `07-SEGURANCA-LGPD-MULTITENANT.md`
 
 ### Objetivo
@@ -138,10 +137,10 @@ backup configurado.
 Enquanto isso não for corrigido, construir Command Center, IA ou integrações é
 empilhar produto sobre um vazamento em curso.
 
-### Ordem obrigatória da migração
-Inverter os passos abaixo derruba a aplicação em produção com dados órfãos:
-criar tenancy → provisionar Keystone → adicionar coluna nullable → backfill →
-`SET NOT NULL` → **só então** trocar as políticas.
+### Ordem obrigatória
+O banco nasce vazio, então não há backfill nem convivência com política antiga.
+Sobra a regra que não se negocia: **nenhuma tabela é criada antes da política
+dela.** Tabela que existe sem RLS, mesmo por uma migração, é uma janela aberta.
 
 ### Subtarefas
 
@@ -155,50 +154,39 @@ criar tenancy → provisionar Keystone → adicionar coluna nullable → backfil
    a `authenticated`.
 3. **[DATABASE] Provisionar a organização Keystone**
    Criar a organização e vincular os usuários existentes como `owner`/`admin`.
-4. **[DATABASE] Adicionar `organization_id` nullable em `financial_entries`**
-   Ainda sem `NOT NULL`, para não quebrar a aplicação durante a transição.
-5. **[DATABASE] Backfill e `SET NOT NULL`**
-   Preencher todas as linhas com a organização Keystone, conferir que não sobrou
-   nenhuma nula, e só então aplicar a restrição.
-6. **[SEGURANÇA] Derrubar as políticas antigas e aplicar o padrão de tenancy**
-   Remover as seis políticas atuais. Aplicar `ENABLE` **e** `FORCE ROW LEVEL
-   SECURITY` e as quatro políticas por operação. A de `UPDATE` precisa de `USING`
-   **e** `WITH CHECK` — só com `USING`, um usuário move a própria linha para outra
-   organização. **Corrige C-01.**
-7. **[DATABASE] Idempotência do import**
-   Criar `import_batches` com `checksum` único por organização, adicionar
-   `row_hash` em `financial_entries` e um índice único parcial sobre
-   `(organization_id, row_hash) where deleted_at is null`. **Corrige H-03.**
-8. **[DATABASE] Colunas de auditoria em `financial_entries`**
-   `updated_at` com trigger e `deleted_at` para soft delete.
-9. **[BACKEND] RPCs de agregação**
-   `rpc_cost_center_summary` e a paginação de lançamentos no servidor. Todas
+4. **[SEGURANÇA] Padrão de tenancy aplicado na criação de cada tabela**
+   `ENABLE` **e** `FORCE ROW LEVEL SECURITY`, mais as quatro políticas por
+   operação. A de `UPDATE` precisa de `USING` **e** `WITH CHECK` — só com
+   `USING`, um usuário move a própria linha para outra organização. Nenhuma
+   tabela é criada antes da política dela.
+5. **[DATABASE] Colunas de auditoria em toda tabela de negócio**
+   `created_at`, `updated_at` com trigger, `created_by` e `deleted_at` para
+   soft delete. Sem soft delete, um `DELETE` acidental não tem volta.
+6. **[BACKEND] RPCs de agregação**
+   Toda soma e contagem roda no servidor, paginação inclusive. Todas
    `SECURITY INVOKER` e `STABLE` — uma função de agregação `SECURITY DEFINER`
-   ignoraria a RLS e vazaria dados entre organizações. **Corrige H-02.**
-10. **[BACKEND] Endurecer o import**
-    Schema `zod` para cada linha, limite de tamanho de arquivo, e correção do
-    parsing de data: tratar `DD/MM/YYYY` explicitamente e parar de aceitar
-    qualquer número entre 1 e 200.000 como serial de Excel. **Corrige H-04 e H-05.**
-11. **[FRONTEND] Autenticação**
+   ignoraria a RLS e vazaria dados entre organizações.
+7. **[BACKEND] Endurecer toda entrada de dado**
+    Schema `zod` em cada payload, limite de tamanho, e parsing de data
+    explícito: tratar `DD/MM/YYYY` como tal e parar de aceitar
+    qualquer número entre 1 e 200.000 como serial de Excel.
+8. **[FRONTEND] Autenticação**
     Login, logout, recuperação de senha e fluxo de convite, com `<ProtectedRoute>`
     envolvendo as rotas.
-12. **[FRONTEND] Onboarding e seletor de organização**
+9. **[FRONTEND] Onboarding e seletor de organização**
     Criar organização, convidar time, configurar marca inicial.
-13. **[FRONTEND] Migrar o Cost Intelligence para as RPCs**
-    Substituir o `useFinancialData` que baixa a tabela inteira. O comportamento
-    visível deve ficar idêntico ao atual — é migração, não redesenho.
-14. **[FRONTEND] Remover os fallbacks que mascaram dado ausente**
-    `totalPago || totalNegativo` esconde a diferença entre "pago igual a zero" e
-    "campo não mapeado". Exibir o estado real. **Corrige M-01.**
-15. **[TEST] Suíte pgTAP de isolamento de tenant**
+10. **[FRONTEND] Proibir fallback que mascara dado ausente**
+    Padrões como `a || b` escondem a diferença entre "o valor é zero" e "o campo
+    não veio". A tela precisa exibir o estado real, incluindo o desconhecido.
+11. **[TEST] Suíte pgTAP de isolamento de tenant**
     Para cada tabela: organização A não lê, não altera, não apaga e não insere
     linha da organização B, e não consegue mover a própria linha para B.
-16. **[TEST] Teste de regressão do C-01**
+12. **[TEST] Teste de regressão de acesso anônimo**
     `anon` não lê, não escreve e não apaga em nenhuma tabela de negócio. Roda em
-    todo CI, para sempre.
-17. **[TEST] Idempotência do import**
-    Reimportar o mesmo arquivo não cria linha nova.
-18. **[VALIDATE] Advisors de segurança do Supabase**
+    todo CI, para sempre. Existe porque este exato buraco já apareceu uma vez em
+    outro produto da casa — o achado C-01 da auditoria — e um teste é mais
+    barato que a memória de quem escreveu a migração.
+13. **[VALIDATE] Advisors de segurança do Supabase**
     Rodar e zerar todos os alertas abertos.
 
 ### Critérios de aceite
@@ -208,10 +196,9 @@ criar tenancy → provisionar Keystone → adicionar coluna nullable → backfil
 - [ ] Todas as tabelas com RLS habilitada **e** forçada
 - [ ] Política de `UPDATE` com `USING` e `WITH CHECK`
 - [ ] Suíte pgTAP passando para todas as tabelas
-- [ ] Teste de regressão do C-01 no CI
-- [ ] `financial_entries` com `organization_id NOT NULL` e backfill íntegro
-- [ ] Dashboard de custos idêntico ao anterior, agora via RPC
-- [ ] Reimportar o mesmo arquivo não duplica linhas
+- [ ] Teste de regressão de acesso anônimo rodando no CI
+- [ ] Toda tabela com `organization_id NOT NULL` desde a criação
+- [ ] Nenhuma agregação feita no cliente
 - [ ] Datas `DD/MM/YYYY` corretas; número que não é data não vira data
 - [ ] Advisors de segurança sem alerta aberto
 

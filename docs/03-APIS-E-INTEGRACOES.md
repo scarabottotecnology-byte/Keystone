@@ -33,7 +33,6 @@ Corrige o achado **H-02**: agregação sai do navegador e vai para o Postgres.
 | Função | Retorno | Consumidor |
 |---|---|---|
 | `rpc_command_center(p_from, p_to)` | KPIs, Growth Score, deltas | `/` |
-| `rpc_cost_center_summary(p_filters)` | totais por CC, grupo, competência | `/cost-intelligence` |
 | `rpc_content_performance(p_from, p_to)` | performance por peça e pilar | `/analytics` |
 | `rpc_pipeline_board(p_pipeline_id)` | oportunidades agrupadas por estágio | `/pipeline` |
 | `rpc_next_best_actions(p_limit)` | lista priorizada do dia | `/`, `/ai-insights` |

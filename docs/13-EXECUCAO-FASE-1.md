@@ -5,115 +5,132 @@ Registro do que já foi construído da FASE 1 — Fundação técnica. Segue os 
 
 **Status:** parcial. A fatia de frontend está entregue; a de backend e CI não.
 
+> **Nota de escopo.** Parte deste trabalho foi feita no repositório de origem,
+> quando o Growth OS ainda seria construído dentro do Centro de Custos. Com a
+> reversão do ADR-001 (documento 15), o que atravessou para cá foi só o que é
+> infraestrutura de interface. As telas de custo, o importador e o esquema
+> financeiro **não vieram** — pertencem ao outro produto.
+
 ---
 
 ## Concluído
 
 ### Estrutura de módulos (subtarefa 2)
 
-`src/` reorganizado. O código de custos saiu de `src/pages/` e virou o módulo
-`cost-intelligence`, com histórico preservado (movido por `git mv`).
+`src/` organizado por módulo de negócio, com a convenção de que **um módulo não
+importa de outro**.
 
 ```
 src/
-├── app/                        composição: navegação, rotas, 404
-│   ├── navigation.ts           registro único dos 15 destinos
+├── app/                        composição: navegação, tema, rotas, 404
+│   ├── navigation.ts           registro único dos 14 destinos
+│   ├── ThemeProvider.tsx
 │   └── NotFound.tsx
 ├── components/
-│   ├── ui/                     48 componentes shadcn — preservados
+│   ├── ui/                     48 componentes shadcn
 │   └── shared/                 transversais do produto
+│       ├── Logo.tsx
 │       ├── PageHeader.tsx
 │       ├── QueryState.tsx
 │       └── ModulePlaceholder.tsx
-└── modules/
-    └── cost-intelligence/
-        ├── pages/  CostDashboard · CostImport · CostEntries · CostCenters
-        ├── hooks/  useFinancialData
-        ├── lib/    field-mapping
-        └── types.ts
+├── integrations/supabase/      cliente e tipos gerados
+└── modules/                    vazio — o primeiro módulo nasce na FASE 3
 ```
 
-Rotas antigas (`/import`, `/entries`, `/cost-centers`) redirecionam para as
-novas, para não quebrar link salvo.
+`modules/` estar vazio é o estado correto da FASE 1: a fundação existe, o
+negócio ainda não.
 
-### Design system premium (subtarefa 6)
+### Design system (subtarefa 6)
 
 `src/index.css` reescrito. O tema padrão do Lovable saiu.
 
-- **Dark-first**, com tema claro completo. `class="dark"` no `<html>`.
+- **Dark-first**, com tema claro completo, e seletor claro/escuro/sistema.
 - **Um acento apenas** — teal `hsl(176 42% 46%)`. Marca ação primária e destaque
   de dado; não decora.
 - **Semântica em três estados**: `positive`, `warning`, `negative`, separados do
   acento. Cor que significa "está ruim" não pode ser a mesma que significa
   "clique aqui".
-- **Escala de gráfico** `--chart-1` a `--chart-6`, pensada para leitura de série.
-  As cores literais em `hsl(220, 70%, 50%)` que estavam espalhadas pelos
-  gráficos foram substituídas por tokens — antes elas ignoravam o tema.
-- **Raio 0.375rem**, contra os 0.75rem anteriores. Canto muito arredondado lê
+- **Escala de gráfico** `--chart-1` a `--chart-6`, pensada para leitura de série,
+  em vez de cores literais que ignoram o tema.
+- **Raio 0.375rem**, contra os 0.75rem do template. Canto muito arredondado lê
   como ferramenta de consumo.
 - Utilitários `.numeric` e `.label-caps`; foco sempre visível;
   `prefers-reduced-motion` respeitado.
-- O emoji `💰` saiu da navegação.
+
+### Tipografia e identidade
+
+Newsreader (display) e Inter (interface), auto-hospedadas via
+`@fontsource-variable`. Três regras aplicadas: o peso **cai** conforme o corpo
+sobe (600, não 700+), *tracking* negativo acima de 24px, e todo número em
+figuras tabulares.
+
+A marca foi redesenhada — a pedra de fecho, com topo em arco — e os arquivos
+para uso fora do produto estão em `public/brand/`: proposta comercial, contrato
+e documento de onboarding.
 
 ### Shell de navegação (subtarefas 6 e 7)
 
-`src/app/navigation.ts` é o registro único dos 15 destinos, agrupados em Visão
-geral, Crescimento, Receita, Inteligência, Controladoria e Sistema. A sidebar, o
-roteador e as telas de módulo não construído leem daqui — não há lista de
-destinos duplicada. Está preparado para filtrar item por papel quando o RBAC
-entrar na FASE 2.
+`src/app/navigation.ts` é o registro único dos destinos, agrupados em Visão
+geral, Crescimento, Receita, Inteligência e Sistema. A sidebar, o roteador e as
+telas de módulo não construído leem daqui — não há lista duplicada. Está
+preparado para filtrar item por papel quando o RBAC entrar na FASE 2.
 
 Cada destino declara a fase em que é entregue, exibida como etiqueta `F3`, `F12`
 na sidebar.
 
 ### Telas de módulo não construído
 
-`ModulePlaceholder` renderiza, para cada um dos 13 módulos ainda não
-implementados, o que o módulo responde e o que existirá nele — **sem dado de
-exemplo, sem gráfico falso**. É degradação explícita, conforme a seção 64 do
-master prompt.
+`ModulePlaceholder` renderiza, para **todos** os módulos, o que aquele módulo
+responde e o que existirá nele — sem dado de exemplo, sem gráfico falso. É
+degradação explícita, conforme a seção 64 do master prompt.
+
+Hoje nenhum módulo está `active`, e um teste garante isso: marcar um como pronto
+sem registrar a rota no `App` quebra a suíte, em vez de produzir uma entrada de
+menu que abre um 404.
 
 ### Estados de carregamento, erro e vazio
 
-Corrigido um defeito real encontrado ao rodar a aplicação: o dashboard de custos
-exibia **"Carregando..." indefinidamente** quando o Supabase não respondia. O
-usuário não distinguia consulta lenta de falha de conexão e não tinha caminho de
-recuperação.
+`QueryState` garante os três estados obrigatórios em qualquer tela que dependa
+de consulta. Nasceu de um defeito real observado na aplicação de origem: a tela
+exibia **"Carregando..." indefinidamente** quando o Supabase não respondia, e o
+usuário não distinguia consulta lenta de falha de conexão.
 
-`QueryState` passa a garantir os três estados nas quatro telas do módulo. O
-extrator de mensagem trata o formato de erro do Supabase, que é objeto simples e
-não instância de `Error` — tratar só `instanceof Error` fazia toda falha de banco
-virar "erro desconhecido".
+O extrator de mensagem trata o formato de erro do Supabase, que é objeto simples
+e não instância de `Error` — tratar só `instanceof Error` fazia toda falha de
+banco virar "erro desconhecido".
+
+### Cliente Supabase que falha cedo
+
+O cliente valida `VITE_SUPABASE_URL` e `VITE_SUPABASE_PUBLISHABLE_KEY` na carga
+e lança com mensagem acionável. Sem isso, ambiente mal configurado só aparecia
+mais tarde, como um `Failed to fetch` sem causa aparente.
+
+### Proteção do ambiente (subtarefa 5)
+
+`.env` fora do versionamento — no repositório de origem ele estava **rastreado**.
+Fica só o `.env.example`, com aviso explícito de que `service_role` nunca entra
+num arquivo lido pelo Vite: tudo com prefixo `VITE_` vai para dentro do bundle.
 
 ### Limpeza de lint (pré-requisito da subtarefa 11)
 
-Lint saiu de **7 erros para 0**. Todos preexistentes:
-
-| Erro | Correção |
-|---|---|
-| `require()` em `tailwind.config.ts` | import ES |
-| Interface vazia em `command.tsx` e `textarea.tsx` | alias de tipo |
-| `any` em `useFinancialData` | tipo gerado do banco |
-| `any` em `CostCenters` | união `CostCenterField` |
-| `any` ×2 em `CostImport` | `FinancialEntryInsert` e narrowing no catch |
+Lint saiu de **7 erros para 0**, todos preexistentes: `require()` em
+`tailwind.config.ts`, interfaces vazias em componentes shadcn, e quatro `any`.
 
 Sem isso, o gate de CI da subtarefa 11 nasceria vermelho e teria de ser
 desligado — o que anularia o próprio critério de aceite.
 
 ### Testes
 
-`src/test/example.test.ts` (que só afirmava `true === true`) foi removido e
-substituído por 14 testes reais sobre a lógica introduzida: integridade do
-registro de navegação e extração de mensagem de erro.
+14 testes sobre a lógica introduzida: integridade do registro de navegação e
+extração de mensagem de erro. O `example.test.ts` que só afirmava `true === true`
+foi removido.
 
-### Descoberta: lockfile fora de sincronia
+### Padronização do gerenciador (subtarefa 4)
 
-`npm install` revelou que `package-lock.json` **não continha**
-`@supabase/supabase-js` nem `xlsx`, apesar de ambos estarem no `package.json`.
-O lockfile estava sendo mantido pelo bun e o do npm ficou para trás. Isso é
-evidência concreta do achado **L-04**: instalar com npm e com bun produzia
-árvores diferentes. O lockfile foi regenerado; a padronização de um gerenciador
-único (subtarefa 4) segue pendente.
+**npm.** Os lockfiles do bun ficaram no repositório de origem. A convivência dos
+dois já tinha produzido evidência concreta do achado **L-04**: o
+`package-lock.json` não continha `@supabase/supabase-js` nem `xlsx`, apesar de
+ambos estarem no `package.json`, porque o lockfile mantido era o do bun.
 
 ---
 
@@ -124,13 +141,9 @@ evidência concreta do achado **L-04**: instalar com npm e com bun produzia
 | Typecheck | limpo |
 | Lint | 0 erros, 8 avisos (todos `react-refresh` em componentes shadcn) |
 | Testes | 14 passando |
-| Build | ✓ em 6,5 s |
-| Navegação | 15 rotas conferidas no navegador, tema claro e escuro |
-| Console | sem erro de código |
-
-O único erro de console é `ERR_TUNNEL_CONNECTION_FAILED` no módulo de custos:
-o container de desenvolvimento não alcança o Supabase pelo proxy. Não é defeito
-da aplicação — e é justamente o cenário que agora exibe o estado de erro correto.
+| Build | ✓ em 4,3 s · bundle 399 kB (125 kB gzip) |
+| Navegação | rotas conferidas no navegador, tema claro e escuro |
+| Console | sem erro |
 
 ---
 
@@ -138,15 +151,12 @@ da aplicação — e é justamente o cenário que agora exibe o estado de erro c
 
 | # | Subtarefa | Observação |
 |---|---|---|
-| 1 | Revalidar o banco remoto | Bloqueado: MCP do Supabase sem permissão nesta sessão |
 | 3 | Lint proibindo import entre módulos | A convenção existe, falta a regra que a impõe |
-| 4 | Padronizar gerenciador de pacotes | Decisão pendente: npm ou bun |
-| 5 | Proteger o `.env` | `.gitignore` e `.env.example` |
 | 8 | `_shared/` das Edge Functions | Não iniciado |
 | 9 | `ai-gateway` | Não iniciado |
 | 10 | Migração das tabelas de IA e observabilidade | Não iniciado |
 | 11 | CI no GitHub Actions | Não iniciado — lint já está verde para o gate |
-| 12–14 | Pedidos LinkedIn, Meta e WhatsApp | Ação humana |
+| 12–14 | Pedidos LinkedIn, Meta e WhatsApp | Ação humana, com semanas de lead time |
 
 ---
 
@@ -154,9 +164,11 @@ da aplicação — e é justamente o cenário que agora exibe o estado de erro c
 
 O frontend foi feito antes do backend a pedido do cliente, contrariando a ordem
 sugerida no documento 09. A escolha é defensável e não gerou dívida: o que foi
-construído — tokens, estrutura de módulos, shell — é infraestrutura de interface
-que não depende de banco, e nenhuma tela exibe dado simulado.
+construído — tokens, estrutura de módulos, shell, tema, identidade — é
+infraestrutura de interface que não depende de banco, e nenhuma tela exibe dado
+simulado.
 
-O limite dessa inversão é claro e permanece respeitado: **nenhuma tela de
-produto será construída antes da FASE 2**. O achado C-01 continua aberto e é a
-prioridade real do projeto.
+O limite dessa inversão permanece: **nenhuma tela de produto antes da FASE 2.**
+Enquanto não houver tenancy e RLS forçada, não há onde uma tela real buscar
+dado sem abrir o mesmo tipo de buraco que a auditoria encontrou no produto de
+origem.

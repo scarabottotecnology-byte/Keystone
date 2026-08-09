@@ -1,21 +1,17 @@
 import {
   Activity,
   BarChart3,
-  Blocks,
   Building2,
   CalendarDays,
-  FileSpreadsheet,
   Gauge,
   Inbox,
   LayoutGrid,
-  Lightbulb,
   Megaphone,
   PenLine,
   Radar,
   Settings,
   Share2,
   Sparkles,
-  Upload,
   Users,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -30,6 +26,9 @@ import type { LucideIcon } from "lucide-react";
  * `phase` é a fase do roadmap (docs/09-ROADMAP-E-ACEITE.md) em que o módulo
  * passa a existir de verdade. Módulo com `status: "planned"` renderiza um
  * estado honesto dizendo isso, em vez de uma tela com dado falso.
+ *
+ * Hoje **todos** estão planejados: a FASE 1 entrega a fundação, não telas com
+ * dado. O primeiro a virar `active` é o Command Center, na FASE 3.
  */
 
 export type ModuleStatus = "active" | "planned";
@@ -250,44 +249,6 @@ export const NAVIGATION: NavGroup[] = [
           "Histórico de execução, taxa de erro e timeline por passo",
           "Correlation ID reconstruindo a cadeia inteira de uma execução",
         ],
-      },
-    ],
-  },
-  {
-    label: "Controladoria",
-    items: [
-      {
-        label: "Centro de Custos",
-        to: "/cost-intelligence",
-        icon: FileSpreadsheet,
-        status: "active",
-        phase: 2,
-        end: true,
-        purpose: "Analisar custo por centro, grupo, filial e competência.",
-      },
-      {
-        label: "Importar",
-        to: "/cost-intelligence/import",
-        icon: Upload,
-        status: "active",
-        phase: 2,
-        purpose: "Importar planilha com mapeamento de campos.",
-      },
-      {
-        label: "Lançamentos",
-        to: "/cost-intelligence/entries",
-        icon: Blocks,
-        status: "active",
-        phase: 2,
-        purpose: "Consultar lançamentos com filtro e busca.",
-      },
-      {
-        label: "Por centro",
-        to: "/cost-intelligence/centers",
-        icon: Lightbulb,
-        status: "active",
-        phase: 2,
-        purpose: "Detalhar um centro de custo específico.",
       },
     ],
   },

@@ -1,7 +1,20 @@
-# 00 — Auditoria do Estado Atual (STEP 1: ANALYZE)
+# 00 — Auditoria do repositório de origem (STEP 1: ANALYZE)
 
-Levantamento factual do que existe hoje no repositório, antes de qualquer decisão
-de arquitetura. Nada aqui é suposição: cada afirmação vem de leitura de arquivo.
+> **Este documento audita outro produto.** Ele foi escrito quando o Growth OS
+> ainda seria construído dentro do repositório do **Centro de Custos
+> Inteligente**, sob o ADR-001. Essa decisão foi revertida: o Growth OS tem
+> repositório e banco próprios, e o Centro de Custos permanece separado
+> (documento 15).
+>
+> Fica aqui por duas razões. É o registro de onde vieram as escolhas de stack e
+> de design system que foram aproveitadas, e é a **origem do achado C-01** — a
+> falha crítica que continua aberta naquele produto e precisa de dono lá.
+>
+> Nada descrito abaixo é herdado por este repositório.
+
+Levantamento factual do que existia no repositório de origem, antes de qualquer
+decisão de arquitetura. Nada aqui é suposição: cada afirmação vem de leitura de
+arquivo.
 
 ---
 
@@ -240,21 +253,21 @@ Vite injeta tudo com esse prefixo no bundle público.
 
 ---
 
-## 4. O que será preservado
+## 4. O que foi aproveitado
 
-O Master Prompt (seção 5) proíbe destruir funcionalidade existente. Decisão:
+Sob o ADR-001, esta seção listava o que seria preservado dentro do mesmo
+repositório. Com a reversão, o que atravessou foi só o que é **portável e não
+carrega o negócio do outro produto**:
 
 | Ativo | Destino |
 |---|---|
-| 48 componentes `src/components/ui/` | **Preservados e reutilizados.** Base do design system premium. |
-| `AppLayout`, `AppSidebar`, `NavLink` | **Refatorados**, não recriados. Sidebar passa a ser orientada a dados e filtrada por papel. |
-| `financial_entries` + dados | **Preservada.** Recebe `organization_id` via backfill na FASE 2. Vira o módulo **Cost Intelligence**. |
-| `Import.tsx` + `field-mapping.ts` | **Preservados e endurecidos** — validação `zod`, idempotência por checksum, correção de datas. |
-| `Index.tsx`, `CostCenters.tsx`, `Entries.tsx` | **Preservados**, migrados de agregação em cliente para RPC no Postgres. |
-| Configuração Vite/Tailwind/TS/Vitest/Playwright | **Preservada e estendida.** |
+| 48 componentes `src/components/ui/` | **Copiados.** Base do design system. São shadcn, não código de custos. |
+| `AppLayout`, `AppSidebar`, `NavLink` | **Copiados e refatorados.** A sidebar passa a ser orientada a dados. |
+| Configuração Vite/Tailwind/TS/Vitest/Playwright | **Copiada e estendida.** |
+| `financial_entries`, telas de custo, importador, `field-mapping` | **Não vieram.** Pertencem ao Centro de Custos. |
 
-Nada é descartado. O Growth OS é construído **em volta** do que existe, não sobre
-suas ruínas.
+O que veio é infraestrutura de frontend, que não tem dono de domínio. O que
+ficou é o produto de controladoria — inclusive o esquema e os dados.
 
 ---
 
