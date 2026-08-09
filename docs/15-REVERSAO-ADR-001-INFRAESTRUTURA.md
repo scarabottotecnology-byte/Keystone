@@ -163,40 +163,53 @@ substitui ou complementa o Supabase Storage.
 | Recurso | Situação |
 |---|---|
 | **Supabase `keystone-growth-os`** | ✅ criado — ref `rplnjrqpzqznbxfascqs`, região `sa-east-1` (São Paulo), organização da Keystone, ativo |
-| Repositório GitHub | ❌ **bloqueado** — a integração retornou `403 Resource not accessible by integration` |
+| **Repositório `scarabottotecnology-byte/Keystone`** | ✅ criado pelo Jefferson em 09/08, privado. É onde este documento está. |
+| **Fundação migrada** | ✅ commit `02f523c` — design system, shell, tema, identidade, Cost Intelligence, 16 documentos, 14 testes |
 | Projeto Cloudflare | pendente, FASE 24 |
 
 **Região São Paulo** foi escolhida deliberadamente: latência para usuários
 brasileiros e dado pessoal de titulares brasileiros hospedado no país, o que
 simplifica o capítulo de transferência internacional no ROPA da LGPD.
 
-### O bloqueio do GitHub
+### O bloqueio do GitHub, resolvido
 
-A App do GitHub conectada a esta sessão tem escopo limitado ao repositório
-`centro-de-custos-inteligente` e não pode criar repositórios novos. É limitação
-de permissão, não erro.
+A App do GitHub desta sessão tinha escopo limitado ao repositório
+`centro-de-custos-inteligente` e não podia criar repositórios — limitação de
+permissão, não erro. O Jefferson criou o repositório manualmente e ele foi
+anexado à sessão.
 
-**Precisa de ação do Jefferson.** Duas saídas:
+### O que mudou na migração
 
-1. Criar o repositório manualmente — `keystone-growth-os`, privado — e me dar o
-   nome para eu anexá-lo à sessão com `add_repo`.
-2. Ampliar a permissão da App do GitHub em
-   `claude.ai/admin-settings/claude-in-slack`, e eu crio.
+O código não veio intacto. Cinco ajustes:
 
-Enquanto isso, o trabalho de frontend continua na branch atual e migra assim que
-o destino existir.
+| | Antes | Agora | Por quê |
+|---|---|---|---|
+| `.env` | **rastreado pelo git** | ignorado; só `.env.example` | segredo não se versiona, mesmo o publicável |
+| Chave | `anon` legada | `sb_publishable_...` | rotaciona sozinha, sem derrubar o resto |
+| Cliente Supabase | aceitava `undefined` | falha na carga | o erro aparecia depois, como `Failed to fetch` sem causa |
+| `lovable-tagger` | no build | removido | este repositório não é gerenciado pela Lovable |
+| Bind do Vite | `::` | `0.0.0.0` | `EAFNOSUPPORT` no contêiner |
+
+Verificado depois da migração: lint sem erro, `tsc` limpo, 14 testes passando,
+build em 9,8 s, aplicação carregando contra o Supabase novo sem um único erro de
+console.
+
+A migração do Centro de Custos **não** foi aplicada. Está em `supabase/legacy/`
+como referência, com o motivo escrito lá: ela carrega o C-01.
 
 ---
 
 ## Pendências
 
-1. **Repositório novo** — bloqueado, aguarda ação do Jefferson.
-2. **Migrar o frontend já entregue** para o repositório novo: design system,
-   estrutura de módulos, shell, tema, identidade visual, testes.
-3. **Plano de exportação dos dados** do Supabase gerenciado pela Lovable.
-4. **Atualizar as fichas do ClickUp** — a FASE 2 muda de escopo: sai o backfill,
-   entra a migração entre projetos.
-5. **Apontar o `.env`** para o projeto novo quando a migração começar.
-6. **Decidir o destino da aplicação atual** depois da migração: aposentar ou
-   manter em paralelo. Enquanto ela existir com as políticas `anon`, o C-01
-   continua explorável, mesmo que o dado já esteja duplicado no banco novo.
+1. **Preencher o `.env` local** a partir do `.env.example` — a chave publishable
+   está no painel do Supabase. (Já configurado nesta sessão; cada máquina
+   precisa do seu.)
+2. **Plano de exportação dos dados** do Supabase gerenciado pela Lovable.
+   É a dependência de entrada da FASE 2 e a única que não está sob controle
+   direto — precisa de acesso ao painel da Lovable ou de um dump gerado por lá.
+3. **Atualizar as fichas do ClickUp** — a FASE 2 muda de escopo: sai o backfill,
+   entra a migração entre projetos. A FASE 5 deve ser criada a partir do
+   documento 14, não do 12.
+4. **Aposentar a aplicação antiga** depois da migração. Enquanto ela existir com
+   as políticas `anon`, o C-01 continua explorável, mesmo com o dado já
+   duplicado no banco novo. Duplicar não fecha buraco — só desligar fecha.
