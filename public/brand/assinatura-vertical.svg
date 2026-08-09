@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 134" width="260" height="134" role="img" aria-label="Keystone Controladoria">
+  <title>Keystone Controladoria — assinatura vertical</title>
+  <g transform="translate(98 -2) scale(1.0)">
+    <path d="M9 16 Q32 6 55 16 L47 52 H17 Z" fill="#12403E"/>
+    <path d="M9 16 Q32 6 55 16 L53.8 21.5 Q32 11.5 10.2 21.5 Z" fill="#1F6F6B"/>
+  </g>
+  <text x="130" y="100" text-anchor="middle" font-family="Newsreader, 'Iowan Old Style', Georgia, serif"
+        font-size="34" font-weight="600" letter-spacing="1.4" fill="#12403E">KEYSTONE</text>
+  <text x="130" y="118" text-anchor="middle" font-family="Inter, Helvetica, Arial, sans-serif"
+        font-size="9.5" font-weight="500" letter-spacing="5.2" fill="#1F6F6B">CONTROLADORIA</text>
+</svg>

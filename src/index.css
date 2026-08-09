@@ -1,0 +1,195 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================================
+   KEYSTONE GROWTH OS — DESIGN SYSTEM
+   ----------------------------------------------------------------------------
+   Posicionamento: premium, executivo, tecnológico, orientado a dados.
+
+   Regras que governam este arquivo:
+
+   1. Todas as cores em HSL, sempre como token. Nenhum componente declara cor
+      literal — se precisar de uma cor nova, ela nasce aqui.
+   2. UM acento apenas (--primary, teal). Ele marca ação primária e destaque de
+      dado. Não é decoração.
+   3. Semântica restrita a três estados: positive, warning, negative. Sem paleta
+      arco-íris.
+   4. Cor em gráfico codifica informação. As --chart-* são uma escala pensada
+      para leitura de série, não para enfeite.
+   5. Dark-first. O tema claro existe e é completo, mas o produto nasce escuro.
+      A troca é feita pela classe .dark no <html> (convenção shadcn preservada,
+      com dark aplicado por padrão no index.html).
+   6. Raio pequeno (0.375rem). Canto muito arredondado lê como ferramenta de
+      consumo; este é um sistema de decisão comercial.
+   ========================================================================== */
+
+@layer base {
+  :root {
+    /* ---- superfícies ---- */
+    --background: 195 22% 97%;
+    --foreground: 200 26% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 200 26% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 200 26% 10%;
+
+    /* ---- acento único ---- */
+    --primary: 176 46% 32%;
+    --primary-foreground: 0 0% 100%;
+
+    /* ---- neutros com viés na direção do acento (escolhidos, não herdados) ---- */
+    --secondary: 195 16% 93%;
+    --secondary-foreground: 200 22% 22%;
+
+    --muted: 195 16% 94%;
+    --muted-foreground: 198 10% 40%;
+
+    --accent: 195 18% 91%;
+    --accent-foreground: 200 22% 20%;
+
+    --border: 196 15% 87%;
+    --input: 196 15% 84%;
+    --ring: 176 46% 36%;
+
+    /* ---- semântica: três estados, nada além ---- */
+    --positive: 152 46% 32%;
+    --positive-foreground: 0 0% 100%;
+    --warning: 34 68% 40%;
+    --warning-foreground: 0 0% 100%;
+    --negative: 4 60% 46%;
+    --negative-foreground: 0 0% 100%;
+
+    --destructive: 4 60% 46%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* ---- escala de gráfico: codifica série, não decora ---- */
+    --chart-1: 176 46% 34%;
+    --chart-2: 205 48% 42%;
+    --chart-3: 34 62% 44%;
+    --chart-4: 262 28% 48%;
+    --chart-5: 152 38% 34%;
+    --chart-6: 14 48% 48%;
+
+    --radius: 0.375rem;
+
+    /* ---- sidebar ---- */
+    --sidebar-background: 200 26% 12%;
+    --sidebar-foreground: 195 12% 72%;
+    --sidebar-primary: 176 44% 52%;
+    --sidebar-primary-foreground: 200 30% 8%;
+    --sidebar-accent: 200 22% 18%;
+    --sidebar-accent-foreground: 190 14% 92%;
+    --sidebar-border: 200 20% 18%;
+    --sidebar-ring: 176 44% 46%;
+  }
+
+  .dark {
+    --background: 200 24% 7%;
+    --foreground: 190 14% 91%;
+
+    --card: 200 21% 10%;
+    --card-foreground: 190 14% 91%;
+
+    --popover: 200 22% 9%;
+    --popover-foreground: 190 14% 91%;
+
+    --primary: 176 42% 46%;
+    --primary-foreground: 200 30% 7%;
+
+    --secondary: 200 16% 16%;
+    --secondary-foreground: 190 12% 88%;
+
+    --muted: 200 16% 15%;
+    --muted-foreground: 196 9% 58%;
+
+    --accent: 200 17% 18%;
+    --accent-foreground: 190 12% 90%;
+
+    --border: 200 14% 16%;
+    --input: 200 14% 20%;
+    --ring: 176 42% 46%;
+
+    --positive: 152 40% 46%;
+    --positive-foreground: 200 30% 7%;
+    --warning: 38 62% 54%;
+    --warning-foreground: 200 30% 7%;
+    --negative: 4 62% 58%;
+    --negative-foreground: 200 30% 7%;
+
+    --destructive: 4 62% 52%;
+    --destructive-foreground: 190 14% 95%;
+
+    --chart-1: 176 44% 52%;
+    --chart-2: 205 50% 58%;
+    --chart-3: 38 58% 56%;
+    --chart-4: 262 32% 62%;
+    --chart-5: 152 36% 50%;
+    --chart-6: 14 50% 58%;
+
+    --sidebar-background: 200 28% 5%;
+    --sidebar-foreground: 195 10% 66%;
+    --sidebar-primary: 176 44% 54%;
+    --sidebar-primary-foreground: 200 30% 6%;
+    --sidebar-accent: 200 20% 12%;
+    --sidebar-accent-foreground: 190 14% 92%;
+    --sidebar-border: 200 18% 12%;
+    --sidebar-ring: 176 44% 48%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Números são o elemento visual dominante deste produto. Alinhamento
+     tabular em toda métrica, para que colunas de valores leiam como coluna. */
+  th[data-numeric],
+  td[data-numeric],
+  .tnum {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+
+  /* Foco sempre visível — navegação por teclado é requisito, não extra. */
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  ::selection {
+    background: hsl(var(--primary) / 0.25);
+  }
+}
+
+@layer utilities {
+  /* Rótulo de seção: caixa alta, pequeno, espaçado. Usado em eyebrow e
+     cabeçalho de tabela. */
+  .label-caps {
+    @apply text-[0.68rem] font-semibold uppercase tracking-[0.1em] text-muted-foreground;
+  }
+
+  .numeric {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

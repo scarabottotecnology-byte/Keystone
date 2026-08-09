@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 168" width="460" height="168" role="img" aria-label="Keystone Controladoria — Clareza financeira para decisões que importam">
+  <title>Keystone Controladoria — assinatura com frase</title>
+  <g transform="translate(198 0)">
+    <path d="M9 16 Q32 6 55 16 L47 52 H17 Z" fill="#12403E"/>
+    <path d="M9 16 Q32 6 55 16 L53.8 21.5 Q32 11.5 10.2 21.5 Z" fill="#1F6F6B"/>
+  </g>
+  <text x="230" y="104" text-anchor="middle" font-family="Newsreader, 'Iowan Old Style', Georgia, serif"
+        font-size="36" font-weight="600" letter-spacing="1.5" fill="#12403E">KEYSTONE</text>
+  <text x="230" y="122" text-anchor="middle" font-family="Inter, Helvetica, Arial, sans-serif"
+        font-size="10" font-weight="500" letter-spacing="5.4" fill="#1F6F6B">CONTROLADORIA</text>
+  <line x1="140" y1="138" x2="320" y2="138" stroke="#D5DEDE" stroke-width="1"/>
+  <text x="230" y="158" text-anchor="middle" font-family="Newsreader, 'Iowan Old Style', Georgia, serif"
+        font-size="15" font-style="italic" fill="#37464A">Clareza financeira para decisões que importam.</text>
+</svg>
