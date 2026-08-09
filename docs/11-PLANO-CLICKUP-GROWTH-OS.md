@@ -195,21 +195,36 @@ e 15, travam o roadmap.
 | 08/08 · 18:10 | Segunda tentativa: ainda bloqueado, 126 min restantes. |
 | 08/08 · 20:35 | Cota liberada. Pasta, 7 listas, 3 fichas do EIXO A e 18 subtarefas criadas. |
 | 08/08 · 20:38 | **Cota diária esgotada em ~29 objetos** — 1438 min (24 h) para renovar. Reagendado para 09/08 às 20:51. |
+| 09/08 · 08:05 | Ainda bloqueado, 746 min. Causa identificada — ver abaixo. |
 
-### Nota sobre o limite da API
+### Nota sobre o limite da API — causa encontrada
 
 O bloqueio de 1438 minutos indica **cota diária**, não janela deslizante: renova
-uma vez por dia. Na prática, cerca de 30 objetos por dia — os 216 restantes
-levariam mais de uma semana em criações automatizadas.
+uma vez por dia. Na prática, cerca de 30 objetos por dia.
 
-Duas alternativas, se a velocidade importar:
+**A cota não estava sendo consumida só por este projeto.** Uma segunda sessão,
+dedicada à reconciliação do backlog do **Portal Crimson**, vem executando desde
+06/08 contra a **mesma chave de API do ClickUp**: criação de 93 tarefas, 19
+listas, e a atualização de ~60 tarefas com comentários. Ela tem rotinas
+agendadas próprias, que disparam e esgotam a cota do dia.
 
-1. **Criar as 21 fichas de fase restantes primeiro e as subtarefas depois.** Em
-   um dia o roadmap inteiro fica visível; o detalhe entra ao longo da semana. É
-   a ordem já programada para a próxima execução.
-2. **Investigar o consumo da cota.** O limite bateu com poucas chamadas feitas
-   por esta sessão — vale verificar se outra integração conectada à conta
-   (Zap, app, automação) está consumindo o mesmo teto.
+As duas sessões estão se matando de fome. É por isso que o limite bate com
+poucas chamadas feitas daqui: quando esta sessão acorda, o teto do dia já foi
+gasto pela outra — e vice-versa.
+
+**Isto não é problema de código, é de coordenação.** Três saídas, em ordem de
+preferência:
+
+1. **Serializar.** Terminar o Portal Crimson primeiro (está mais perto do fim),
+   pausando as rotinas do Growth OS, e depois inverter. Custo zero, resolve.
+2. **Chave separada por projeto.** Se o ClickUp aplicar a cota por token e não
+   por workspace, uma segunda integração dá dois tetos independentes. Precisa
+   ser verificado antes de valer como plano.
+3. **Criar as 21 fichas de fase à mão** e deixar só as subtarefas para a API. O
+   roadmap fica visível em uma tarde; o detalhe entra ao longo da semana.
+
+Enquanto nada disso for decidido, a estimativa realista para os 216 objetos
+restantes é de **mais de uma semana**, disputando o teto com a outra sessão.
 
 ### Correção pendente de aplicar
 
