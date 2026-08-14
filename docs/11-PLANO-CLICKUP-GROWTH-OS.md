@@ -177,19 +177,42 @@ e 15, travam o roadmap.
 | EIXO F — Inteligência | `901328129604` | ✅ |
 | EIXO G — Produção | `901328129605` | ✅ |
 | FASE 1 — Fundação técnica | `86ajy2jwa` | ✅ completa, 14 subtarefas |
-| FASE 2 — Banco, auth e multi-tenant | `86ajy2jwg` | ⚠️ 4 de 13 subtarefas — **as 4 criadas descrevem o escopo antigo e precisam ser revistas** |
+| FASE 2 — Banco, auth e multi-tenant | `86ajy2jwg` | ✅ descrição reescrita para o escopo novo · 3 de 13 subtarefas |
 | FASE 3 — Command Center | `86ajy2jwh` | ⚠️ 0 de 9 subtarefas |
+| FASE 4 — Content Strategy + Market Intelligence | `86ak16518` | ✅ ficha |
+| FASE 5 — AI Content Factory + geração de arte | `86ak16523` | ✅ ficha · **urgente**, do documento 14 |
+| FASE 6 — LinkedIn | `86ak1652z` | ✅ ficha |
+| FASE 7 — Meta / Instagram | `86ak1653a` | ✅ ficha |
+| FASE 8 — Social Analytics | `86ak1653k` | ✅ ficha |
+| FASE 9 — AI Performance Analyst | `86ak16546` | ✅ ficha |
+| FASE 10 — Lead Engine | `86ak1654x` | ✅ ficha |
+| FASE 11 — ICP Engine | `86ak1655e` | ✅ ficha |
+| FASE 12 — Company Discovery | `86ak1655z` | ✅ ficha |
+| FASE 13 — Prospect Intelligence | `86ak16568` | ✅ ficha |
+| FASE 14 — E-mail Outreach | `86ak1657a` | ✅ ficha |
+| FASE 15 — WhatsApp | `86ak16586` | ✅ ficha |
+| FASE 16 — AI Qualification | `86ak1658j` | ✅ ficha |
+| FASE 17 — CRM + Pipeline | `86ak1658w` | ✅ ficha |
+| FASE 18 — Attribution | `86ak165aa` | ✅ ficha |
+| FASE 19 — AI Growth Strategist | `86ak165at` | ✅ ficha |
+| FASE 20 — Daily Growth Cycle | `86ak165bc` | ✅ ficha |
+| FASE 21 — Observabilidade e segurança | `86ak165bw` | ✅ ficha |
+| FASE 22 — Testes completos | `86ak165cd` | ✅ ficha |
+| FASE 23 — Hardening | `86ak165cn` | ✅ ficha |
+| FASE 24 — Deploy | `86ak165d1` | ✅ ficha |
 
-**29 de 240 objetos criados (12%).**
+**49 de 240 objetos criados (20%). As 24 fichas de fase existem — o roadmap
+inteiro está visível no ClickUp.**
 
 ### O que falta
 
+Só subtarefas. O roadmap já é navegável sem elas.
+
 | Pendência | Volume |
 |---|---|
-| FASE 2 — rever as 4 subtarefas criadas e criar as 9 restantes | 13 |
+| FASE 2, subtarefas 04–13 | 10 |
 | FASE 3, subtarefas | 9 |
-| Fichas de fase dos eixos B a G | 21 |
-| Subtarefas dos eixos B a G | 172 |
+| Subtarefas das FASES 4 a 24 | 172 |
 
 ### Histórico
 
@@ -200,6 +223,7 @@ e 15, travam o roadmap.
 | 08/08 · 20:35 | Cota liberada. Pasta, 7 listas, 3 fichas do EIXO A e 18 subtarefas criadas. |
 | 08/08 · 20:38 | **Cota diária esgotada em ~29 objetos** — 1438 min (24 h) para renovar. Reagendado para 09/08 às 20:51. |
 | 09/08 · 08:05 | Ainda bloqueado, 746 min — a cota é da conta, não deste projeto. Ver a nota abaixo. |
+| 09/08 · noite | Cota liberada. **As 21 fichas restantes criadas**, a FASE 2 reescrita para o escopo novo e a subtarefa de `financial_entries` removida. |
 
 ### Nota sobre o limite da API
 
