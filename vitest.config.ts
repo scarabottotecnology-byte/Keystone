@@ -14,6 +14,7 @@ export default defineConfig({
     include: [
       "src/**/*.{test,spec}.{ts,tsx}",
       "supabase/functions/**/*.{test,spec}.ts",
+      "eslint-rules/**/*.{test,spec}.ts",
     ],
   },
   resolve: {

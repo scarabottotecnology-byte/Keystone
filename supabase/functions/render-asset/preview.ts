@@ -14,7 +14,10 @@
 import { compose } from "./compose.ts";
 import { TEMPLATES } from "./templates.ts";
 
-const AMOSTRAS: Record<string, { payload: Record<string, string>; copy: string }> = {
+const AMOSTRAS: Record<
+  string,
+  { payload: Record<string, string>; copy: string }
+> = {
   dado: {
     payload: {
       eyebrow: "Controladoria · Custos",
@@ -30,7 +33,8 @@ const AMOSTRAS: Record<string, { payload: Record<string, string>; copy: string }
   afirmacao: {
     payload: {
       eyebrow: "Controladoria · Margem",
-      tese: "Produto deficitário não aparece no DRE. Ele aparece na conta bancária, três meses depois.",
+      tese:
+        "Produto deficitário não aparece no DRE. Ele aparece na conta bancária, três meses depois.",
       apoio:
         "Custeio por absorção distribui o fixo por volume e faz o item que dá prejuízo parecer saudável.",
       fonte: "Keystone Controladoria",

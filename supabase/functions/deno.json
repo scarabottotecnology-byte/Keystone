@@ -6,10 +6,18 @@
   "nodeModulesDir": "none",
   "lint": {
     "rules": {
-      "tags": ["recommended"]
-    }
+      "tags": [
+        "recommended"
+      ]
+    },
+    "exclude": [
+      "**/*.test.ts"
+    ]
   },
   "fmt": {
-    "lineWidth": 80
+    "lineWidth": 80,
+    "exclude": [
+      "**/*.md"
+    ]
   }
 }

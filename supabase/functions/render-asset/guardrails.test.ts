@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { extractNumbers, verifyNumbersGrounded } from "./guardrails";
-import { TEMPLATES, describeViolations, validatePayload } from "./templates";
+import { describeViolations, TEMPLATES, validatePayload } from "./templates";
 
 describe("extractNumbers", () => {
   it("lê inteiro simples e percentual", () => {
@@ -27,7 +27,11 @@ describe("extractNumbers", () => {
   });
 
   it("acha vários números na mesma frase", () => {
-    expect(extractNumbers("de 34% para 43%, em 12 meses")).toEqual([34, 43, 12]);
+    expect(extractNumbers("de 34% para 43%, em 12 meses")).toEqual([
+      34,
+      43,
+      12,
+    ]);
   });
 
   it("devolve vazio em texto sem número", () => {
@@ -88,7 +92,11 @@ describe("validatePayload", () => {
 
   it("acusa zona obrigatória ausente", () => {
     const v = validatePayload(dado, { valor: "43%" });
-    expect(v.map((x) => x.zone).sort()).toEqual(["afirmacao", "eyebrow", "fonte"]);
+    expect(v.map((x) => x.zone).sort()).toEqual([
+      "afirmacao",
+      "eyebrow",
+      "fonte",
+    ]);
     expect(v.every((x) => x.kind === "missing")).toBe(true);
   });
 

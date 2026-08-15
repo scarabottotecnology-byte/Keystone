@@ -30,9 +30,9 @@ import satori from "satori";
 import { initWasm, Resvg } from "@resvg/resvg-wasm";
 
 import {
+  describeViolations,
   type Payload,
   type TemplateSpec,
-  describeViolations,
   validatePayload,
 } from "./templates.ts";
 import { verifyNumbersGrounded } from "./guardrails.ts";
@@ -53,7 +53,12 @@ let wasmPromise: Promise<void> | null = null;
 
 interface Font {
   name: string;
-  data: Uint8Array;
+  /**
+   * `ArrayBuffer`, não `Uint8Array`. O satori tipa `data` assim, e passar a
+   * view funciona em runtime mas não passa no `deno check` — o tipo de erro que
+   * some do radar até quebrar numa atualização de biblioteca.
+   */
+  data: ArrayBuffer;
   weight: 400 | 500 | 600;
   style: "normal";
 }
@@ -67,7 +72,16 @@ interface Font {
  */
 function loadFonts(): Promise<Font[]> {
   fontsPromise ??= (async () => {
-    const read = (f: string) => Deno.readFile(new URL(f, FONT_DIR));
+    const read = async (f: string): Promise<ArrayBuffer> => {
+      const bytes = await Deno.readFile(new URL(f, FONT_DIR));
+      // O slice pelo offset é necessário: `Deno.readFile` pode devolver uma
+      // view sobre um buffer maior, e entregar `.buffer` cru passaria bytes
+      // vizinhos junto.
+      return bytes.buffer.slice(
+        bytes.byteOffset,
+        bytes.byteOffset + bytes.byteLength,
+      ) as ArrayBuffer;
+    };
     const [ir, im, nr, ns] = await Promise.all([
       read("Inter-Regular.ttf"),
       read("Inter-Medium.ttf"),
@@ -202,7 +216,14 @@ const LAYOUTS: Record<string, (p: Payload) => Node> = {
           p.tese!,
         ),
         ...(p.apoio
-          ? [box({ fontSize: 30, lineHeight: 1.5, color: C.muted, maxWidth: 760 }, p.apoio)]
+          ? [
+            box({
+              fontSize: 30,
+              lineHeight: 1.5,
+              color: C.muted,
+              maxWidth: 760,
+            }, p.apoio),
+          ]
           : []),
       ]),
       rodape(p.fonte!),
@@ -278,7 +299,9 @@ export async function compose({
   if (!grounding.ok) {
     throw new ComposeError(
       "ungrounded_number",
-      `A arte exibe número que não consta na copy: ${grounding.ungrounded.join(", ")}`,
+      `A arte exibe número que não consta na copy: ${
+        grounding.ungrounded.join(", ")
+      }`,
       grounding.ungrounded,
     );
   }

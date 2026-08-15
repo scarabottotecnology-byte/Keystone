@@ -1,0 +1,73 @@
+name: CI
+
+# Portão de merge. Sem isto, "a fase está testada" é declaração de boa intenção.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# Um PR que recebe push novo cancela a execução anterior: gastar minuto de
+# runner conferindo um commit já substituído não informa nada.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  web:
+    name: Frontend — lint, tipos, testes, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # `ci` e não `install`: falha se o lockfile estiver fora de sincronia com
+      # o package.json, em vez de silenciosamente corrigi-lo. Foi exatamente
+      # essa divergência que produziu o achado L-04.
+      - run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Testes
+        run: npm test
+
+      - name: Build
+        run: npm run build
+        env:
+          # Valores de fachada. O cliente Supabase falha na carga se as
+          # variáveis faltarem, e o build precisa ser representativo do bundle
+          # real — nenhuma requisição é feita aqui.
+          VITE_SUPABASE_URL: https://exemplo.supabase.co
+          VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci
+
+  functions:
+    name: Edge Functions — formatação, lint, tipos
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      # As Edge Functions ficam fora do ESLint do frontend (runtime diferente),
+      # então precisam do próprio portão — senão elas seriam a única parte do
+      # sistema sem verificação nenhuma.
+      - name: Formatação
+        run: deno fmt --check --config supabase/functions/deno.json supabase/functions
+
+      - name: Lint
+        run: deno lint --config supabase/functions/deno.json supabase/functions
+
+      - name: Tipos
+        run: deno check --config supabase/functions/deno.json supabase/functions/render-asset/preview.ts

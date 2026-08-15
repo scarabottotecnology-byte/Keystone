@@ -125,6 +125,52 @@ desligado — o que anularia o próprio critério de aceite.
 extração de mensagem de erro. O `example.test.ts` que só afirmava `true === true`
 foi removido.
 
+### Fronteira entre módulos, imposta por lint (subtarefa 3)
+
+A convenção existia; agora ela quebra o build.
+
+Regra própria em `eslint-rules/no-cross-module-import.js`, sem dependência nova.
+Duas alternativas foram tentadas antes e descartadas:
+
+- **`no-restricted-imports`** casa contra o *texto* do import e não sabe onde o
+  arquivo está. Não separa `../lib/x`, que fica dentro do próprio módulo, de
+  `../outro/x`, que atravessa a fronteira — as duas strings começam igual. Pega
+  o alias e deixa passar o caminho relativo, que é justamente o caso mais fácil
+  de escrever sem perceber.
+- **`eslint-plugin-boundaries`** resolve isso lendo o disco, mas para lidar com
+  `.ts` e com o alias `@/` puxa uma cadeia de resolvedores que não instalou
+  limpo. Sem resolvedor, a regra não enxerga import nenhum e passa em silêncio —
+  pior que não ter regra, porque dá impressão de proteção.
+
+A regra própria compara **prefixo de diretório**, que é o que a decisão de fato
+depende. Não precisa que o arquivo exista, não tem resolvedor para quebrar.
+
+Cobre alias, caminho relativo em qualquer profundidade, `export … from`,
+`export *` e `import()` dinâmico. 13 casos em `RuleTester`.
+
+### CI no GitHub Actions (subtarefa 11)
+
+`.github/workflows/ci.yml`, dois jobs, bloqueando merge:
+
+| Job | O que roda |
+|---|---|
+| **web** | `npm ci`, lint, typecheck, testes, build |
+| **functions** | `deno fmt --check`, `deno lint`, `deno check` |
+
+O segundo job existe porque as Edge Functions ficam fora do ESLint do frontend —
+runtime diferente. Sem portão próprio, seriam a única parte do sistema sem
+verificação nenhuma.
+
+`npm ci` e não `npm install`: falha se o lockfile estiver fora de sincronia, em
+vez de corrigi-lo em silêncio. Foi essa divergência que produziu o achado L-04.
+
+**Um erro real apareceu ao montar o portão.** O `deno check` acusou que o satori
+tipa `FontOptions.data` como `ArrayBuffer`, e eu estava passando `Uint8Array`.
+Funcionava em runtime — é o tipo de divergência que fica invisível até quebrar
+numa atualização de biblioteca. Corrigido com slice pelo offset, porque
+`Deno.readFile` pode devolver uma view sobre um buffer maior e entregar
+`.buffer` cru passaria bytes vizinhos junto.
+
 ### Padronização do gerenciador (subtarefa 4)
 
 **npm.** Os lockfiles do bun ficaram no repositório de origem. A convivência dos
@@ -140,10 +186,14 @@ ambos estarem no `package.json`, porque o lockfile mantido era o do bun.
 |---|---|
 | Typecheck | limpo |
 | Lint | 0 erros, 8 avisos (todos `react-refresh` em componentes shadcn) |
-| Testes | 14 passando |
-| Build | ✓ em 4,3 s · bundle 399 kB (125 kB gzip) |
+| Testes | 33 passando |
+| Build | ✓ em 5,1 s · bundle 399 kB (125 kB gzip) |
+| Edge Functions | `deno fmt --check`, `deno lint` e `deno check` limpos |
 | Navegação | rotas conferidas no navegador, tema claro e escuro |
 | Console | sem erro |
+
+Os cinco comandos do CI foram rodados localmente antes de subir o workflow — um
+portão que nasce vermelho é um portão que alguém desliga.
 
 ---
 
@@ -151,12 +201,23 @@ ambos estarem no `package.json`, porque o lockfile mantido era o do bun.
 
 | # | Subtarefa | Observação |
 |---|---|---|
-| 3 | Lint proibindo import entre módulos | A convenção existe, falta a regra que a impõe |
-| 8 | `_shared/` das Edge Functions | Não iniciado |
-| 9 | `ai-gateway` | Não iniciado |
-| 10 | Migração das tabelas de IA e observabilidade | Não iniciado |
-| 11 | CI no GitHub Actions | Não iniciado — lint já está verde para o gate |
+| 8 | `_shared/` das Edge Functions | Próximo |
+| 9 | `ai-gateway` | Depende da 8 e da 10 |
+| 10 | Migração das tabelas de IA e observabilidade | **Bloqueada pela FASE 2** — ver abaixo |
 | 12–14 | Pedidos LinkedIn, Meta e WhatsApp | Ação humana, com semanas de lead time |
+
+### A subtarefa 10 depende da FASE 2
+
+As tabelas de IA e observabilidade — `ai_invocations`, `automation_runs`,
+`error_logs` — carregam `organization_id NOT NULL`, como toda tabela de negócio
+(ADR-002). Só que `organizations` nasce na FASE 2.
+
+Não há como criar essas tabelas na FASE 1 sem uma das duas saídas ruins: abrir
+exceção ao P1 logo na primeira migração, ou criar `organizations` fora da fase
+dela. A ordem correta é a que o documento 16 já descreve — identidade primeiro.
+
+Registrado aqui porque é descoberta de execução, não erro de planejamento: o
+roadmap listava a subtarefa 10 na FASE 1 antes de o P1 estar escrito.
 
 ---
 

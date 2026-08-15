@@ -3,6 +3,7 @@ import globals from "globals";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
 import tseslint from "typescript-eslint";
+import keystone from "./eslint-rules/no-cross-module-import.js";
 
 export default tseslint.config(
   // As Edge Functions rodam em Deno: globais diferentes, importação por
@@ -25,6 +26,18 @@ export default tseslint.config(
       ...reactHooks.configs.recommended.rules,
       "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
       "@typescript-eslint/no-unused-vars": "off",
+    },
+  },
+
+  // ── Fronteira entre módulos ───────────────────────────────────────────────
+  //
+  // Regra própria; o porquê está no cabeçalho de
+  // `eslint-rules/no-cross-module-import.js`.
+  {
+    files: ["src/modules/**/*.{ts,tsx}"],
+    plugins: { keystone },
+    rules: {
+      "keystone/no-cross-module-import": "error",
     },
   },
 );
