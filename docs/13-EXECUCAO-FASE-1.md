@@ -171,6 +171,56 @@ numa atualização de biblioteca. Corrigido com slice pelo offset, porque
 `Deno.readFile` pode devolver uma view sobre um buffer maior e entregar
 `.buffer` cru passaria bytes vizinhos junto.
 
+### Camada compartilhada das Edge Functions (subtarefa 8)
+
+`supabase/functions/_shared/`, cinco módulos. Os quatro primeiros são puros —
+sem Deno, sem rede — e rodam no mesmo vitest do frontend.
+
+| Módulo | O que resolve |
+|---|---|
+| `errors.ts` | erro com código e `retryable` |
+| `redact.ts` | redação de segredo antes do log |
+| `correlation.ts` | ULID ordenável por tempo |
+| `log.ts` | linha JSON, com redação obrigatória |
+| `auth.ts` | JWT e resolução de organização |
+
+**`retryable` é campo do erro, não julgamento de quem captura.** Quem faz o
+`catch` raramente sabe se vale repetir: um `500` do LinkedIn vale, um `422` por
+texto acima do limite não vale e só queima cota. Deixar a decisão para cada
+`catch` garante que ela será tomada diferente em cada lugar.
+
+**A redação é propriedade do código, não promessa.** O critério da FASE 21 é
+"nenhum log com credencial, verificado por teste". Não existe caminho no `log.ts`
+que escreva um objeto cru: tudo passa por `redact` na saída. Cobre chave
+sensível por nome, e — o caso que de fato acontece — credencial embutida em
+mensagem de erro: JWT, `sb_publishable_`, `sk-`, `ghp_`, `Bearer`. Trata ciclo e
+profundidade, porque derrubar o logger no meio de um erro é a pior hora.
+
+**ULID e não UUID** porque o correlation ID existe para reconstruir a ordem de
+uma execução. ULID ordena lexicograficamente por tempo; UUIDv4 obrigaria a
+confiar no relógio de cada sistema. Monotônico dentro do mesmo milissegundo —
+sem isso a garantia valeria só nessa escala, e uma Edge Function emite vários
+eventos no mesmo milissegundo.
+
+**O cliente do `auth.ts` usa o JWT de quem chamou, nunca a `service_role`.** A
+`service_role` ignora RLS: uma função que a usa para simplificar vira porta com
+acesso total ao banco — a mesma classe de falha do C-01, com outro nome.
+
+#### Idempotência: a parte com regra veio, o armazenamento não
+
+`idempotency.ts` tem a derivação da chave e o protocolo `runOnce`, com o
+armazenamento **injetado**. A tabela `idempotency_keys` nasce na FASE 2, e a
+separação existe para que a parte com risco de erro sutil seja testável agora.
+
+Um detalhe que só apareceu ao escrever o teste: o separador entre as partes da
+chave é **NUL**, não `:`. Com `:`, `["a:b","c"]` e `["a","b:c"]` produziriam a
+mesma chave — e colisão aqui significa uma publicação silenciosamente engolida,
+como se já tivesse acontecido. Identificador, data e URL contêm `:`, `|` e
+espaço o tempo todo; NUL é o único caractere com a garantia de não aparecer.
+
+Falha retentável libera a chave; falha definitiva **não** — repetir só
+reproduziria o mesmo erro gastando cota da plataforma.
+
 ### Padronização do gerenciador (subtarefa 4)
 
 **npm.** Os lockfiles do bun ficaram no repositório de origem. A convivência dos
@@ -186,8 +236,8 @@ ambos estarem no `package.json`, porque o lockfile mantido era o do bun.
 |---|---|
 | Typecheck | limpo |
 | Lint | 0 erros, 8 avisos (todos `react-refresh` em componentes shadcn) |
-| Testes | 33 passando |
-| Build | ✓ em 5,1 s · bundle 399 kB (125 kB gzip) |
+| Testes | 77 passando |
+| Build | ✓ em 4,6 s · bundle 399 kB (125 kB gzip) |
 | Edge Functions | `deno fmt --check`, `deno lint` e `deno check` limpos |
 | Navegação | rotas conferidas no navegador, tema claro e escuro |
 | Console | sem erro |
@@ -201,8 +251,7 @@ portão que nasce vermelho é um portão que alguém desliga.
 
 | # | Subtarefa | Observação |
 |---|---|---|
-| 8 | `_shared/` das Edge Functions | Próximo |
-| 9 | `ai-gateway` | Depende da 8 e da 10 |
+| 9 | `ai-gateway` | Próximo — depende das tabelas da 10 |
 | 10 | Migração das tabelas de IA e observabilidade | **Bloqueada pela FASE 2** — ver abaixo |
 | 12–14 | Pedidos LinkedIn, Meta e WhatsApp | Ação humana, com semanas de lead time |
 

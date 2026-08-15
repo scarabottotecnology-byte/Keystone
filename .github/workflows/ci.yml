@@ -69,5 +69,9 @@ jobs:
       - name: Lint
         run: deno lint --config supabase/functions/deno.json supabase/functions
 
+      # Os arquivos `.test.ts` importam do vitest e são verificados no job
+      # `web`; aqui checamos o resto, que é o que de fato roda em Deno.
       - name: Tipos
-        run: deno check --config supabase/functions/deno.json supabase/functions/render-asset/preview.ts
+        run: |
+          files=$(git ls-files 'supabase/functions/**/*.ts' | grep -v '\.test\.ts$')
+          deno check --config supabase/functions/deno.json $files
