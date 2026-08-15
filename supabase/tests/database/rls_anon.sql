@@ -18,9 +18,18 @@
 -- `command_center_revoke_anon_execute.sql`). Uma RPC nova que esqueça o
 -- revoke explícito por role fica chamável por qualquer um, sem sessão
 -- nenhuma — e passaria despercebida sem um teste que olhe o catálogo.
+-- A partir da FASE 4, as duas provas de catálogo (linhas ~260 abaixo) deixam
+-- de listar tabela por nome e passam a varrer todo o schema `public` — a
+-- lista manual já tinha sete entradas e ia crescer a cada fase; generalizar
+-- agora é o que a FASE 22 pede antecipado ("matriz gerada do catálogo... uma
+-- tabela sem política falha o CI por omissão"). As tabelas anteriores a esta
+-- fase continuam com bloco de comportamento próprio, abaixo; as desta fase
+-- (FASE 4) têm um representante de cada migração testado por comportamento
+-- (`ai_invocations`, `ai_prompts`, `content_pillars`) — o resto já está
+-- coberto estruturalmente pela varredura de catálogo, que não lista nome.
 begin;
 
-select plan(23);
+select plan(29);
 
 -- ── organizations ────────────────────────────────────────────────────────────
 set local role anon;
@@ -178,6 +187,69 @@ select throws_ok(
 
 reset role;
 
+-- ── ai_invocations (FASE 4 — débito da FASE 1) ──────────────────────────────
+set local role anon;
+
+select is(
+  (select count(*)::int from ai_invocations),
+  0,
+  'anon não enxerga nenhuma invocação de IA'
+);
+
+select throws_ok(
+  $$ insert into ai_invocations (organization_id, operation, provider, model, status)
+     values ((select id from organizations limit 1), 'x', 'x', 'x', 'success') $$,
+  '42501',
+  null,
+  'anon não consegue gravar invocação de IA'
+);
+
+reset role;
+
+-- ── ai_prompts (FASE 4) ──────────────────────────────────────────────────────
+-- O caso extra aqui: existe prompt com `organization_id null` (global) de
+-- verdade na base — os prompts de A1/A2, semeados nesta fase. A política é
+-- `to authenticated`, então `anon` não deveria enxergar nem esse, mesmo sendo
+-- "de todo mundo". Testar isso é o que distingue "RLS bloqueia por role" de
+-- "RLS bloqueia só por organização" — são condições diferentes na mesma
+-- política, e só uma delas foi exercitada nas tabelas anteriores.
+set local role anon;
+
+select is(
+  (select count(*)::int from ai_prompts),
+  0,
+  'anon não enxerga nenhum prompt — nem os globais (organization_id null)'
+);
+
+select throws_ok(
+  $$ insert into ai_prompts (key, system_prompt, user_template)
+     values ('invasor', 'x', 'x') $$,
+  '42501',
+  null,
+  'anon não consegue gravar prompt'
+);
+
+reset role;
+
+-- ── content_pillars (FASE 4) ─────────────────────────────────────────────────
+set local role anon;
+
+select is(
+  (select count(*)::int from content_pillars),
+  0,
+  'anon não enxerga nenhum pilar de conteúdo — nem os 13 da Keystone'
+);
+
+select throws_ok(
+  $$ insert into content_pillars (organization_id, name, slug)
+     values ((select id from organizations limit 1), 'x', 'x') $$,
+  '42501',
+  null,
+  'anon não consegue gravar pilar de conteúdo'
+);
+
+reset role;
+
 -- ── rpc_command_center() e rpc_next_best_actions() ──────────────────────────
 -- Não é RLS — é EXECUTE na função em si. Ver a nota no topo do arquivo: o
 -- privilégio padrão do schema concede isso a `anon` a menos que alguém
@@ -204,20 +276,19 @@ reset role;
 -- As duas provas se complementam: os testes acima provam que a tentativa
 -- falha; esta prova por que ela falha — porque a política não existe, não
 -- porque algo mais a está bloqueando de forma incidental.
+--
+-- Varre TODO o schema `public`, não uma lista de nomes escrita à mão — uma
+-- tabela nova sem política contra `anon` falha este teste automaticamente,
+-- nunca por alguém lembrar de acrescentá-la na lista.
 select is(
   (
     select count(*)::int
       from pg_policies
      where schemaname = 'public'
-       and tablename in (
-             'organizations', 'profiles', 'memberships',
-             'audit_log', 'idempotency_keys',
-             'growth_score_config', 'growth_score_snapshots'
-           )
        and 'anon' = any(roles)
   ),
   0,
-  'nenhuma política, em nenhuma das sete tabelas, concede qualquer coisa a anon'
+  'nenhuma política, em nenhuma tabela de public, concede qualquer coisa a anon'
 );
 
 select is(
@@ -225,14 +296,10 @@ select is(
     select bool_and(relforcerowsecurity)
       from pg_class
      where relnamespace = 'public'::regnamespace
-       and relname in (
-             'organizations', 'profiles', 'memberships',
-             'audit_log', 'idempotency_keys',
-             'growth_score_config', 'growth_score_snapshots'
-           )
+       and relkind = 'r'  -- tabela comum; exclui view (ai_usage_daily) e sequence
   ),
   true,
-  'FORCE ROW LEVEL SECURITY está ativo nas sete — vale até para o dono da tabela'
+  'FORCE ROW LEVEL SECURITY está ativo em toda tabela de public — vale até para o dono'
 );
 
 -- Generaliza a descoberta desta fase para toda função presente e futura:

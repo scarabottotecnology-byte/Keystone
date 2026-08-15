@@ -1130,6 +1130,10 @@ from ai_invocations group by 1,2,3,4,5;
 `AI COST / LEAD` e `AI COST / OPPORTUNITY` (seção 53) derivam desta view cruzada
 com contagens de `leads` e `opportunities` no mesmo período.
 
+`ai_insights.source_url` é `not null` — não opcional. O agente A1 (`05 §4`) e
+o critério de aceite da FASE 4 são explícitos: "insight sem fonte rastreável é
+rejeitado". Rastreabilidade inclui a URL, não só o nome da fonte.
+
 ```sql
 create table ai_insights (
   id                   uuid primary key default gen_random_uuid(),
@@ -1138,7 +1142,7 @@ create table ai_insights (
   title                text not null,
   description          text not null,
   source               text not null,
-  source_url           text,
+  source_url           text not null,
   observed_at          timestamptz not null,
   relevance            int check (relevance between 0 and 100),
   category             text,
@@ -1196,22 +1200,41 @@ abaixo de um `sample_size` mínimo configurável.
 
 ```sql
 create table growth_score_config (
-  organization_id uuid primary key references organizations(id) on delete cascade,
-  weights         jsonb not null,  -- {content:15, leads:15, prospecting:15,
-                                   --  pipeline:20, conversion:15, revenue:20}
-  targets         jsonb not null,
-  updated_at      timestamptz not null default now()
+  organization_id    uuid primary key references organizations(id) on delete cascade,
+  content_weight     numeric not null default 15,
+  content_target     numeric,
+  leads_weight       numeric not null default 15,
+  leads_target       numeric,
+  prospecting_weight numeric not null default 15,
+  prospecting_target numeric,
+  pipeline_weight    numeric not null default 20,
+  pipeline_target    numeric,
+  conversion_weight  numeric not null default 15,
+  conversion_target  numeric,
+  revenue_weight     numeric not null default 20,
+  revenue_target     numeric,
+  created_at         timestamptz not null default now(),
+  updated_at         timestamptz not null default now()
 );
 
 create table growth_score_snapshots (
   id              uuid primary key default gen_random_uuid(),
   organization_id uuid not null references organizations(id) on delete cascade,
-  for_date        date not null,
-  score           numeric(5,2) not null,
-  components      jsonb not null,
-  unique (organization_id, for_date)
+  snapshot_date   date not null,
+  total_score     numeric,   -- null enquanto nem todo componente tiver dado — nunca 0 fabricado
+  components      jsonb not null default '{}',
+  created_at      timestamptz not null default now(),
+  unique (organization_id, snapshot_date)
 );
 ```
+
+Peso e meta por componente em colunas próprias, não em `weights`/`targets`
+genéricos como uma versão anterior deste documento descrevia — a FASE 3
+(`docs/17-EXECUCAO-FASE-3.md` e `docs/18-EXECUCAO-FASE-3.md`) implementou
+assim para que cada componente tivesse `check`/tipo próprios em vez de uma
+estrutura `jsonb` sem validação de schema. `total_score` é nullable de
+propósito: um score composto calculado sobre uma base incompleta pareceria
+uma nota real — ver `src/modules/command-center/growthScore.ts`.
 
 ### 4.10 Automation & Observability
 
