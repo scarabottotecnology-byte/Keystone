@@ -28,11 +28,13 @@ import type { LucideIcon } from "lucide-react";
  * estado honesto dizendo isso, em vez de uma tela com dado falso.
  *
  * A FASE 1 entregou a fundação, não telas com dado — todos nasceram
- * `planned`. Configurações foi o primeiro a virar `active`, na FASE 2, com a
- * seção de Equipe: é a própria tabela `memberships` que a fase constrói,
- * então não há razão para escondê-la atrás de um placeholder. As seções que
- * a tela ainda não cobre — marca, ICP, orçamento de IA — aparecem nela
- * mesma como pendentes, com a fase em que chegam.
+ * `planned`. Configurações virou `active` na FASE 2, com a seção de Equipe.
+ * Command Center virou `active` na FASE 3: `rpc_command_center()` responde
+ * de verdade, só que com os seis componentes do Growth Score indisponíveis,
+ * porque nenhuma tabela de origem (conteúdo, leads, prospecção, pipeline)
+ * existe ainda. Cada tela ativa que ainda não cobre tudo o que promete
+ * declara a parte pendente nela mesma, com a fase em que chega — nunca
+ * esconde atrás de um placeholder de tela inteira nem finge com dado falso.
  */
 
 export type ModuleStatus = "active" | "planned";
@@ -67,7 +69,7 @@ export const NAVIGATION: NavGroup[] = [
         label: "Command Center",
         to: "/",
         icon: Gauge,
-        status: "planned",
+        status: "active",
         phase: 3,
         end: true,
         purpose:

@@ -1,10 +1,11 @@
 /**
- * Seção de Configurações que ainda não existe.
+ * Parte de uma tela ativa que ainda não existe.
  *
- * Mesmo princípio do `ModulePlaceholder`, em escala de seção: a tela é real
- * — a Equipe funciona de verdade —, mas nem toda seção prometida em
- * `navigation.ts` está pronta. Melhor dizer isso explicitamente do que
- * esconder a seção ou fingir que ela existe.
+ * Mesmo princípio do `ModulePlaceholder`, em escala de seção: a tela em volta
+ * é real — Equipe, em Configurações, funciona de verdade; o Growth Score, no
+ * Command Center, calcula de verdade —, mas nem toda seção prometida em
+ * `navigation.ts` ou no roadmap está pronta. Melhor dizer isso explicitamente
+ * do que esconder a seção ou fingir que ela existe.
  */
 export function PendingSection({
   title,

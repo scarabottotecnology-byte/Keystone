@@ -1,6 +1,6 @@
 import { PageHeader } from "@/components/shared/PageHeader";
+import { PendingSection } from "@/components/shared/PendingSection";
 import { TeamSection } from "./TeamSection";
-import { PendingSection } from "./PendingSection";
 
 export function SettingsPage() {
   return (

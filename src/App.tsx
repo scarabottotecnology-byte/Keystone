@@ -12,6 +12,7 @@ import { ForgotPasswordPage } from "@/app/auth/ForgotPasswordPage";
 import { ResetPasswordPage } from "@/app/auth/ResetPasswordPage";
 import { ModulePlaceholder } from "@/components/shared/ModulePlaceholder";
 import { SettingsPage } from "@/app/settings/SettingsPage";
+import { CommandCenterPage } from "@/modules/command-center/CommandCenterPage";
 import { PLANNED_ITEMS } from "@/app/navigation";
 import NotFound from "@/app/NotFound";
 
@@ -55,6 +56,15 @@ const App = () => (
                   }
                 />
               ))}
+
+              <Route
+                path="/"
+                element={
+                  <AppRoute>
+                    <CommandCenterPage />
+                  </AppRoute>
+                }
+              />
 
               <Route
                 path="/settings"

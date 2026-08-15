@@ -2,7 +2,8 @@
 //
 // Esquema nasce na FASE 2: organizations, profiles, memberships, audit_log,
 // idempotency_keys — RLS habilitada e forçada em todas (docs/02-MODELO-DE-DADOS.md).
-// Regenerar depois de cada migração.
+// FASE 3 acrescenta growth_score_config, growth_score_snapshots e as RPCs
+// rpc_command_center/rpc_next_best_actions. Regenerar depois de cada migração.
 
 export type Json =
   | string
@@ -66,6 +67,103 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "audit_log_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      growth_score_config: {
+        Row: {
+          content_target: number | null
+          content_weight: number
+          conversion_target: number | null
+          conversion_weight: number
+          created_at: string
+          leads_target: number | null
+          leads_weight: number
+          organization_id: string
+          pipeline_target: number | null
+          pipeline_weight: number
+          prospecting_target: number | null
+          prospecting_weight: number
+          revenue_target: number | null
+          revenue_weight: number
+          updated_at: string
+        }
+        Insert: {
+          content_target?: number | null
+          content_weight?: number
+          conversion_target?: number | null
+          conversion_weight?: number
+          created_at?: string
+          leads_target?: number | null
+          leads_weight?: number
+          organization_id: string
+          pipeline_target?: number | null
+          pipeline_weight?: number
+          prospecting_target?: number | null
+          prospecting_weight?: number
+          revenue_target?: number | null
+          revenue_weight?: number
+          updated_at?: string
+        }
+        Update: {
+          content_target?: number | null
+          content_weight?: number
+          conversion_target?: number | null
+          conversion_weight?: number
+          created_at?: string
+          leads_target?: number | null
+          leads_weight?: number
+          organization_id?: string
+          pipeline_target?: number | null
+          pipeline_weight?: number
+          prospecting_target?: number | null
+          prospecting_weight?: number
+          revenue_target?: number | null
+          revenue_weight?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "growth_score_config_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: true
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      growth_score_snapshots: {
+        Row: {
+          components: Json
+          created_at: string
+          id: string
+          organization_id: string
+          snapshot_date: string
+          total_score: number | null
+        }
+        Insert: {
+          components?: Json
+          created_at?: string
+          id?: string
+          organization_id: string
+          snapshot_date: string
+          total_score?: number | null
+        }
+        Update: {
+          components?: Json
+          created_at?: string
+          id?: string
+          organization_id?: string
+          snapshot_date?: string
+          total_score?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "growth_score_snapshots_organization_id_fkey"
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
@@ -226,7 +324,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      rpc_command_center: { Args: never; Returns: Json }
+      rpc_next_best_actions: { Args: never; Returns: Json }
     }
     Enums: {
       membership_status: "invited" | "active" | "suspended"
