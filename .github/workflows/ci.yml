@@ -75,3 +75,27 @@ jobs:
         run: |
           files=$(git ls-files 'supabase/functions/**/*.ts' | grep -v '\.test\.ts$')
           deno check --config supabase/functions/deno.json $files
+
+  database:
+    name: Banco — migrações e regressão de RLS (pgTAP)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      # Sobe Postgres local via Docker (o runner do GitHub já tem o daemon),
+      # aplica todas as migrações de supabase/migrations/ do zero e roda a
+      # suíte de supabase/tests/database/ com pg_prove.
+      #
+      # A suíte prova a ausência da classe de falha do achado C-01: cada
+      # asserção foi verificada manualmente contra o projeto remoto antes de
+      # ser commitada — ver docs/13-EXECUCAO-FASE-1.md — mas esta é a primeira
+      # vez que o job em si roda: não havia Docker disponível na sessão que o
+      # escreveu para testar o job de ponta a ponta.
+      - name: Aplicar migrações e rodar pgTAP
+        run: |
+          supabase db start
+          supabase test db

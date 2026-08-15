@@ -1,7 +1,8 @@
 // Gerado por `supabase gen types typescript`. Não edite à mão.
 //
-// O banco está vazio: o esquema nasce na FASE 2, multi-tenant desde a primeira
-// tabela (docs/02-MODELO-DE-DADOS.md). Regenerar depois de cada migração.
+// Esquema nasce na FASE 2: organizations, profiles, memberships, audit_log,
+// idempotency_keys — RLS habilitada e forçada em todas (docs/02-MODELO-DE-DADOS.md).
+// Regenerar depois de cada migração.
 
 export type Json =
   | string
@@ -19,7 +20,207 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      audit_log: {
+        Row: {
+          action: string
+          actor_id: string | null
+          actor_type: string
+          after: Json | null
+          at: string
+          before: Json | null
+          correlation_id: string | null
+          id: string
+          ip_hash: string | null
+          organization_id: string
+          subject_id: string | null
+          subject_type: string
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          actor_type?: string
+          after?: Json | null
+          at?: string
+          before?: Json | null
+          correlation_id?: string | null
+          id?: string
+          ip_hash?: string | null
+          organization_id: string
+          subject_id?: string | null
+          subject_type: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          actor_type?: string
+          after?: Json | null
+          at?: string
+          before?: Json | null
+          correlation_id?: string | null
+          id?: string
+          ip_hash?: string | null
+          organization_id?: string
+          subject_id?: string | null
+          subject_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_log_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      idempotency_keys: {
+        Row: {
+          created_at: string
+          key: string
+          organization_id: string
+          result: Json | null
+          scope: string
+          subject_id: string | null
+          subject_type: string | null
+        }
+        Insert: {
+          created_at?: string
+          key: string
+          organization_id: string
+          result?: Json | null
+          scope: string
+          subject_id?: string | null
+          subject_type?: string | null
+        }
+        Update: {
+          created_at?: string
+          key?: string
+          organization_id?: string
+          result?: Json | null
+          scope?: string
+          subject_id?: string | null
+          subject_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "idempotency_keys_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      memberships: {
+        Row: {
+          created_at: string
+          id: string
+          invited_by: string | null
+          organization_id: string
+          role: Database["public"]["Enums"]["org_role"]
+          status: Database["public"]["Enums"]["membership_status"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invited_by?: string | null
+          organization_id: string
+          role?: Database["public"]["Enums"]["org_role"]
+          status?: Database["public"]["Enums"]["membership_status"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invited_by?: string | null
+          organization_id?: string
+          role?: Database["public"]["Enums"]["org_role"]
+          status?: Database["public"]["Enums"]["membership_status"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "memberships_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organizations: {
+        Row: {
+          cnpj: string | null
+          created_at: string
+          deleted_at: string | null
+          display_name: string
+          id: string
+          legal_name: string
+          locale: string
+          plan: string
+          slug: string
+          status: string
+          timezone: string
+          updated_at: string
+        }
+        Insert: {
+          cnpj?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          display_name: string
+          id?: string
+          legal_name: string
+          locale?: string
+          plan?: string
+          slug: string
+          status?: string
+          timezone?: string
+          updated_at?: string
+        }
+        Update: {
+          cnpj?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          display_name?: string
+          id?: string
+          legal_name?: string
+          locale?: string
+          plan?: string
+          slug?: string
+          status?: string
+          timezone?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_path: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          locale: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_path?: string | null
+          created_at?: string
+          full_name?: string | null
+          id: string
+          locale?: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_path?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          locale?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -28,7 +229,8 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      membership_status: "invited" | "active" | "suspended"
+      org_role: "owner" | "admin" | "operator" | "analyst" | "viewer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -155,6 +357,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      membership_status: ["invited", "active", "suspended"],
+      org_role: ["owner", "admin", "operator", "analyst", "viewer"],
+    },
   },
 } as const
