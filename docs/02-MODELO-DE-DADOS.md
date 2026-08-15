@@ -8,8 +8,15 @@ aplicado ao banco — aplicar é trabalho da FASE 2.
 
 ## §1. Princípios de modelagem
 
-**P1 — `organization_id NOT NULL` em toda tabela de negócio.** Sem exceção. É o
-que torna a RLS uniforme e o retrofit para SaaS trivial.
+**P1 — `organization_id NOT NULL` em toda tabela de negócio.** Sem exceção.
+
+Não é preparo para vender o sistema — ele é de uso interno da Keystone. É o que
+torna a **política de RLS uniforme**: uma única forma de escrever `using` em
+todas as tabelas, em vez de sessenta políticas diferentes que alguém precisa
+revisar uma a uma. Política uniforme é política auditável.
+
+A coluna custa quase nada na criação e é a decisão de maior arrependimento se
+precisar ser adicionada depois.
 
 **P2 — Enum de banco para todo estado de máquina.** Status de post, estágio de
 pipeline, modo de aprovação. Texto livre em coluna de status é fonte garantida de
@@ -1400,6 +1407,7 @@ Atualizadas por `REFRESH MATERIALIZED VIEW CONCURRENTLY` no WF-013 noturno.
 | `run_status` | running, succeeded, failed, partial, cancelled |
 
 Estágios de pipeline (seção 31) são **linhas em `pipeline_stages`**, não enum —
-porque um SaaS multiempresa precisa de funil configurável por cliente. Trade-off
+porque funil comercial muda quando o processo comercial muda — e ele muda.
+Trade-off
 consciente: perde-se validação no banco, ganha-se a extensibilidade exigida pela
 seção 60.

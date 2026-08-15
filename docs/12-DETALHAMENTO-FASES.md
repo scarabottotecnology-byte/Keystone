@@ -117,25 +117,29 @@ travam o roadmap.
 
 ---
 
-## FASE 2 — Banco, autenticação e multi-tenant
+## FASE 2 — Banco, autenticação e RLS
 
 **Prazo** 07/09/2026 · **Estimativa** 2 semanas · **Prioridade** urgente
 **Dependência** FASE 1 · **Referência** `02-MODELO-DE-DADOS.md`, `07-SEGURANCA-LGPD-MULTITENANT.md`
 
 ### Objetivo
-Fechar a falha crítica de segurança, criar a base multi-tenant e migrar o módulo
-de custos para dentro dela sem perder dado nem funcionalidade.
+Criar a base de identidade e acesso do sistema: organização, usuários, papéis e
+RLS forçada em toda tabela.
 
-### Por que esta fase é o gargalo do projeto
-A migração atual concede `SELECT`, `INSERT` e `DELETE` ao papel `anon` com
-`USING (true)`. RLS está habilitada, o que dá aparência de proteção, mas a
-condição anula tudo. Como a URL e a chave pública estão no bundle — como precisam
-estar —, qualquer pessoa que abra a aplicação consegue ler todos os lançamentos
-financeiros dos clientes ou apagar a tabela inteira. Não há soft delete nem
-backup configurado.
+### Por que esta fase não pode ser pulada
+Nada que guarde segredo pode existir antes dela. Um token de OAuth do LinkedIn
+precisa pertencer a alguém; um template de arte precisa ter dono. Sem
+autenticação, qualquer tabela criada fica atrás de uma chave publicável que vai
+no bundle — o que não é proteção nenhuma.
 
-Enquanto isso não for corrigido, construir Command Center, IA ou integrações é
-empilhar produto sobre um vazamento em curso.
+Foi exatamente essa confusão que produziu o achado **C-01** na auditoria da FASE
+0, em outro produto da casa: políticas concedendo `SELECT`, `INSERT` e `DELETE`
+ao papel `anon` com `USING (true)`. RLS habilitada, aparência de proteção, e a
+condição anulando tudo.
+
+O sistema vai guardar token de rede social, dado de prospect e conversa de
+WhatsApp. Construir qualquer um desses módulos antes desta fase é empilhar
+produto sobre um vazamento.
 
 ### Ordem obrigatória
 O banco nasce vazio, então não há backfill nem convivência com política antiga.
@@ -888,7 +892,7 @@ seja possível.
 ### Subtarefas
 
 1. **[DATABASE] `pipelines`, `pipeline_stages`, `opportunities`, `opportunity_stage_history`, `activities`**
-   Estágios como **linhas**, não enum — um SaaS multiempresa precisa de funil
+   Estágios como **linhas**, não enum — funil comercial muda quando o processo
    configurável por cliente.
 2. **[DATA] Seed dos 10 estágios**
    NEW, QUALIFIED, CONTACTED, ENGAGED, MEETING, DIAGNOSIS, PROPOSAL, NEGOTIATION,

@@ -8,9 +8,15 @@ Cobre os itens 1 a 5 exigidos pela seção 66 do Master Prompt.
 
 ### O que estamos construindo
 
-Keystone Growth OS é um **sistema operacional de crescimento comercial**: um ciclo
-fechado que vai de inteligência de mercado até receita registrada, e devolve o
-resultado da venda como insumo de aprendizado para o próximo ciclo.
+O motor de marketing e prospecção **da própria Keystone**: um ciclo fechado que
+vai de inteligência de mercado até receita registrada, e devolve o resultado da
+venda como insumo de aprendizado para o próximo ciclo.
+
+**Ferramenta interna, não produto.** Não será vendida, licenciada nem oferecida a
+cliente. O único usuário é a Keystone, e isso é uma vantagem de projeto, não uma
+limitação: não há requisito hipotético de mercado a acomodar, nem cliente
+imaginário cujo caso de uso precise caber. Cada decisão pode ser tomada para uma
+consultoria de controladoria brasileira, e só.
 
 A distinção prática entre isto e uma ferramenta de social media é uma só: aqui,
 **todo conteúdo publicado carrega identidade até a oportunidade fechada**. Um post
@@ -210,7 +216,8 @@ políticas, não o modelo de dados.
 Cada `modules/<nome>/` contém `pages/`, `components/`, `hooks/`, `api/`,
 `types.ts`. Regra: um módulo pode importar de `components/ui`, `lib` e `shared`;
 **não pode importar de outro módulo**. Dependência entre domínios passa por
-`lib/` ou pelo banco. Isso mantém a extração para SaaS multiempresa viável.
+`lib/` ou pelo banco. A razão é manutenção: fronteira frouxa entre módulos vira,
+em seis meses, um grafo em que mudar o CRM quebra a fila de publicação.
 
 ---
 
@@ -306,7 +313,7 @@ Sidebar conforme seção 43 do Master Prompt.
 | `/automations` | Automações | Catálogo, cron, modo de aprovação, últimas execuções, taxa de erro | `automation_definitions`, `automation_runs` | 20 |
 | `/automations/runs/:id` | Execução | Timeline por passo, payload, erro, correlation ID | `automation_logs` | 21 |
 | `/ai-insights` | AI Insights | Feed de recomendações: problema, evidência, recomendação, impacto, botão **EXECUTAR** | `ai_recommendations` | 19 |
-| `/settings/*` | Configurações | Organization, Brand, AI, Social, WhatsApp, Email, ICP, Automation, Notifications, Security, Billing | diversas | 2+ |
+| `/settings/*` | Configurações | Marca, IA, contas conectadas, WhatsApp, e-mail, ICP, automação, notificações, segurança | diversas | 2+ |
 
 ### Linguagem visual
 

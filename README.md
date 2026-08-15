@@ -1,20 +1,25 @@
 # Keystone Growth OS
 
-CRM comercial com gestão de redes sociais por IA e publicação automática.
+O motor de marketing e prospecção da própria Keystone Controladoria.
+
+**Ferramenta interna.** Não é produto, não será vendida nem licenciada. Existe
+para uma coisa: maximizar o marketing e a geração de demanda da consultoria, com
+o mínimo de tempo humano gasto nisso.
 
 O objetivo central é este: **o sistema produz a peça inteira — copy, arte,
 legenda, hashtags, alt text — agenda e publica, sem que ninguém suba imagem.**
-A intervenção humana é opcional e acontece pela fila de publicação, escrevendo
-o que se quer diferente; o sistema regera. Em volta disso está o resto do ciclo
-comercial: inteligência de mercado alimenta a pauta, o conteúdo publicado gera
-lead, o lead vira prospect qualificado, o prospect entra no pipeline, e a
-receita fechada volta como sinal de aprendizado para o que se publica amanhã.
+A intervenção é opcional e acontece pela fila de publicação, escrevendo o que se
+quer diferente; o sistema regera. Em volta disso está o resto do ciclo:
+inteligência de mercado alimenta a pauta, o conteúdo publicado gera lead, o lead
+vira prospect qualificado, o prospect entra no pipeline, e a receita fechada
+volta como sinal de aprendizado para o que se publica amanhã.
 
-Não é ferramenta de agendamento de posts, e não é CRM com um módulo de social
-pendurado. É um ciclo fechado onde cada etapa alimenta a seguinte.
+Não é agendador de posts, e não é CRM com social pendurado. É um ciclo fechado
+onde cada etapa alimenta a seguinte.
 
-A arquitetura é multi-tenant desde a primeira tabela, para que o produto possa
-virar SaaS sem reescrita.
+Ter um único usuário conhecido é vantagem de projeto: não há requisito
+hipotético de mercado a acomodar. Cada decisão é tomada para uma consultoria de
+controladoria brasileira, e só.
 
 ## Estado
 
@@ -81,7 +86,9 @@ Quatro regras que o código não pode violar. Detalhadas em
 
 - **I-1** — nenhum segredo no frontend. Só a chave publishable; o que protege o
   dado é a RLS.
-- **I-2** — toda linha pertence a uma organização. RLS `ENABLE` e `FORCE`.
+- **I-2** — toda linha pertence a uma organização, e o acesso passa por RLS
+  `ENABLE` **e** `FORCE`. Não é preparo para escala: é o que torna a política de
+  segurança uniforme e revisável numa página.
 - **I-3** — o n8n orquestra, não decide. Regra de negócio mora em Edge Function.
 - **I-4** — nenhum efeito externo sem chave de idempotência gravada antes da
   chamada.

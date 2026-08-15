@@ -89,8 +89,8 @@ Etapa 2.
 `ENABLE` e `FORCE`, login. Não dá para pular: token de OAuth precisa pertencer a
 alguém, e template precisa de dono.
 
-É a FASE 2 sem os enfeites — sem RBAC fino, sem convite, sem seletor de
-organização. Uma organização, os usuários da Keystone.
+É a FASE 2 sem os enfeites — sem RBAC fino, sem seletor de organização, sem
+convite de time externo. Uma organização, os usuários da Keystone.
 
 ### Etapa 3 — copy
 

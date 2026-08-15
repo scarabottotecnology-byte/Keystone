@@ -168,11 +168,11 @@ como escrever RLS por usuário até que isto exista.
 
 ### HIGH
 
-**H-01 — Ausência total de isolamento por tenant.** Nenhuma tabela tem
-`organization_id`. Como o Master Prompt exige multi-tenant desde o início (seções
-40–41), e como retrofit de tenancy em base com dados é sempre mais caro que
-começar certo, esta é a decisão que deve ser tomada na FASE 2 e não depois.
-Ver ADR-002.
+**H-01 — Ausência total de escopo por organização.** Nenhuma tabela tem
+`organization_id`, o que obriga cada política de RLS a ser escrita e revisada
+individualmente. Retrofit dessa coluna em base com dados é sempre mais caro que
+começar certo. Ver ADR-002 revisto — a razão é auditabilidade da política, não
+preparo para múltiplos clientes.
 
 **H-02 — O dashboard carrega a tabela inteira no navegador.**
 `useFinancialData.ts` pagina em blocos de 1.000 registros num laço `while` **sem

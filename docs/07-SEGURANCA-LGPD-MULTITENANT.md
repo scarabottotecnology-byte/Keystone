@@ -1,4 +1,4 @@
-# 07 — Segurança, LGPD e Multi-tenant
+# 07 — Segurança, LGPD e isolamento de acesso
 
 Cobre os itens 14, 15 e 16 da seção 66.
 
@@ -32,7 +32,7 @@ para a Keystone.
 
 ---
 
-## §2. Multi-tenant e RLS
+## §2. Escopo por organização e RLS
 
 ### Modelo
 

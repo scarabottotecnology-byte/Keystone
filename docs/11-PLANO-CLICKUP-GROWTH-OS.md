@@ -39,13 +39,13 @@ As datas são derivadas, não compromisso — ajuste na pasta depois de criada.
 ## Estrutura
 
 ### EIXO A — Fundação
-*Estrutura técnica, banco, autenticação, multi-tenant e a tela executiva.
+*Estrutura técnica, banco, autenticação, RLS e a tela executiva.
 Nenhum outro eixo pode começar antes deste terminar.*
 
 | Ficha | Prazo | Est. |
 |---|---|---|
 | **FASE 1 — Fundação técnica** | 24/08/2026 | 2 sem |
-| **FASE 2 — Banco, autenticação e multi-tenant** | 07/09/2026 | 2 sem |
+| **FASE 2 — Banco, autenticação e RLS** | 07/09/2026 | 2 sem |
 | **FASE 3 — Command Center** | 24/09/2026 | 1,5 sem |
 
 ### EIXO B — Conteúdo
@@ -146,7 +146,7 @@ A ficha só é fechada quando todos os critérios estiverem marcados — é a
 
 | Prioridade | Fichas | Motivo |
 |---|---|---|
-| `urgent` | FASE 1, FASE 2 | Sem tenancy e RLS forçada não existe nem a primeira tela real, e retrofitar isolamento depois de haver dado é ordem de magnitude pior |
+| `urgent` | FASE 1, FASE 2, FASE 5 | Sem autenticação e RLS forçada não existe nem a primeira tela real. A FASE 5 é a fábrica de conteúdo — o motivo pelo qual o sistema existe |
 | `high` | FASES 3, 6, 7, 14, 15, 21 | Gargalos de caminho crítico ou de conformidade |
 | `normal` | demais | — |
 
@@ -177,7 +177,7 @@ e 15, travam o roadmap.
 | EIXO F — Inteligência | `901328129604` | ✅ |
 | EIXO G — Produção | `901328129605` | ✅ |
 | FASE 1 — Fundação técnica | `86ajy2jwa` | ✅ completa, 14 subtarefas |
-| FASE 2 — Banco, auth e multi-tenant | `86ajy2jwg` | ✅ descrição reescrita para o escopo novo · 3 de 13 subtarefas |
+| FASE 2 — Banco, autenticação e RLS | `86ajy2jwg` | ✅ descrição reescrita para o escopo novo · 3 de 13 subtarefas |
 | FASE 3 — Command Center | `86ajy2jwh` | ⚠️ 0 de 9 subtarefas |
 | FASE 4 — Content Strategy + Market Intelligence | `86ak16518` | ✅ ficha |
 | FASE 5 — AI Content Factory + geração de arte | `86ak16523` | ✅ ficha · **urgente**, do documento 14 |

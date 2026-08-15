@@ -43,7 +43,7 @@ grandeza para planejamento, não compromisso contratual.
 | Fase | Entrega | Est. | Dependência |
 |---|---|---|---|
 | **1** | Fundação técnica: estrutura de módulos, design system premium, CI, `_shared` de Edge Functions, `ai-gateway`, tabelas de IA e observabilidade | 2 | — |
-| **2** | Banco + auth + multi-tenant: `organizations`/`profiles`/`memberships`, RLS em tudo, login, onboarding, RPCs de agregação, convites e papéis | 3 | 1 |
+| **2** | Banco + autenticação + RLS: `organizations`/`profiles`/`memberships`, RLS forçada em tudo, login, papéis, RPCs de agregação | 2 | 1 |
 | **3** | Command Center: RPC agregada, KPIs, Growth Score, blocos AI Growth Insight e Next Best Action | 1,5 | 2 |
 
 **Na FASE 1, além do código:** abrir os pedidos de acesso ao LinkedIn Community
@@ -145,13 +145,13 @@ zero linhas da org B no teste automatizado" é.
 - [ ] Custo e tokens gravados em toda invocação
 - [ ] Pedidos LinkedIn, Meta e WhatsApp protocolados (comprovante anexado ao relatório)
 
-### FASE 2 — Banco, auth e multi-tenant
-- [ ] Login, logout, recuperação e convite funcionando
+### FASE 2 — Banco, autenticação e RLS
+- [ ] Login, logout, recuperação e convite de membro da equipe funcionando
 - [ ] `organizations`, `profiles`, `memberships` criadas; Keystone provisionada
 - [ ] **Nenhuma política concede acesso a `anon`** (verificado por consulta ao catálogo)
 - [ ] Todas as tabelas com RLS habilitada **e** forçada
-- [ ] Suíte pgTAP: org A não lê, escreve, altera nem apaga dados da org B
-- [ ] Teste de regressão do C-01 no CI
+- [ ] Suíte pgTAP: usuário sem vínculo não lê, escreve, altera nem apaga nada
+- [ ] Teste de regressão de acesso anônimo no CI
 - [ ] Toda tabela nasce com `organization_id NOT NULL`
 - [ ] Agregação por RPC no servidor — nenhuma tela paginando para somar no cliente
 - [ ] Advisors de segurança do Supabase sem alerta aberto

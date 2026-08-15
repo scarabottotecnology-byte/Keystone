@@ -41,22 +41,36 @@ próprio motor de growth.
 
 ---
 
-## ADR-002 — Multi-tenant desde a FASE 2, não depois 🔴
+## ADR-002 — `organization_id` em toda tabela, e RLS forçada 🔴
 
-**Contexto.** Só a Keystone usará o sistema no início. Multi-tenancy poderia ser
-adiada.
+**Revisto em 15/08/2026.** A justificativa original era preparo para SaaS. O
+sistema é de **uso interno da Keystone** e não será vendido — a decisão continua,
+com outra razão.
 
-**Decisão.** `organization_id NOT NULL` em toda tabela de negócio desde a
-primeira migração.
+**Contexto.** Uma organização, poucos usuários. Escopo por organização poderia
+ser dispensado.
 
-**Razão.** Retrofit de tenancy sobre base com dados e código é uma das migrações
-mais caras que existem: toda query, toda política, toda função e todo teste
-precisam mudar simultaneamente, com risco de vazamento entre clientes durante a
-transição. O custo agora é uma coluna e uma política por tabela. O custo depois é
-um projeto.
+**Decisão.** `organization_id NOT NULL` em toda tabela de negócio, RLS `ENABLE`
+**e** `FORCE`, desde a primeira migração.
 
-**Consequência.** Toda tabela carrega uma coluna que, hoje, tem sempre o mesmo
-valor. É desperdício aparente e economia real.
+**Razão.** Não é escala — é **auditabilidade**. Com a coluna, existe uma única
+forma de escrever a política, aplicada igual em sessenta tabelas: ou a linha
+pertence à organização do usuário autenticado, ou não é visível. Sem ela, cada
+tabela ganha a sua própria regra, e revisar sessenta regras distintas é como o
+buraco de segurança nasce.
+
+A segunda razão é que **autenticação é obrigatória de qualquer forma**. O sistema
+guarda token de OAuth, dado de prospect e conversa de WhatsApp. Isso não pode
+ficar atrás de uma chave publicável que vai no bundle — foi exatamente essa
+confusão que produziu o achado C-01 no outro produto da casa.
+
+**Consequência.** Toda tabela carrega uma coluna que hoje tem sempre o mesmo
+valor. O custo é uma coluna e um índice; o benefício é que a superfície de
+revisão de segurança cabe numa página.
+
+**O que sai junto com o SaaS.** Seletor de organização, convite de time externo,
+cobrança e a matriz de teste de isolamento entre organizações. Nada disso se
+constrói.
 
 ---
 
@@ -204,14 +218,14 @@ banco.
 
 **Decisão.** `pipeline_stages` como tabela.
 
-**Razão.** A seção 60 exige preparo para SaaS multiempresa, e funil de vendas é
-das primeiras coisas que cada empresa quer configurar de forma diferente. Enum
-exigiria migração por cliente.
+**Razão.** Funil comercial muda quando o processo comercial muda — e ele muda,
+com muito mais frequência que o esquema do banco. Com enum, renomear um estágio
+ou inserir um passo intermediário vira migração; com tabela, é edição de linha.
 
-**Consequência.** Perde-se validação no banco; ganha-se extensibilidade. Os dez
-estágios da Keystone são criados como seed na FASE 17. Demais máquinas de estado
-(status de conteúdo, de publicação, de job) **continuam sendo enum**, porque são
-internas ao sistema e não devem variar por cliente.
+**Consequência.** Perde-se validação no banco; ganha-se poder ajustar o processo
+sem deploy. Os dez estágios são criados como seed na FASE 17. Demais máquinas de
+estado — status de conteúdo, de publicação, de job — **continuam sendo enum**,
+porque são internas ao sistema e mudam só com o código.
 
 ---
 
@@ -278,6 +292,45 @@ roadmap e precisa de dono no outro produto.
 
 ---
 
+## ADR-014 — Ferramenta interna, não produto 🔴
+
+**Decisão do cliente, 15/08/2026.**
+
+> "A ferramenta é de uso interno, para maximizar meu próprio marketing."
+
+**Contexto.** O master prompt pedia arquitetura "genérica o suficiente para
+virar SaaS multi-tenant". Vários documentos foram escritos sob essa premissa.
+
+**Decisão.** O Growth OS é **ferramenta interna da Keystone**. Não será vendido,
+licenciado nem oferecido a cliente. Nenhuma decisão de arquitetura se justifica
+por preparo para venda.
+
+**Razão.** Requisito hipotético é o pior tipo de requisito: custa hoje, em
+complexidade real, para atender um cenário que talvez nunca exista — e quando o
+cenário aparece, quase sempre é diferente do que foi antecipado. Ter um único
+usuário conhecido é vantagem: cada escolha pode ser tomada para uma consultoria
+de controladoria brasileira, e só.
+
+**O que sai.**
+
+| | Motivo |
+|---|---|
+| Seletor de organização | uma organização |
+| Convite de time externo | só a equipe da Keystone |
+| Tela de cobrança | não há o que cobrar |
+| Matriz pgTAP de isolamento **entre** organizações | não há segunda organização |
+| Justificativa "preparo para SaaS" em qualquer ADR | premissa morta |
+
+**O que fica, com outra razão.** `organization_id` e RLS forçada permanecem —
+**não** por escala, mas por auditabilidade e porque autenticação é obrigatória de
+qualquer forma. Ver o ADR-002 revisto.
+
+**Consequência no roadmap.** A FASE 2 perde o onboarding multi-organização e a
+matriz de isolamento cruzado. As demais fases não mudam: o ciclo comercial que o
+sistema executa é o mesmo, sendo interno ou não.
+
+---
+
 ## Decisões deliberadamente adiadas
 
 | Tema | Quando | Por quê agora não |
@@ -285,5 +338,4 @@ roadmap e precisa de dono no outro produto.
 | Provedor de e-mail (Resend × SES × Postmark) | FASE 14 | Abstração `EmailProvider` isola a escolha |
 | Provedor primário de LLM | FASE 1, revisável | O gateway torna a troca barata |
 | Hospedagem do n8n (cloud × self-hosted) | FASE 20 | Não afeta o desenho |
-| Modelo de billing para SaaS | pós-FASE 24 | Só a Keystone usa hoje |
 | Workers × Pages, e R2 × Supabase Storage | FASE 24 | Não afeta o desenho até o deploy |
