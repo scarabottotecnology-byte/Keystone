@@ -2,7 +2,8 @@
   "imports": {
     "satori": "npm:satori@0.10.13",
     "@resvg/resvg-wasm": "npm:@resvg/resvg-wasm@2.6.2",
-    "@supabase/supabase-js": "npm:@supabase/supabase-js@2"
+    "@supabase/supabase-js": "npm:@supabase/supabase-js@2",
+    "zod": "npm:zod@3"
   },
   "nodeModulesDir": "none",
   "lint": {

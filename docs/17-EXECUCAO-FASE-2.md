@@ -3,8 +3,10 @@
 Registro do que já foi construído da FASE 2 — Banco, autenticação e RLS.
 Segue os STEPs 11 e 12 do método (DOCUMENT e REPORT) do documento 09.
 
-**Status:** parcial. Identidade, RLS e a suíte de regressão estão entregues.
-Autenticação de frontend e as RPCs de agregação ainda não.
+**Status:** quase completa. Identidade, RLS, a suíte de regressão, autenticação
+de frontend, convite de membro e a regra contra dado mascarado estão
+entregues. Só resta a subtarefa 6 (RPCs de agregação), que depende de haver
+uma tabela de negócio para agregar — ou seja, depende da FASE 3.
 
 ---
 
@@ -142,18 +144,96 @@ contra o projeto remoto, não escrito à mão.
 
 ---
 
+## Autenticação de frontend (subtarefa 8)
+
+`src/app/auth/`: `AuthProvider` (sessão via `onAuthStateChange`, que já
+dispara uma vez com a sessão em cache ao inscrever — um listener só cobre
+carga inicial e toda troca depois), `useMembership` (o vínculo ativo do
+usuário logado — filtra por `user_id` explicitamente, porque a política
+`tenant_select` de `memberships` mostra a organização inteira, não só a
+própria linha), `ProtectedRoute` (fecha três portas: sem sessão redireciona
+para `/entrar`; sem vínculo ativo mostra `PendingAccessScreen`; falha na
+própria consulta usa o `QueryState` do resto do produto).
+
+Três telas: `LoginPage`, `ForgotPasswordPage`, `ResetPasswordPage`. Sem link
+de "criar conta" — ADR-014, sem cadastro público, a conta nasce por convite.
+`ForgotPasswordPage` não revela se o e-mail existe na base ("se houver uma
+conta com esse e-mail…") — evita enumeração de usuário. `ResetPasswordPage`
+não lê nem troca token: o cliente Supabase já detecta o link e cria a sessão
+sozinho (`detectSessionInUrl`, ligado por padrão); a tela só espera isso
+terminar e troca a senha na sessão resultante.
+
+Logout entrou no header (`UserMenu`), ao lado do seletor de tema.
+
+## Convite de membro e Equipe (subtarefa 9, escopo reduzido pelo ADR-014)
+
+O subtarefa original do documento 12 pedia "criar organização, convidar
+time, configurar marca inicial". ADR-014 já tinha eliminado a criação de
+organização e o seletor — sobra só o convite, e nem esse por e-mail
+transacional próprio: usa `auth.admin.inviteUserByEmail`, que a Supabase já
+manda.
+
+Edge Function `invite-member`, implantada no projeto remoto. `service_role`
+entra só na única operação que de fato exige privilégio elevado — criar o
+usuário de autenticação. A gravação que importa, a `membership`, usa o
+cliente do próprio chamador (`caller.db`): quem decide se o convite pode
+acontecer é a política `admin_insert`, não o código da função. Usar
+`service_role` para os dois passos teria sido a mesma classe de falha do
+achado C-01, só que numa Edge Function em vez de numa migração.
+
+Payload validado por zod (`invite-member/validate.ts`, módulo puro, testado
+no vitest — 7 casos, incluindo a rejeição explícita de `role: "owner"`: esse
+papel só sai do bootstrap do primeiro usuário, nunca de um convite). Casos
+tratados: e-mail já registrado (sem `getUserByEmail` na API admin, cai para
+`listUsers` e localiza por e-mail — aceitável na escala de uma organização
+só, ADR-014); `membership` duplicada (`23505` vira `409 conflict` legível,
+não `500`).
+
+Frontend: `/settings` deixou de ser placeholder. Seção **Equipe**
+(`TeamSection`) lista `role`/`status` de cada membro, com botão "Convidar"
+visível só para `owner`/`admin`. `memberships` e `profiles` não têm chave
+estrangeira entre si — ambas apontam para `auth.users`, mas não uma para a
+outra —, então a lista faz duas consultas e o merge no cliente, em vez de um
+`select` aninhado que o PostgREST não consegue montar.
+
+**Limite conhecido, registrado em vez de escondido:** a lista não mostra
+e-mail — `profiles` não duplica e-mail de propósito (documento 02), e mostrar
+e-mail exigiria ou reverter essa decisão ou uma segunda Edge Function com
+`service_role` só para leitura. Um convidado sem `full_name` (que só é
+preenchido no primeiro login) aparece como "Sem nome — aguardando primeiro
+acesso" — estado real, não mascarado, em vez de inventar um rótulo.
+
+As demais seções prometidas em `navigation.ts` (marca, ICP, orçamento de IA)
+aparecem na própria tela como pendentes, cada uma com a fase em que chega —
+mesmo princípio do `ModulePlaceholder`, em escala de seção.
+
+## Fallback que mascara dado ausente (subtarefa 10)
+
+`eslint-rules/no-masking-fallback.js`, mesmo padrão sem dependência nova de
+`no-cross-module-import.js`. Proíbe `a || 0`, `a || ""` e `a || false` —
+especificamente esses três literais, não todo uso de `||`: são os valores que
+**também são** o "vazio" do próprio tipo, então `saldo || 0` esconde a
+diferença entre "o saldo é zero" e "o saldo não veio". `??` resolve porque só
+substitui `null`/`undefined`. Regra ampla o bastante para pegar o defeito real
+e estreita o bastante para não gerar ruído em lógica booleana comum. Achou uma
+ocorrência pré-existente (`progress.tsx`, `value || 0`), corrigida.
+
+---
+
 ## Verificação
 
 | | |
 |---|---|
 | Typecheck | limpo |
-| Lint | 0 erros, 8 avisos (mesmos pré-existentes da FASE 1, componentes shadcn) |
-| Testes | 77 passando (nenhum teste novo de frontend nesta fase — a suíte nova é pgTAP, fora do vitest) |
-| Build | ✓ · bundle 399 kB (126 kB gzip) |
+| Lint | 0 erros, 9 avisos (mesmos de sempre + `AuthProvider`, todos `react-refresh` em arquivo com hook e componente) |
+| Testes | 85 passando |
+| Build | ✓ · bundle 760 kB (223 kB gzip) — cresceu porque Dialog, Select, Table e `functions.invoke` passaram a ser exercitados de verdade; revisão de bundle é escopo da FASE 23 |
 | `get_advisors(security)` | zero lints, contra o projeto remoto |
 | RLS | `ENABLE` + `FORCE` nas cinco tabelas, confirmado por catálogo e por comportamento |
 | Política `anon` | zero, nas cinco tabelas, confirmado por catálogo |
 | CI `database` | configurado; não executado localmente (sem Docker na sandbox) |
+| `invite-member` | implantada (`ACTIVE`) no projeto remoto; lógica pura testada no vitest, mas a chamada HTTP de ponta a ponta não foi exercitada nesta sandbox — o proxy de saída bloqueia HTTPS direto a `*.supabase.co` |
+| Navegação no navegador | `/`, `/entrar`, `/esqueci-senha` renderizados via Chromium headless; redirecionamento não-autenticado → `/entrar` confirmado; console sem erro |
 
 ---
 
@@ -161,15 +241,19 @@ contra o projeto remoto, não escrito à mão.
 
 | Subtarefa | O que falta |
 |---|---|
-| 6 | RPCs de agregação (`SECURITY INVOKER` + `STABLE`) |
-| 7 | Endurecer entrada com zod nas Edge Functions que já existem |
-| 8 (frontend) | Login, logout, recuperação de senha, `<ProtectedRoute>` |
-| 9 | Onboarding — escopo reduzido por ADR-014: como não há criação de
-    organização nem convite por e-mail, provavelmente só uma tela de "aceitar
-    vínculo" para quando `admin_insert` cria a `membership` de um novo membro |
-| 10 | Lint/regra proibindo fallback `a || b` que mascara dado ausente |
+| 6 | RPCs de agregação (`SECURITY INVOKER` + `STABLE`) — sem tabela de negócio ainda para agregar, fica para quando o primeiro módulo (FASE 3) nascer |
+| 7 | Endurecer entrada com zod nas demais Edge Functions (`render-asset`) — `invite-member` já nasceu validada |
 
 Com `organizations` existindo, a subtarefa 10 da FASE 1 (`ai-gateway` e
 tabelas de IA/observabilidade), registrada como bloqueada em
 `docs/13-EXECUCAO-FASE-1.md`, está desbloqueada — mas não foi retomada nesta
 sessão.
+
+Um ajuste identificado mas não feito: `supabase/functions/_shared/auth.ts`
+cria o cliente sem o genérico `Database`, então `caller.db` fica sem
+tipagem de coluna em toda Edge Function que o usa — gap que já existia desde
+a FASE 1, escrito antes do schema existir. Corrigível agora com um import de
+tipo cross-boundary (`src/integrations/supabase/types.ts` a partir de
+`supabase/functions/`), mas não verificável nesta sandbox sem `deno check`
+local — fica para uma sessão com Docker/Deno disponível, para não commitar
+uma mudança de tipagem sem conseguir rodar o checker que ela afeta.

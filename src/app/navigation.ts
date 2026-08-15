@@ -27,8 +27,12 @@ import type { LucideIcon } from "lucide-react";
  * passa a existir de verdade. Módulo com `status: "planned"` renderiza um
  * estado honesto dizendo isso, em vez de uma tela com dado falso.
  *
- * Hoje **todos** estão planejados: a FASE 1 entrega a fundação, não telas com
- * dado. O primeiro a virar `active` é o Command Center, na FASE 3.
+ * A FASE 1 entregou a fundação, não telas com dado — todos nasceram
+ * `planned`. Configurações foi o primeiro a virar `active`, na FASE 2, com a
+ * seção de Equipe: é a própria tabela `memberships` que a fase constrói,
+ * então não há razão para escondê-la atrás de um placeholder. As seções que
+ * a tela ainda não cobre — marca, ICP, orçamento de IA — aparecem nela
+ * mesma como pendentes, com a fase em que chegam.
  */
 
 export type ModuleStatus = "active" | "planned";
@@ -259,7 +263,7 @@ export const NAVIGATION: NavGroup[] = [
         label: "Configurações",
         to: "/settings",
         icon: Settings,
-        status: "planned",
+        status: "active",
         phase: 2,
         purpose:
           "Organização, marca, IA, contas conectadas, ICP, automação, segurança.",

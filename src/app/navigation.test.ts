@@ -42,16 +42,14 @@ describe("registro de navegação", () => {
     }
   });
 
-  it("nenhum módulo se declara pronto sem rota no roteador", () => {
-    // O App só monta rota para PLANNED_ITEMS. Um item marcado 'active' sem
-    // rota correspondente cai no NotFound — a sidebar prometeria algo que não
-    // abre. Este teste falha de propósito quando o primeiro módulo for marcado
-    // como pronto, para lembrar de ligar a rota dele no App.
+  it("todo item 'active' tem rota própria registrada em App.tsx", () => {
+    // O App só monta rota automática para PLANNED_ITEMS — um item 'active'
+    // precisa da própria <Route> escrita à mão, com a tela real. Esta lista
+    // é a prova de que ninguém esqueceu: marcar um módulo como pronto sem
+    // registrar a rota dele aqui (e em App.tsx) cai no NotFound, e a sidebar
+    // prometeria algo que não abre.
     const active = ALL_NAV_ITEMS.filter((i) => i.status === "active");
-    expect(
-      active.map((i) => i.to),
-      "item 'active' encontrado: registre a rota em App.tsx e ajuste este teste",
-    ).toEqual([]);
+    expect(active.map((i) => i.to)).toEqual(["/settings"]);
   });
 
   it("nenhum grupo fica vazio", () => {

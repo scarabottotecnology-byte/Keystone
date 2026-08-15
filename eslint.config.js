@@ -4,6 +4,7 @@ import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
 import tseslint from "typescript-eslint";
 import keystone from "./eslint-rules/no-cross-module-import.js";
+import keystoneData from "./eslint-rules/no-masking-fallback.js";
 
 export default tseslint.config(
   // As Edge Functions rodam em Deno: globais diferentes, importação por
@@ -38,6 +39,19 @@ export default tseslint.config(
     plugins: { keystone },
     rules: {
       "keystone/no-cross-module-import": "error",
+    },
+  },
+
+  // ── Fallback que mascara dado ausente ─────────────────────────────────────
+  //
+  // O porquê está no cabeçalho de `eslint-rules/no-masking-fallback.js`.
+  // Vale para todo o frontend, não só `modules/` — a tela de configurações e a
+  // shell de navegação exibem dado real tanto quanto qualquer módulo.
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    plugins: { "keystone-data": keystoneData },
+    rules: {
+      "keystone-data/no-masking-fallback": "error",
     },
   },
 );
