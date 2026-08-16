@@ -5,15 +5,16 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Keystone — Ink / Paper / Red
- * Display: Fraunces (serif editorial, light/regular, italic)
- * Body:    Inter (sans, 300/400/500/600)
+ * Keystone — Dark Luxury Corporate
+ * Black / Charcoal / Ivory / Champagne, red as a rare signature accent only.
+ * Display: Cormorant Garamond (serif editorial, light/regular, italic)
+ * Body:    Manrope (sans, 300/400/500/600/700)
  */
 
 @theme inline {
-  --font-sans: "Inter", system-ui, sans-serif;
-  --font-display: "Fraunces", Georgia, serif;
-  --font-accent: "Fraunces", Georgia, serif;
+  --font-sans: "Manrope", system-ui, sans-serif;
+  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-accent: "Cormorant Garamond", Georgia, serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
 
   --radius-sm: 0;
@@ -56,26 +57,34 @@
   --color-cream-dim: var(--cream-dim);
   --color-cream-mute: var(--cream-mute);
   --color-border-sub: var(--border-sub);
+  --color-red: var(--red);
+  --color-red-bright: var(--red-bright);
 }
 
 :root {
   --radius: 0;
 
-  /* Brand palette — Preto / Branco / Cinza / Vermelho Keystone */
-  --navy: #ffffff;
-  --navy-mid: #fafafa;
-  --navy-card: #ffffff;
-  --navy-light: #f4f4f3;
-  --gold: #a6192e;
-  --gold-light: #c41e3a;
-  --gold-dim: rgba(166, 25, 46, 0.07);
-  --cream: #0a0a0a;
-  --cream-dim: rgba(10, 10, 10, 0.68);
-  --cream-mute: rgba(10, 10, 10, 0.42);
-  --border: rgba(10, 10, 10, 0.14);
-  --border-sub: rgba(10, 10, 10, 0.09);
+  /* Brand palette — Black / Charcoal / Graphite / Ivory / Champagne.
+     Red is a signature accent only (logo, rare emphasis) — never the
+     dominant color. Variable names kept from the previous theme so every
+     component (hero, header, footer, ferramentas, blog, diagnóstico)
+     re-themes automatically. */
+  --navy: #090909;           /* black — primary background */
+  --navy-mid: #101010;
+  --navy-card: #151515;      /* charcoal */
+  --navy-light: #202020;     /* dark graphite — hover / raised surface */
+  --gold: #c9b58a;           /* champagne — primary accent (5-10%) */
+  --gold-light: #ddcba0;
+  --gold-dim: rgba(201, 181, 138, 0.08);
+  --cream: #f2efe9;          /* warm white — primary text */
+  --cream-dim: rgba(242, 239, 233, 0.7);
+  --cream-mute: rgba(242, 239, 233, 0.44);
+  --border: rgba(242, 239, 233, 0.14);
+  --border-sub: rgba(242, 239, 233, 0.08);
+  --red: #8e1118;            /* secondary red — signature accent only, max 3-5% */
+  --red-bright: #b5121b;
 
-  /* Semantic — light surface */
+  /* Semantic — dark surface */
   --background: var(--navy);
   --foreground: var(--cream);
   --card: var(--navy-card);
@@ -84,9 +93,9 @@
   --popover-foreground: var(--cream);
 
   --primary: var(--gold);
-  --primary-foreground: #ffffff;
+  --primary-foreground: var(--navy);
   --secondary: var(--gold-light);
-  --secondary-foreground: #ffffff;
+  --secondary-foreground: var(--navy);
 
   --muted: var(--navy-mid);
   --muted-foreground: var(--cream-mute);
@@ -123,7 +132,7 @@
     letter-spacing: -0.01em;
   }
 
-  ::selection { background: var(--gold); color: #ffffff; }
+  ::selection { background: var(--gold); color: var(--navy); }
 }
 
 @utility eyebrow {
@@ -165,7 +174,7 @@
   gap: 10px;
   padding: 14px 26px;
   background: var(--gold);
-  color: #ffffff;
+  color: var(--navy);
   font-family: var(--font-sans);
   font-size: 12px;
   font-weight: 600;
@@ -296,7 +305,7 @@
 
 .grid-texture {
   background-image:
-    linear-gradient(rgba(10, 10, 10, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(10, 10, 10, 0.04) 1px, transparent 1px);
+    linear-gradient(rgba(242, 239, 233, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(242, 239, 233, 0.05) 1px, transparent 1px);
   background-size: 44px 44px;
 }
