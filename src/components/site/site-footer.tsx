@@ -1,0 +1,34 @@
+import { Link } from "@tanstack/react-router";
+import { LogoMark } from "@/components/site/logo-mark";
+
+export function SiteFooter() {
+  return (
+    <footer className="border-t border-border-sub bg-navy">
+      <div className="mx-auto grid max-w-[1400px] gap-10 px-8 py-14 md:grid-cols-3 md:items-center">
+        <Link to="/" className="flex items-center gap-3">
+          <span className="grid h-10 w-10 place-items-center border border-gold/40" aria-hidden>
+            <LogoMark size={24} />
+          </span>
+          <span className="font-display text-base text-cream">Keystone</span>
+        </Link>
+        <nav className="flex flex-wrap justify-center gap-7 text-[11px] uppercase tracking-[0.18em] text-cream-mute">
+          <Link to="/" className="hover:text-gold">Home</Link>
+          <a href="/#servicos" className="hover:text-gold">Serviços</a>
+          <a href="/#metodologia" className="hover:text-gold">Metodologia</a>
+          <a href="/#sobre" className="hover:text-gold">Sobre</a>
+          <Link to="/ferramentas" className="hover:text-gold">Ferramentas</Link>
+          <Link to="/diagnostico" className="hover:text-gold">Diagnóstico</Link>
+          <a href="/#contato" className="hover:text-gold">Contato</a>
+        </nav>
+        <div className="md:text-right">
+          <p className="font-accent text-sm italic text-gold-light">
+            Clareza financeira para decisões que importam.
+          </p>
+          <p className="mt-2 text-[11px] text-cream-mute">
+            © {new Date().getFullYear()} Keystone
+          </p>
+        </div>
+      </div>
+    </footer>
+  );
+}

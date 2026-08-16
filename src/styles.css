@@ -1,0 +1,302 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Keystone — Ink / Paper / Red
+ * Display: Fraunces (serif editorial, light/regular, italic)
+ * Body:    Inter (sans, 300/400/500/600)
+ */
+
+@theme inline {
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-display: "Fraunces", Georgia, serif;
+  --font-accent: "Fraunces", Georgia, serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-xl: 0;
+  --radius-2xl: 0;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+
+  /* Keystone palette — kept variable names so every component (hero, header,
+     footer, ferramentas, blog, diagnóstico) re-themes automatically */
+  --color-navy: var(--navy);
+  --color-navy-mid: var(--navy-mid);
+  --color-navy-card: var(--navy-card);
+  --color-navy-light: var(--navy-light);
+  --color-gold: var(--gold);
+  --color-gold-light: var(--gold-light);
+  --color-gold-dim: var(--gold-dim);
+  --color-cream: var(--cream);
+  --color-cream-dim: var(--cream-dim);
+  --color-cream-mute: var(--cream-mute);
+  --color-border-sub: var(--border-sub);
+}
+
+:root {
+  --radius: 0;
+
+  /* Brand palette — Preto / Branco / Cinza / Vermelho Keystone */
+  --navy: #ffffff;
+  --navy-mid: #fafafa;
+  --navy-card: #ffffff;
+  --navy-light: #f4f4f3;
+  --gold: #a6192e;
+  --gold-light: #c41e3a;
+  --gold-dim: rgba(166, 25, 46, 0.07);
+  --cream: #0a0a0a;
+  --cream-dim: rgba(10, 10, 10, 0.68);
+  --cream-mute: rgba(10, 10, 10, 0.42);
+  --border: rgba(10, 10, 10, 0.14);
+  --border-sub: rgba(10, 10, 10, 0.09);
+
+  /* Semantic — light surface */
+  --background: var(--navy);
+  --foreground: var(--cream);
+  --card: var(--navy-card);
+  --card-foreground: var(--cream);
+  --popover: var(--navy-card);
+  --popover-foreground: var(--cream);
+
+  --primary: var(--gold);
+  --primary-foreground: #ffffff;
+  --secondary: var(--gold-light);
+  --secondary-foreground: #ffffff;
+
+  --muted: var(--navy-mid);
+  --muted-foreground: var(--cream-mute);
+  --accent: var(--gold-dim);
+  --accent-foreground: var(--gold-light);
+
+  --destructive: oklch(0.6 0.22 27);
+  --destructive-foreground: oklch(0.985 0 0);
+
+  --input: var(--border-sub);
+  --ring: var(--gold);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border-sub);
+  }
+
+  html, body {
+    font-family: var(--font-sans);
+    font-weight: 300;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: 0.005em;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+
+  ::selection { background: var(--gold); color: #ffffff; }
+}
+
+@utility eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 600;
+
+  &::before {
+    content: "";
+    width: 40px;
+    height: 1px;
+    background: var(--gold);
+  }
+}
+
+@utility section-title {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(36px, 5vw, 62px);
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  color: var(--cream);
+
+  & em {
+    font-style: italic;
+    color: var(--gold);
+    font-weight: 300;
+  }
+}
+
+@utility btn-gold {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 26px;
+  background: var(--gold);
+  color: #ffffff;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  border: 1px solid var(--gold);
+  transition: background 0.2s, transform 0.2s;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--gold-light);
+    transform: translateY(-1px);
+  }
+}
+
+@utility btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 26px;
+  background: transparent;
+  color: var(--cream);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  border: 1px solid var(--border);
+  transition: border-color 0.2s, color 0.2s;
+
+  &:hover { border-color: var(--gold); color: var(--gold); }
+}
+
+.post-body p { margin-bottom: 1.1rem; }
+.post-body h2 {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 500;
+  margin-top: 2.5rem;
+  margin-bottom: 0.85rem;
+  color: var(--gold);
+  font-style: italic;
+}
+.post-body h3 {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 500;
+  margin-top: 1.75rem;
+  margin-bottom: 0.5rem;
+  color: var(--cream);
+}
+.post-body ul {
+  list-style: disc;
+  padding-left: 1.4rem;
+  color: var(--cream-dim);
+}
+.post-body ul li { margin-top: 0.4rem; }
+.post-body strong { color: var(--gold); font-weight: 600; }
+.post-body a { color: var(--gold); text-decoration: underline; text-underline-offset: 4px; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; } to { opacity: 1; }
+}
+@keyframes rotSlow {
+  from { transform: rotate(0); } to { transform: rotate(360deg); }
+}
+@keyframes floatY {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes scrollPulse {
+  0%, 100% { opacity: 0.3; } 50% { opacity: 0.85; }
+}
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; } 50% { opacity: 0.35; }
+}
+
+.anim-fade-up { animation: fadeUp 0.8s ease forwards; opacity: 0; }
+.anim-fade-in { animation: fadeIn 1s ease forwards; opacity: 0; }
+
+/* HubSpot embedded form — light theme */
+.hubspot-form-dark .hs-form fieldset {
+  max-width: 100% !important;
+}
+.hubspot-form-dark .hs-form .hs-input {
+  background: #ffffff !important;
+  border: 1px solid rgba(10,10,10,0.16) !important;
+  color: #0a0a0a !important;
+  border-radius: 2px !important;
+  padding: 10px 14px !important;
+  width: 100% !important;
+}
+.hubspot-form-dark .hs-form .hs-input:focus {
+  border-color: #A6192E !important;
+  outline: none !important;
+}
+.hubspot-form-dark .hs-form label {
+  color: #6B6B6B !important;
+  font-size: 11px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.18em !important;
+}
+.hubspot-form-dark .hs-form .hs-button {
+  background: #A6192E !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  border: none !important;
+  padding: 12px 32px !important;
+  cursor: pointer !important;
+  width: 100% !important;
+  font-size: 13px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.18em !important;
+}
+.hubspot-form-dark .hs-form .hs-button:hover {
+  background: #C41E3A !important;
+}
+.hubspot-form-dark .hs-form .hs-error-msgs {
+  color: #EF4444 !important;
+  font-size: 11px !important;
+  list-style: none !important;
+  padding-left: 0 !important;
+}
+
+.grid-texture {
+  background-image:
+    linear-gradient(rgba(10, 10, 10, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(10, 10, 10, 0.04) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
