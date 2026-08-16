@@ -1,12 +1,15 @@
-# 19 — Execução da FASE 4 (em andamento)
+# 19 — Execução da FASE 4
 
-Registro do que já foi construído da FASE 4 — Content Strategy + Market
+Registro do que foi construído na FASE 4 — Content Strategy + Market
 Intelligence. Segue os STEPs 11 e 12 do método (DOCUMENT e REPORT) do
 documento 09.
 
-**Status:** parcial. Toda a infraestrutura de dado e o `ai-gateway` estão
-prontos e verificados. Os agentes A1/A2 como Edge Functions, o workflow
-WF-015 e as quatro telas de frontend ainda não.
+**Status:** completa. Infraestrutura de dado, `ai-gateway`, os dois agentes
+(A1 `market-intelligence`, A2 `content-strategist`) como Edge Functions
+deployadas, o export do workflow WF-015 e as telas de Intelligence e
+Calendar estão prontos e verificados. Falta apenas ação humana fora do
+código: configurar `ANTHROPIC_API_KEY` como secret e validar A1/A2 ponta a
+ponta com uma chamada real (ver "Pendente" no fim).
 
 ---
 
@@ -160,16 +163,122 @@ estruturalmente pela varredura, que não decide por nome.
 29 asserções ao todo, cada uma verificada manualmente contra o banco remoto
 antes de commitar — mesma disciplina de toda fase anterior.
 
+## Agente A1 — `market-intelligence` (Edge Function)
+
+Disparado por cron (n8n, WF-015), sem sessão de usuário. Autentica por
+cabeçalho compartilhado `x-automation-secret`, comparado contra o secret
+`AUTOMATION_WEBHOOK_SECRET` — não é o atalho do achado C-01: não existe
+sessão para contornar, é o mecanismo correto para uma chamada
+máquina-a-máquina. Roda inteiramente com `service_role`, escopando por
+organização explicitamente em cada consulta, nunca por RLS implícita.
+
+Fluxo: resolve a organização Keystone pelo slug → abre `automation_runs`
+(`running`) → busca `market_intelligence_sources` ativas (zero fontes fecha
+a execução como `succeeded` com `items_processed: 0`, sem chamar o
+gateway) → busca `content_pillars` ativos → busca e limpa o HTML de cada
+fonte em paralelo (`Promise.allSettled`, timeout de 15s, truncamento em
+6000 caracteres por fonte) → se todas as fontes falharem, fecha a execução
+`failed` e devolve 502 → chama `invoke()` do `ai-gateway` com
+`market_intelligence.analyze` → grava cada insight retornado em
+`ai_insights` (falha por linha é registrada, não interrompe as demais) →
+fecha a execução `succeeded` com as contagens.
+
+`supabase/functions/market-intelligence/sourceContent.ts` — módulo puro de
+limpeza de HTML (`extractPlainText`, `truncate`), 6 testes.
+
+**Simplificação deliberada:** o padrão documentado (documento 04 §1) prevê
+um `automation-dispatch` compartilhado que n8n chamaria antes/depois da
+função de domínio para gerir o ciclo de vida de `automation_runs`. Esse
+dispatcher é escopo da FASE 20, ainda não construído. Em vez de bloquear A1
+nele, `market-intelligence` gerencia a própria linha de `automation_runs`
+diretamente — registrado aqui e em `n8n/workflows/README.md` como
+simplificação consciente, a ser refeita quando a FASE 20 entregar o
+dispatcher para as ~15 automações.
+
+## Agente A2 — `content-strategist` (Edge Function)
+
+Disparado interativamente por um operador a partir do feed de insights —
+diferente de A1, tem sessão de usuário real. Autentica via `authenticate()`
+de `_shared/auth.ts` (JWT do chamador). Antes de gastar qualquer chamada de
+IA, verifica o papel do chamador em `memberships` (`owner`/`admin`/
+`operator`) e devolve `forbidden` cedo caso contrário.
+
+Lê o insight e o pilar através do cliente RLS-escopado do chamador — um ID
+de outra organização simplesmente não é encontrado, sem checagem manual
+adicional. Chama `invoke()` do `ai-gateway` **sem** passar o cliente do
+chamador como dependência: um `operator` não tem `INSERT` em
+`ai_invocations` (política `admin_insert`), e passar o cliente do chamador
+faria esse registro de custo falhar silenciosamente. O gateway cai então no
+próprio `service_role` só para essa gravação de bookkeeping — a gravação de
+domínio (`content_ideas`) continua pelo cliente do chamador, que impõe
+`operator_insert` de verdade.
+
+`supabase/functions/content-strategist/validate.ts` — `generateIdeaSchema`
+(zod): `insight_id`, `pillar_id`, `intent`. 5 testes.
+
+## Deploy
+
+Ambas as funções deployadas no projeto remoto (`rplnjrqpzqznbxfascqs`),
+status `ACTIVE`: `market-intelligence` (`verify_jwt: false`, secret de
+automação) e `content-strategist` (`verify_jwt: true`, JWT de usuário).
+Verificação ponta a ponta por HTTP direto não foi possível nesta sandbox —
+o proxy de saída bloqueia HTTPS direto a `*.supabase.co`, mesma limitação
+já registrada desde a FASE 2. A confiança vem de três fontes: deploy bem-
+sucedido (falharia em erro de resolução de import), os testes unitários dos
+módulos puros, e revisão de código.
+
+## WF-015 (n8n) — `n8n/workflows/WF-015-market-intelligence.json`
+
+Export versionado: nó Cron (`0 6 * * 1-5`), nó Code gerando um
+correlation ID leve, nó HTTP Request chamando
+`{{$env.SUPABASE_PROJECT_URL}}/functions/v1/market-intelligence` com
+`x-automation-secret` via credencial nomeada (nenhum segredo em texto no
+arquivo — o valor real vive no credential store do n8n), nó `noOp` como
+placeholder de falha. `n8n/workflows/README.md` documenta a convenção de
+export, a lacuna do `automation-dispatch` (acima) e os passos manuais antes
+de ativar o cron de verdade (`ANTHROPIC_API_KEY`,
+`AUTOMATION_WEBHOOK_SECRET`, pelo menos uma fonte ativa, import e teste
+manual no n8n).
+
+## Frontend: Intelligence (`/intelligence`)
+
+`src/modules/intelligence/` — `IntelligencePage.tsx` reúne
+`EditorialStrategySection` (pilares e regras de calendário, somente
+leitura — o editor é a subtarefa 8, deliberadamente adiada; as políticas
+`operator_insert`/`operator_update` já existem para quando ele for
+construído) e `InsightsFeed` (lista `ai_insights` com badge de tipo,
+relevância e potencial comercial — `null` aparece como "sem nota", nunca
+como zero fabricado — e o botão que abre `GenerateIdeaDialog`, que chama
+`content-strategist` e invalida o feed no sucesso).
+
+Consolida o que o documento 01 descreve como duas telas (`/content/strategy`
++ `/intelligence`) numa só, porque `navigation.ts` — a fonte de verdade
+atual — não tem uma entrada de navegação separada para "estratégia
+editorial". Registrado como consolidação deliberada dado o estado atual da
+navegação, revisitável se um dia a sidebar precisar separar as duas.
+
+## Frontend: Calendar (`/calendar`)
+
+`src/modules/calendar/` — quatro visualizações (`MonthView`, `WeekView`,
+`DayView`, `ListView`) sobre `useCalendarItems()`, todas mostrando
+`EmptyCalendarNotice` quando vazias. `content_calendar` é estruturalmente
+vazia nesta fase — `content_calendar.asset_id` aponta para
+`content_assets`, que só nasce na FASE 5 — então o estado vazio é hoje o
+único estado possível, e é honesto, não um placeholder de tela inteira.
+`MonthView`/`WeekView` constroem a grade de dias com `date-fns`
+(`eachDayOfInterval`, `startOfWeek`/`endOfWeek`, `startOfMonth`/
+`endOfMonth`), localizado em `ptBR`.
+
 ---
 
 ## Verificação
 
 | | |
 |---|---|
-| Typecheck | limpo |
+| Typecheck | limpo (`types.ts` regenerado contra o projeto remoto após as migrações desta fase) |
 | Lint | 0 erros, 9 avisos (mesmos de sempre) |
-| Testes | 112 passando (17 novos do `ai-gateway`) |
-| Build | ✓ · bundle inalterado nesta sessão (769 kB) — nenhum código de frontend novo ainda |
+| Testes | 123 passando (17 do `ai-gateway` + 6 de `sourceContent` + 5 de `content-strategist/validate`) |
+| Build | ✓ |
 | `get_advisors(security)` | zero lints, contra o projeto remoto, após cada migração |
 | RLS | `ENABLE` + `FORCE` em toda tabela nova, confirmado por catálogo generalizado |
 | `anon` × tabelas | zero políticas, confirmado por catálogo generalizado (não lista mais nome) |
@@ -183,16 +292,15 @@ antes de commitar — mesma disciplina de toda fase anterior.
 
 | Subtarefa | O que falta |
 |---|---|
-| 5 | Agente A1 como Edge Function — hoje só o prompt e o gateway existem; falta o consumidor que busca as fontes ativas, monta `{{sources}}`/`{{pillars}}` e chama `invoke()` |
-| 6 | Agente A2 como Edge Function — mesma situação |
-| 7 | WF-015 (n8n) — export JSON versionado; nenhuma instância n8n está conectada a este projeto ainda |
-| 8 | Tela de estratégia editorial (pilares, temas, editor de regras) |
-| 9 | Feed de Market Intelligence |
-| 10 | Ação "gerar ideia a partir deste insight" |
-| 11 | Calendário editorial (mês/semana/dia/lista) |
-| 12 | Teste de rejeição de insight sem fonte — a proteção existe (`source_url not null` + `output_schema` exige `source`/`source_url`), mas não foi exercitada ponta a ponta porque A1 ainda não roda de verdade |
+| 7 | WF-015 exportado e documentado, mas nenhuma instância n8n real está conectada a este projeto ainda — o import e o teste manual descritos em `n8n/workflows/README.md` são passo humano |
+| 8 | Editor de regras de distribuição (hoje `EditorialStrategySection` é somente leitura; as políticas de escrita já existem) |
+| 12 | Teste de rejeição de insight sem fonte — a proteção existe (`source_url not null` + `output_schema` exige `source`/`source_url`), mas não foi exercitada ponta a ponta porque A1 ainda não rodou com uma chave de IA real |
+
+Subtarefas 5, 6, 9, 10 e 11 foram concluídas nesta sessão (agentes A1/A2,
+feed de insights, ação de gerar ideia, calendário editorial).
 
 **Ação humana antes de qualquer execução real:** `ANTHROPIC_API_KEY` precisa
 ser configurada como Edge Function secret (`supabase secrets set`) antes que
 A1 ou A2 produzam qualquer saída real — sem ela, o gateway devolve
-`misconfigured` corretamente, não uma simulação.
+`misconfigured` corretamente, não uma simulação. Nenhum provedor de IA foi
+chamado de verdade nesta sessão.

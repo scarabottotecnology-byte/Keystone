@@ -13,6 +13,8 @@ import { ResetPasswordPage } from "@/app/auth/ResetPasswordPage";
 import { ModulePlaceholder } from "@/components/shared/ModulePlaceholder";
 import { SettingsPage } from "@/app/settings/SettingsPage";
 import { CommandCenterPage } from "@/modules/command-center/CommandCenterPage";
+import { IntelligencePage } from "@/modules/intelligence/IntelligencePage";
+import { CalendarPage } from "@/modules/calendar/CalendarPage";
 import { PLANNED_ITEMS } from "@/app/navigation";
 import NotFound from "@/app/NotFound";
 
@@ -71,6 +73,24 @@ const App = () => (
                 element={
                   <AppRoute>
                     <SettingsPage />
+                  </AppRoute>
+                }
+              />
+
+              <Route
+                path="/intelligence"
+                element={
+                  <AppRoute>
+                    <IntelligencePage />
+                  </AppRoute>
+                }
+              />
+
+              <Route
+                path="/calendar"
+                element={
+                  <AppRoute>
+                    <CalendarPage />
                   </AppRoute>
                 }
               />

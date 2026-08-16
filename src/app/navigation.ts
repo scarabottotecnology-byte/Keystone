@@ -32,9 +32,14 @@ import type { LucideIcon } from "lucide-react";
  * Command Center virou `active` na FASE 3: `rpc_command_center()` responde
  * de verdade, só que com os seis componentes do Growth Score indisponíveis,
  * porque nenhuma tabela de origem (conteúdo, leads, prospecção, pipeline)
- * existe ainda. Cada tela ativa que ainda não cobre tudo o que promete
- * declara a parte pendente nela mesma, com a fase em que chega — nunca
- * esconde atrás de um placeholder de tela inteira nem finge com dado falso.
+ * existe ainda. Intelligence e Calendar viraram `active` na FASE 4: os
+ * agentes A1/A2 e o schema de conteúdo são reais, mas `content_calendar`
+ * segue vazia até a FASE 5 dar a uma peça gerada algo para agendar — as
+ * quatro visualizações do calendário leem a tabela de verdade, só não têm
+ * o que mostrar ainda. Cada tela ativa que ainda não cobre tudo o que
+ * promete declara a parte pendente nela mesma, com a fase em que chega —
+ * nunca esconde atrás de um placeholder de tela inteira nem finge com
+ * dado falso.
  */
 
 export type ModuleStatus = "active" | "planned";
@@ -90,7 +95,7 @@ export const NAVIGATION: NavGroup[] = [
         label: "Intelligence",
         to: "/intelligence",
         icon: Radar,
-        status: "planned",
+        status: "active",
         phase: 4,
         purpose:
           "Descobrir oportunidade de mercado antes de produzir conteúdo.",
@@ -119,7 +124,7 @@ export const NAVIGATION: NavGroup[] = [
         label: "Calendar",
         to: "/calendar",
         icon: CalendarDays,
-        status: "planned",
+        status: "active",
         phase: 4,
         purpose: "Distribuir a pauta ao longo da semana, por canal e formato.",
         delivers: [

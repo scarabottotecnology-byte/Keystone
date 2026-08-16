@@ -1,0 +1,114 @@
+{
+  "name": "WF-015 — Market Intelligence",
+  "meta": {
+    "description": "Dispara o agente A1 (market-intelligence) às 06:00, dias úteis, para analisar as fontes configuradas e gerar ai_insights. Ver docs/04-WORKFLOWS-N8N.md §2 e docs/19-EXECUCAO-FASE-4.md.",
+    "templateCredsSetupCompleted": false
+  },
+  "nodes": [
+    {
+      "id": "trigger-cron",
+      "name": "Cron — 06:00 dias úteis",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "mode": "custom",
+              "cronExpression": "0 6 * * 1-5"
+            }
+          ]
+        }
+      },
+      "notes": "docs/04 §2: WF-015, cron 0 6 * * 1-5, fuso America/Sao_Paulo (configurar no timezone do workflow, não aqui)."
+    },
+    {
+      "id": "generate-correlation-id",
+      "name": "Gerar correlation ID (ULID)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300],
+      "parameters": {
+        "jsCode": "// ULID simplificado — só precisa ser único e ordenável por tempo para\n// reconstruir a execução nos logs; não precisa da implementação completa\n// de supabase/functions/_shared/correlation.ts, que já cobre o caso mais\n// rigoroso (monotonicidade dentro do mesmo milissegundo) do lado da Edge\n// Function.\nconst ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';\nfunction encodeTime(ms) {\n  let out = '';\n  let t = ms;\n  for (let i = 0; i < 10; i++) {\n    out = ALPHABET[t % 32] + out;\n    t = Math.floor(t / 32);\n  }\n  return out;\n}\nfunction randomPart() {\n  let out = '';\n  for (let i = 0; i < 16; i++) {\n    out += ALPHABET[Math.floor(Math.random() * 32)];\n  }\n  return out;\n}\nreturn [{ json: { correlationId: encodeTime(Date.now()) + randomPart() } }];"
+      }
+    },
+    {
+      "id": "call-market-intelligence",
+      "name": "POST market-intelligence",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [680, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SUPABASE_PROJECT_URL }}/functions/v1/market-intelligence",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-correlation-id",
+              "value": "={{ $json.correlationId }}"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={}",
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "keystone-automation-webhook-secret",
+          "name": "Keystone — Automation Webhook Secret"
+        }
+      },
+      "notes": "A credencial 'httpHeaderAuth' carrega o header x-automation-secret com o mesmo valor de AUTOMATION_WEBHOOK_SECRET (Edge Function secret do Supabase). O segredo em si vive só no cofre de credenciais do n8n — nunca neste arquivo."
+    },
+    {
+      "id": "on-failure",
+      "name": "Falha — registrar (placeholder até WF-014)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [900, 460],
+      "notes": "O roteamento de alerta de verdade (severidade, destino) é a FASE 21, WF-014 — Error Monitoring. Até lá, uma falha desta execução fica visível em automation_runs (status='failed', error_summary preenchido pela própria market-intelligence) e no log da execução do n8n; não é enviada a lugar nenhum ativamente ainda."
+    }
+  ],
+  "connections": {
+    "Cron — 06:00 dias úteis": {
+      "main": [
+        [
+          { "node": "Gerar correlation ID (ULID)", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Gerar correlation ID (ULID)": {
+      "main": [
+        [
+          { "node": "POST market-intelligence", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "POST market-intelligence": {
+      "main": [
+        [],
+        [
+          { "node": "Falha — registrar (placeholder até WF-014)", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "timezone": "America/Sao_Paulo",
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "pinData": {}
+}
