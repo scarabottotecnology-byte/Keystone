@@ -1,15 +1,31 @@
 import { describe, expect, it } from "vitest";
-import { collectGroundedOn, formatRagContext, formatStructureForCopy } from "./ragContext.ts";
+import {
+  collectGroundedOn,
+  formatRagContext,
+  formatStructureForCopy,
+} from "./ragContext.ts";
 import type { MatchedChunk, StructureSection } from "./ragContext.ts";
 
 const CHUNKS: MatchedChunk[] = [
-  { chunk_id: "c1", document_id: "d1", document_title: "Case ORBITA", content: "Trecho sobre ORBITA." },
-  { chunk_id: "c2", document_id: "d1", document_title: "Case ORBITA", content: "Outro trecho." },
+  {
+    chunk_id: "c1",
+    document_id: "d1",
+    document_title: "Case ORBITA",
+    content: "Trecho sobre ORBITA.",
+  },
+  {
+    chunk_id: "c2",
+    document_id: "d1",
+    document_title: "Case ORBITA",
+    content: "Outro trecho.",
+  },
 ];
 
 describe("formatRagContext", () => {
   it("devolve mensagem explícita quando não há chunk nenhum", () => {
-    expect(formatRagContext([])).toBe("(sem contexto de conhecimento disponível)");
+    expect(formatRagContext([])).toBe(
+      "(sem contexto de conhecimento disponível)",
+    );
   });
 
   it("formata cada chunk com id e título do documento", () => {
@@ -59,8 +75,18 @@ describe("collectGroundedOn", () => {
 describe("formatStructureForCopy", () => {
   it("serializa cada seção em uma linha legível", () => {
     const sections: StructureSection[] = [
-      { title: "Abertura", purpose: "prender atenção", key_point: "dor real", grounded_on: [] },
-      { title: "Fecho", purpose: "converter", key_point: "CTA claro", grounded_on: [] },
+      {
+        title: "Abertura",
+        purpose: "prender atenção",
+        key_point: "dor real",
+        grounded_on: [],
+      },
+      {
+        title: "Fecho",
+        purpose: "converter",
+        key_point: "CTA claro",
+        grounded_on: [],
+      },
     ];
     expect(formatStructureForCopy(sections)).toBe(
       "Abertura: prender atenção — dor real\nFecho: converter — CTA claro",

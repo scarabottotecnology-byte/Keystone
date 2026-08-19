@@ -6,12 +6,18 @@ const FORMAT_ID = "22222222-2222-2222-2222-222222222222";
 
 describe("generatePieceSchema", () => {
   it("aceita idea_id e format_id válidos", () => {
-    const result = generatePieceSchema.safeParse({ idea_id: IDEA_ID, format_id: FORMAT_ID });
+    const result = generatePieceSchema.safeParse({
+      idea_id: IDEA_ID,
+      format_id: FORMAT_ID,
+    });
     expect(result.success).toBe(true);
   });
 
   it("recusa idea_id que não é uuid", () => {
-    const result = generatePieceSchema.safeParse({ idea_id: "não-é-uuid", format_id: FORMAT_ID });
+    const result = generatePieceSchema.safeParse({
+      idea_id: "não-é-uuid",
+      format_id: FORMAT_ID,
+    });
     expect(result.success).toBe(false);
   });
 

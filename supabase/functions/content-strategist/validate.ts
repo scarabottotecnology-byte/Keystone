@@ -6,7 +6,13 @@
  */
 import { z } from "zod";
 
-export const INTENTS = ["educacao", "dor", "case", "insight", "comercial"] as const;
+export const INTENTS = [
+  "educacao",
+  "dor",
+  "case",
+  "insight",
+  "comercial",
+] as const;
 
 export const generateIdeaSchema = z.object({
   insight_id: z.string().uuid(),

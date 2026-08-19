@@ -47,28 +47,44 @@
  */
 import { authenticate } from "../_shared/auth.ts";
 import { AppError, toAppError } from "../_shared/errors.ts";
-import { CORRELATION_HEADER, correlationIdFrom } from "../_shared/correlation.ts";
+import {
+  CORRELATION_HEADER,
+  correlationIdFrom,
+} from "../_shared/correlation.ts";
 import { createLogger } from "../_shared/log.ts";
 import { invoke } from "../_shared/ai-gateway/gateway.ts";
 import { embed } from "../_shared/ai-gateway/embeddings.ts";
-import { collectGroundedOn, formatRagContext, formatStructureForCopy } from "./ragContext.ts";
+import {
+  collectGroundedOn,
+  formatRagContext,
+  formatStructureForCopy,
+} from "./ragContext.ts";
 import type { MatchedChunk, StructureSection } from "./ragContext.ts";
 import { generatePieceSchema } from "./validate.ts";
 import { z } from "zod";
 
 const CORS_HEADERS: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, content-type, x-correlation-id",
+  "Access-Control-Allow-Headers":
+    "authorization, content-type, x-correlation-id",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
 const RAG_LIMIT = 5;
 const RAG_MIN_SIMILARITY = 0.7;
 
-function jsonResponse(body: unknown, status: number, correlationId: string): Response {
+function jsonResponse(
+  body: unknown,
+  status: number,
+  correlationId: string,
+): Response {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { ...CORS_HEADERS, "Content-Type": "application/json", [CORRELATION_HEADER]: correlationId },
+    headers: {
+      ...CORS_HEADERS,
+      "Content-Type": "application/json",
+      [CORRELATION_HEADER]: correlationId,
+    },
   });
 }
 
@@ -120,7 +136,10 @@ Deno.serve(async (request) => {
     }
 
     const caller = await authenticate(request);
-    const scoped = log.child({ organizationId: caller.organizationId, userId: caller.userId });
+    const scoped = log.child({
+      organizationId: caller.organizationId,
+      userId: caller.userId,
+    });
 
     const { data: membership, error: membershipError } = await caller.db
       .from("memberships")
@@ -130,15 +149,25 @@ Deno.serve(async (request) => {
       .eq("status", "active")
       .maybeSingle();
     if (membershipError) {
-      throw new AppError("internal", "Falha ao verificar papel do requisitante", { cause: membershipError });
+      throw new AppError(
+        "internal",
+        "Falha ao verificar papel do requisitante",
+        { cause: membershipError },
+      );
     }
     const role = membership?.role;
     if (!role || !["owner", "admin", "operator"].includes(role)) {
-      throw new AppError("forbidden", "Só owner, admin ou operator pode gerar peça de conteúdo");
+      throw new AppError(
+        "forbidden",
+        "Só owner, admin ou operator pode gerar peça de conteúdo",
+      );
     }
 
     const json = await request.json().catch(() => {
-      throw new AppError("bad_request", "Corpo da requisição não é JSON válido");
+      throw new AppError(
+        "bad_request",
+        "Corpo da requisição não é JSON válido",
+      );
     });
     const payload = generatePieceSchema.parse(json);
 
@@ -147,16 +176,28 @@ Deno.serve(async (request) => {
       .select("title, angle, hook, rationale, intent, pillar_id")
       .eq("id", payload.idea_id)
       .maybeSingle();
-    if (ideaError) throw new AppError("internal", "Falha ao carregar ideia", { cause: ideaError });
-    if (!idea) throw new AppError("not_found", "Ideia de conteúdo não encontrada");
+    if (ideaError) {
+      throw new AppError("internal", "Falha ao carregar ideia", {
+        cause: ideaError,
+      });
+    }
+    if (!idea) {
+      throw new AppError("not_found", "Ideia de conteúdo não encontrada");
+    }
 
     const { data: format, error: formatError } = await caller.db
       .from("content_formats")
       .select("key, channel, spec")
       .eq("id", payload.format_id)
       .maybeSingle();
-    if (formatError) throw new AppError("internal", "Falha ao carregar formato", { cause: formatError });
-    if (!format) throw new AppError("not_found", "Formato de conteúdo não encontrado");
+    if (formatError) {
+      throw new AppError("internal", "Falha ao carregar formato", {
+        cause: formatError,
+      });
+    }
+    if (!format) {
+      throw new AppError("not_found", "Formato de conteúdo não encontrado");
+    }
 
     let pillarName = "Geral";
     if (idea.pillar_id) {
@@ -165,19 +206,32 @@ Deno.serve(async (request) => {
         .select("name")
         .eq("id", idea.pillar_id)
         .maybeSingle();
-      if (pillarError) throw new AppError("internal", "Falha ao carregar pilar", { cause: pillarError });
+      if (pillarError) {
+        throw new AppError("internal", "Falha ao carregar pilar", {
+          cause: pillarError,
+        });
+      }
       if (pillar) pillarName = pillar.name;
     }
 
     const { data: brand, error: brandError } = await caller.db
       .from("brand_profiles")
-      .select("tone, audience, differentiators, forbidden_words, preferred_words")
+      .select(
+        "tone, audience, differentiators, forbidden_words, preferred_words",
+      )
       .eq("organization_id", caller.organizationId)
       .eq("is_active", true)
       .maybeSingle();
-    if (brandError) throw new AppError("internal", "Falha ao carregar perfil de marca", { cause: brandError });
+    if (brandError) {
+      throw new AppError("internal", "Falha ao carregar perfil de marca", {
+        cause: brandError,
+      });
+    }
     if (!brand) {
-      throw new AppError("misconfigured", "Nenhum perfil de marca ativo configurado para esta organização");
+      throw new AppError(
+        "misconfigured",
+        "Nenhum perfil de marca ativo configurado para esta organização",
+      );
     }
 
     const formatSpec = JSON.stringify(format.spec ?? {});
@@ -209,8 +263,15 @@ Deno.serve(async (request) => {
       },
     });
     if (!angleResult.ok) {
-      scoped.error("falha na etapa 'ângulo'", null, { code: angleResult.error.code, message: angleResult.error.message });
-      return jsonResponse({ error: angleResult.error, step: "angle" }, 502, correlationId);
+      scoped.error("falha na etapa 'ângulo'", null, {
+        code: angleResult.error.code,
+        message: angleResult.error.message,
+      });
+      return jsonResponse(
+        { error: angleResult.error, step: "angle" },
+        502,
+        correlationId,
+      );
     }
 
     // ── Etapa 2: hook ────────────────────────────────────────────────────────
@@ -232,12 +293,20 @@ Deno.serve(async (request) => {
       },
     });
     if (!hookResult.ok) {
-      scoped.error("falha na etapa 'hook'", null, { code: hookResult.error.code, message: hookResult.error.message });
-      return jsonResponse({ error: hookResult.error, step: "hook" }, 502, correlationId);
+      scoped.error("falha na etapa 'hook'", null, {
+        code: hookResult.error.code,
+        message: hookResult.error.message,
+      });
+      return jsonResponse(
+        { error: hookResult.error, step: "hook" },
+        502,
+        correlationId,
+      );
     }
 
     // ── RAG: embedding + busca vetorial, degrada para "sem contexto" ─────────
-    const ragQuery = `${angleResult.data.refined_angle}\n${hookResult.data.hook}\n${idea.title}`;
+    const ragQuery =
+      `${angleResult.data.refined_angle}\n${hookResult.data.hook}\n${idea.title}`;
     let matchedChunks: MatchedChunk[] = [];
     const embedResult = await embed(
       {
@@ -250,23 +319,32 @@ Deno.serve(async (request) => {
       { log: scoped },
     );
     if (embedResult.ok) {
-      const { data: matches, error: matchError } = await caller.db.rpc("match_knowledge", {
-        p_organization_id: caller.organizationId,
-        p_query_embedding: embedResult.embedding,
-        p_limit: RAG_LIMIT,
-        p_min_similarity: RAG_MIN_SIMILARITY,
-      });
+      const { data: matches, error: matchError } = await caller.db.rpc(
+        "match_knowledge",
+        {
+          p_organization_id: caller.organizationId,
+          p_query_embedding: embedResult.embedding,
+          p_limit: RAG_LIMIT,
+          p_min_similarity: RAG_MIN_SIMILARITY,
+        },
+      );
       if (matchError) {
-        scoped.warn("falha ao buscar contexto de conhecimento — seguindo sem contexto", {
-          error: matchError.message,
-        });
+        scoped.warn(
+          "falha ao buscar contexto de conhecimento — seguindo sem contexto",
+          {
+            error: matchError.message,
+          },
+        );
       } else {
         matchedChunks = (matches ?? []) as MatchedChunk[];
       }
     } else {
-      scoped.warn("falha ao gerar embedding da consulta — seguindo sem contexto de conhecimento", {
-        code: embedResult.error.code,
-      });
+      scoped.warn(
+        "falha ao gerar embedding da consulta — seguindo sem contexto de conhecimento",
+        {
+          code: embedResult.error.code,
+        },
+      );
     }
     const ragContext = formatRagContext(matchedChunks);
 
@@ -288,10 +366,20 @@ Deno.serve(async (request) => {
       },
     });
     if (!structureResult.ok) {
-      scoped.error("falha na etapa 'estrutura'", null, { code: structureResult.error.code, message: structureResult.error.message });
-      return jsonResponse({ error: structureResult.error, step: "structure" }, 502, correlationId);
+      scoped.error("falha na etapa 'estrutura'", null, {
+        code: structureResult.error.code,
+        message: structureResult.error.message,
+      });
+      return jsonResponse(
+        { error: structureResult.error, step: "structure" },
+        502,
+        correlationId,
+      );
     }
-    const groundedOn = collectGroundedOn(structureResult.data.sections, matchedChunks);
+    const groundedOn = collectGroundedOn(
+      structureResult.data.sections,
+      matchedChunks,
+    );
     const structureText = formatStructureForCopy(structureResult.data.sections);
 
     // ── Etapa 4: copy ────────────────────────────────────────────────────────
@@ -312,8 +400,15 @@ Deno.serve(async (request) => {
       },
     });
     if (!copyResult.ok) {
-      scoped.error("falha na etapa 'copy'", null, { code: copyResult.error.code, message: copyResult.error.message });
-      return jsonResponse({ error: copyResult.error, step: "copy" }, 502, correlationId);
+      scoped.error("falha na etapa 'copy'", null, {
+        code: copyResult.error.code,
+        message: copyResult.error.message,
+      });
+      return jsonResponse(
+        { error: copyResult.error, step: "copy" },
+        502,
+        correlationId,
+      );
     }
 
     // ── Etapa 5: CTA ─────────────────────────────────────────────────────────
@@ -330,8 +425,15 @@ Deno.serve(async (request) => {
       },
     });
     if (!ctaResult.ok) {
-      scoped.error("falha na etapa 'CTA'", null, { code: ctaResult.error.code, message: ctaResult.error.message });
-      return jsonResponse({ error: ctaResult.error, step: "cta" }, 502, correlationId);
+      scoped.error("falha na etapa 'CTA'", null, {
+        code: ctaResult.error.code,
+        message: ctaResult.error.message,
+      });
+      return jsonResponse(
+        { error: ctaResult.error, step: "cta" },
+        502,
+        correlationId,
+      );
     }
 
     // ── Etapa 6: briefing visual ─────────────────────────────────────────────
@@ -349,8 +451,15 @@ Deno.serve(async (request) => {
       },
     });
     if (!visualResult.ok) {
-      scoped.error("falha na etapa 'briefing visual'", null, { code: visualResult.error.code, message: visualResult.error.message });
-      return jsonResponse({ error: visualResult.error, step: "visual_brief" }, 502, correlationId);
+      scoped.error("falha na etapa 'briefing visual'", null, {
+        code: visualResult.error.code,
+        message: visualResult.error.message,
+      });
+      return jsonResponse(
+        { error: visualResult.error, step: "visual_brief" },
+        502,
+        correlationId,
+      );
     }
 
     // ── Grava a peça (A3 concluído) ──────────────────────────────────────────
@@ -375,10 +484,17 @@ Deno.serve(async (request) => {
       .select()
       .single();
     if (assetError) {
-      throw new AppError("internal", "Peça gerada, mas não foi possível gravar", { cause: assetError });
+      throw new AppError(
+        "internal",
+        "Peça gerada, mas não foi possível gravar",
+        { cause: assetError },
+      );
     }
     const assetId = (asset as { id: string }).id;
-    scoped.info("peça de conteúdo gerada", { assetId, chunksUsados: groundedOn.length });
+    scoped.info("peça de conteúdo gerada", {
+      assetId,
+      chunksUsados: groundedOn.length,
+    });
 
     // ── Etapa A4: revisão, não bloqueia a resposta se falhar ─────────────────
     const reviewResult = await invoke<ReviewResult>({
@@ -405,7 +521,9 @@ Deno.serve(async (request) => {
 
     let review: ReviewResult | null = null;
     if (reviewResult.ok) {
-      const { error: reviewInsertError } = await caller.db.from("content_reviews").insert({
+      const { error: reviewInsertError } = await caller.db.from(
+        "content_reviews",
+      ).insert({
         organization_id: caller.organizationId,
         asset_id: assetId,
         score: reviewResult.data.score,
@@ -416,22 +534,33 @@ Deno.serve(async (request) => {
         model: reviewResult.model,
       });
       if (reviewInsertError) {
-        scoped.warn("revisão gerada, mas falhou ao gravar", { error: reviewInsertError.message });
+        scoped.warn("revisão gerada, mas falhou ao gravar", {
+          error: reviewInsertError.message,
+        });
       } else {
         review = reviewResult.data;
       }
     } else {
-      scoped.warn("falha ao gerar revisão automática — peça fica pendente de revisão", {
-        code: reviewResult.error.code,
-      });
+      scoped.warn(
+        "falha ao gerar revisão automática — peça fica pendente de revisão",
+        {
+          code: reviewResult.error.code,
+        },
+      );
     }
 
     return jsonResponse({ asset, review }, 201, correlationId);
   } catch (thrown) {
     const error = thrown instanceof z.ZodError
-      ? new AppError("bad_request", "Payload inválido", { detail: { issues: thrown.issues } })
+      ? new AppError("bad_request", "Payload inválido", {
+        detail: { issues: thrown.issues },
+      })
       : toAppError(thrown);
     log.error("falha ao gerar peça de conteúdo", error);
-    return jsonResponse(error.toResponseBody(), error.httpStatus, correlationId);
+    return jsonResponse(
+      error.toResponseBody(),
+      error.httpStatus,
+      correlationId,
+    );
   }
 });

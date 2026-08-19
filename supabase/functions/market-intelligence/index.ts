@@ -16,13 +16,17 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { invoke } from "../_shared/ai-gateway/gateway.ts";
 import { AppError, toAppError } from "../_shared/errors.ts";
-import { CORRELATION_HEADER, correlationIdFrom } from "../_shared/correlation.ts";
+import {
+  CORRELATION_HEADER,
+  correlationIdFrom,
+} from "../_shared/correlation.ts";
 import { createLogger } from "../_shared/log.ts";
 import { extractPlainText, truncate } from "../_shared/sourceContent.ts";
 
 const CORS_HEADERS: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "content-type, x-automation-secret, x-correlation-id",
+  "Access-Control-Allow-Headers":
+    "content-type, x-automation-secret, x-correlation-id",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
@@ -31,14 +35,27 @@ const FETCH_TIMEOUT_MS = 15_000;
 
 function requiredEnv(name: string): string {
   const value = Deno.env.get(name);
-  if (!value) throw new AppError("misconfigured", `Variável de ambiente ausente: ${name}`);
+  if (!value) {
+    throw new AppError(
+      "misconfigured",
+      `Variável de ambiente ausente: ${name}`,
+    );
+  }
   return value;
 }
 
-function jsonResponse(body: unknown, status: number, correlationId: string): Response {
+function jsonResponse(
+  body: unknown,
+  status: number,
+  correlationId: string,
+): Response {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { ...CORS_HEADERS, "Content-Type": "application/json", [CORRELATION_HEADER]: correlationId },
+    headers: {
+      ...CORS_HEADERS,
+      "Content-Type": "application/json",
+      [CORRELATION_HEADER]: correlationId,
+    },
   });
 }
 
@@ -46,7 +63,10 @@ function verifyAutomationSecret(request: Request): void {
   const expected = requiredEnv("AUTOMATION_WEBHOOK_SECRET");
   const provided = request.headers.get("x-automation-secret");
   if (!provided || provided !== expected) {
-    throw new AppError("unauthorized", "Segredo de automação ausente ou inválido");
+    throw new AppError(
+      "unauthorized",
+      "Segredo de automação ausente ou inválido",
+    );
   }
 }
 
@@ -63,7 +83,11 @@ async function fetchSource(name: string, url: string): Promise<FetchedSource> {
     const response = await fetch(url, { signal: controller.signal });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const raw = await response.text();
-    return { name, url, content: truncate(extractPlainText(raw), MAX_SOURCE_CHARS) };
+    return {
+      name,
+      url,
+      content: truncate(extractPlainText(raw), MAX_SOURCE_CHARS),
+    };
   } finally {
     clearTimeout(timeout);
   }
@@ -112,7 +136,9 @@ Deno.serve(async (request) => {
       .eq("slug", "keystone")
       .single();
     if (orgError || !org) {
-      throw new AppError("internal", "Organização Keystone não encontrada", { cause: orgError });
+      throw new AppError("internal", "Organização Keystone não encontrada", {
+        cause: orgError,
+      });
     }
     const organizationId = (org as { id: string }).id;
 
@@ -127,7 +153,11 @@ Deno.serve(async (request) => {
       .select("id")
       .single();
     if (runError) {
-      throw new AppError("internal", "Falha ao registrar execução da automação", { cause: runError });
+      throw new AppError(
+        "internal",
+        "Falha ao registrar execução da automação",
+        { cause: runError },
+      );
     }
     runId = (run as { id: string }).id;
 
@@ -137,7 +167,9 @@ Deno.serve(async (request) => {
       .eq("organization_id", organizationId)
       .eq("is_active", true);
     if (sourcesError) {
-      throw new AppError("internal", "Falha ao carregar fontes de mercado", { cause: sourcesError });
+      throw new AppError("internal", "Falha ao carregar fontes de mercado", {
+        cause: sourcesError,
+      });
     }
 
     if (!sources || sources.length === 0) {
@@ -148,7 +180,11 @@ Deno.serve(async (request) => {
         error_summary: "Nenhuma fonte ativa configurada",
       }).eq("id", runId);
       log.info("nenhuma fonte ativa — nada a analisar");
-      return jsonResponse({ insights_created: 0, reason: "no_active_sources" }, 200, correlationId);
+      return jsonResponse(
+        { insights_created: 0, reason: "no_active_sources" },
+        200,
+        correlationId,
+      );
     }
 
     const { data: pillars, error: pillarsError } = await db
@@ -157,14 +193,20 @@ Deno.serve(async (request) => {
       .eq("organization_id", organizationId)
       .eq("is_active", true);
     if (pillarsError) {
-      throw new AppError("internal", "Falha ao carregar pilares de conteúdo", { cause: pillarsError });
+      throw new AppError("internal", "Falha ao carregar pilares de conteúdo", {
+        cause: pillarsError,
+      });
     }
 
     const fetched = await Promise.allSettled(
-      (sources as { name: string; url: string }[]).map((s) => fetchSource(s.name, s.url)),
+      (sources as { name: string; url: string }[]).map((s) =>
+        fetchSource(s.name, s.url)
+      ),
     );
     const succeeded = fetched
-      .filter((r): r is PromiseFulfilledResult<FetchedSource> => r.status === "fulfilled")
+      .filter((r): r is PromiseFulfilledResult<FetchedSource> =>
+        r.status === "fulfilled"
+      )
       .map((r) => r.value);
     const sourcesFailed = fetched.length - succeeded.length;
 
@@ -176,14 +218,23 @@ Deno.serve(async (request) => {
         error_summary: "Todas as fontes ativas falharam ao buscar conteúdo",
       }).eq("id", runId);
       return jsonResponse(
-        { error: { code: "all_sources_failed", message: "Todas as fontes falharam ao buscar conteúdo" } },
+        {
+          error: {
+            code: "all_sources_failed",
+            message: "Todas as fontes falharam ao buscar conteúdo",
+          },
+        },
         502,
         correlationId,
       );
     }
 
-    const sourcesText = succeeded.map((s) => `### ${s.name} (${s.url})\n${s.content}`).join("\n\n");
-    const pillarsText = ((pillars as { name: string }[] | null) ?? []).map((p) => `- ${p.name}`).join("\n");
+    const sourcesText = succeeded.map((s) =>
+      `### ${s.name} (${s.url})\n${s.content}`
+    ).join("\n\n");
+    const pillarsText = ((pillars as { name: string }[] | null) ?? []).map((
+      p,
+    ) => `- ${p.name}`).join("\n");
 
     const result = await invoke<{ insights: InsightPayload[] }>(
       {
@@ -223,7 +274,9 @@ Deno.serve(async (request) => {
         ai_invocation_id: result.invocationId || null,
       });
       if (insertError) {
-        log.warn("falha ao gravar um insight — os demais seguem", { error: insertError.message });
+        log.warn("falha ao gravar um insight — os demais seguem", {
+          error: insertError.message,
+        });
       } else {
         created++;
       }
@@ -237,10 +290,17 @@ Deno.serve(async (request) => {
       items_failed: (insights.length - created) + sourcesFailed,
     }).eq("id", runId);
 
-    log.info("execução concluída", { insights_created: created, sources_failed: sourcesFailed });
+    log.info("execução concluída", {
+      insights_created: created,
+      sources_failed: sourcesFailed,
+    });
 
     return jsonResponse(
-      { insights_created: created, sources_analyzed: succeeded.length, sources_failed: sourcesFailed },
+      {
+        insights_created: created,
+        sources_analyzed: succeeded.length,
+        sources_failed: sourcesFailed,
+      },
       200,
       correlationId,
     );
@@ -261,6 +321,10 @@ Deno.serve(async (request) => {
         // ver comentário acima
       }
     }
-    return jsonResponse(error.toResponseBody(), error.httpStatus, correlationId);
+    return jsonResponse(
+      error.toResponseBody(),
+      error.httpStatus,
+      correlationId,
+    );
   }
 });

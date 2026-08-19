@@ -52,7 +52,12 @@ export type EmbedResult = EmbedSuccess | EmbedFailure;
 
 function requiredEnv(name: string): string {
   const value = Deno.env.get(name);
-  if (!value) throw new AppError("misconfigured", `Variável de ambiente ausente: ${name}`);
+  if (!value) {
+    throw new AppError(
+      "misconfigured",
+      `Variável de ambiente ausente: ${name}`,
+    );
+  }
   return value;
 }
 
@@ -79,7 +84,11 @@ async function loadOpenAiConfig(
     .eq("key", "openai")
     .eq("is_active", true)
     .maybeSingle();
-  if (error) throw new AppError("internal", "Falha ao carregar provedor de embeddings", { cause: error });
+  if (error) {
+    throw new AppError("internal", "Falha ao carregar provedor de embeddings", {
+      cause: error,
+    });
+  }
   return data as OpenAiProviderRow | null;
 }
 
@@ -139,7 +148,10 @@ export async function embed(
   if (!apiKey) {
     return {
       ok: false,
-      error: { code: "misconfigured", message: "OPENAI_API_KEY não configurada" },
+      error: {
+        code: "misconfigured",
+        message: "OPENAI_API_KEY não configurada",
+      },
       invocationId: null,
     };
   }
@@ -150,7 +162,11 @@ export async function embed(
   } catch (thrown) {
     const error = toAppError(thrown);
     log.error("falha ao carregar provedor de embeddings", error);
-    return { ok: false, error: { code: "misconfigured", message: error.message }, invocationId: null };
+    return {
+      ok: false,
+      error: { code: "misconfigured", message: error.message },
+      invocationId: null,
+    };
   }
 
   const model = providerRow?.config?.embedding_model ?? DEFAULT_MODEL;
@@ -160,7 +176,10 @@ export async function embed(
   try {
     response = await fetch(OPENAI_EMBEDDINGS_URL, {
       method: "POST",
-      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({ model, input: input.text }),
     });
   } catch (thrown) {
@@ -176,7 +195,11 @@ export async function embed(
       error: error.message,
       subject: input.subject,
     });
-    return { ok: false, error: { code: "upstream_error", message: error.message }, invocationId };
+    return {
+      ok: false,
+      error: { code: "upstream_error", message: error.message },
+      invocationId,
+    };
   }
 
   if (!response.ok) {
@@ -223,12 +246,19 @@ export async function embed(
     });
     return {
       ok: false,
-      error: { code: "upstream_error", message: "OpenAI não devolveu embedding" },
+      error: {
+        code: "upstream_error",
+        message: "OpenAI não devolveu embedding",
+      },
       invocationId,
     };
   }
 
-  const costUsd = estimateCostUsd(totalTokens, 0, providerRow?.config?.pricing?.[model]);
+  const costUsd = estimateCostUsd(
+    totalTokens,
+    0,
+    providerRow?.config?.pricing?.[model],
+  );
   const invocationId = await recordInvocation(db, {
     organizationId: input.organizationId,
     correlationId: input.correlationId,
@@ -241,5 +271,11 @@ export async function embed(
     subject: input.subject,
   });
 
-  return { ok: true, embedding, invocationId: invocationId ?? "", model, costUsd };
+  return {
+    ok: true,
+    embedding,
+    invocationId: invocationId ?? "",
+    model,
+    costUsd,
+  };
 }

@@ -40,7 +40,10 @@ import type {
 function requiredEnv(name: string): string {
   const value = Deno.env.get(name);
   if (!value) {
-    throw new AppError("misconfigured", `Variável de ambiente ausente: ${name}`);
+    throw new AppError(
+      "misconfigured",
+      `Variável de ambiente ausente: ${name}`,
+    );
   }
   return value;
 }
@@ -82,7 +85,10 @@ async function loadPrompt(
   organizationId: string,
   version?: number,
 ): Promise<PromptRow | null> {
-  const base = db.from("ai_prompts").select("*").eq("key", key).eq("is_active", true);
+  const base = db.from("ai_prompts").select("*").eq("key", key).eq(
+    "is_active",
+    true,
+  );
 
   if (version !== undefined) {
     const { data, error } = await base
@@ -90,7 +96,11 @@ async function loadPrompt(
       .or(`organization_id.eq.${organizationId},organization_id.is.null`)
       .order("organization_id", { ascending: false, nullsFirst: false })
       .limit(1);
-    if (error) throw new AppError("internal", "Falha ao carregar prompt", { cause: error });
+    if (error) {
+      throw new AppError("internal", "Falha ao carregar prompt", {
+        cause: error,
+      });
+    }
     return (data?.[0] as PromptRow) ?? null;
   }
 
@@ -101,7 +111,9 @@ async function loadPrompt(
     .order("version", { ascending: false })
     .limit(1);
   if (orgError) {
-    throw new AppError("internal", "Falha ao carregar prompt da organização", { cause: orgError });
+    throw new AppError("internal", "Falha ao carregar prompt da organização", {
+      cause: orgError,
+    });
   }
   if (orgSpecific && orgSpecific.length > 0) return orgSpecific[0] as PromptRow;
 
@@ -110,7 +122,9 @@ async function loadPrompt(
     .order("version", { ascending: false })
     .limit(1);
   if (globalError) {
-    throw new AppError("internal", "Falha ao carregar prompt global", { cause: globalError });
+    throw new AppError("internal", "Falha ao carregar prompt global", {
+      cause: globalError,
+    });
   }
   return (global?.[0] as PromptRow) ?? null;
 }
@@ -120,14 +134,21 @@ interface ProviderRow {
   config: { pricing?: Record<string, ModelPricing> };
 }
 
-async function loadProviders(db: SupabaseClient, organizationId: string): Promise<ProviderRow[]> {
+async function loadProviders(
+  db: SupabaseClient,
+  organizationId: string,
+): Promise<ProviderRow[]> {
   const { data, error } = await db
     .from("ai_providers")
     .select("key, config")
     .eq("organization_id", organizationId)
     .eq("is_active", true)
     .order("priority", { ascending: true });
-  if (error) throw new AppError("internal", "Falha ao carregar provedores", { cause: error });
+  if (error) {
+    throw new AppError("internal", "Falha ao carregar provedores", {
+      cause: error,
+    });
+  }
   return (data as ProviderRow[]) ?? [];
 }
 
@@ -155,17 +176,25 @@ async function checkBudget(
     .select("estimated_cost_usd")
     .eq("organization_id", organizationId)
     .gte("created_at", startOfDay.toISOString());
-  if (error) throw new AppError("internal", "Falha ao verificar orçamento diário", { cause: error });
+  if (error) {
+    throw new AppError("internal", "Falha ao verificar orçamento diário", {
+      cause: error,
+    });
+  }
 
   const spent = (data ?? []).reduce(
-    (sum: number, row: { estimated_cost_usd: number | null }) => sum + (row.estimated_cost_usd ?? 0),
+    (sum: number, row: { estimated_cost_usd: number | null }) =>
+      sum + (row.estimated_cost_usd ?? 0),
     0,
   );
 
   if (spent >= cap) {
     log.warn("orçamento diário de IA no limite", { spent, cap, priority });
     if (priority !== "critical") {
-      throw new AppError("rate_limited", `Orçamento diário de IA (US$ ${cap}) atingido`);
+      throw new AppError(
+        "rate_limited",
+        `Orçamento diário de IA (US$ ${cap}) atingido`,
+      );
     }
   }
 }
@@ -233,17 +262,29 @@ export async function invoke<T = unknown>(
 
   let prompt: PromptRow | null;
   try {
-    prompt = await loadPrompt(db, input.promptKey, input.organizationId, input.promptVersion);
+    prompt = await loadPrompt(
+      db,
+      input.promptKey,
+      input.organizationId,
+      input.promptVersion,
+    );
   } catch (thrown) {
     const error = toAppError(thrown);
     log.error("falha ao carregar prompt", error);
-    return { ok: false, error: { code: "misconfigured", message: error.message }, invocationId: null };
+    return {
+      ok: false,
+      error: { code: "misconfigured", message: error.message },
+      invocationId: null,
+    };
   }
 
   if (!prompt) {
     return {
       ok: false,
-      error: { code: "prompt_not_found", message: `Prompt não encontrado: ${input.promptKey}` },
+      error: {
+        code: "prompt_not_found",
+        message: `Prompt não encontrado: ${input.promptKey}`,
+      },
       invocationId: null,
     };
   }
@@ -252,7 +293,11 @@ export async function invoke<T = unknown>(
     await checkBudget(db, input.organizationId, priority, log);
   } catch (thrown) {
     const error = toAppError(thrown);
-    return { ok: false, error: { code: "budget_exceeded", message: error.message }, invocationId: null };
+    return {
+      ok: false,
+      error: { code: "budget_exceeded", message: error.message },
+      invocationId: null,
+    };
   }
 
   let providers: ProviderRow[];
@@ -261,19 +306,26 @@ export async function invoke<T = unknown>(
   } catch (thrown) {
     const error = toAppError(thrown);
     log.error("falha ao carregar provedores", error);
-    return { ok: false, error: { code: "misconfigured", message: error.message }, invocationId: null };
+    return {
+      ok: false,
+      error: { code: "misconfigured", message: error.message },
+      invocationId: null,
+    };
   }
 
   const active = providers
     .map((row) => ({ row, provider: PROVIDER_FACTORIES[row.key]?.() ?? null }))
-    .filter((entry): entry is { row: ProviderRow; provider: AIProvider } => entry.provider !== null);
+    .filter((entry): entry is { row: ProviderRow; provider: AIProvider } =>
+      entry.provider !== null
+    );
 
   if (active.length === 0) {
     return {
       ok: false,
       error: {
         code: "misconfigured",
-        message: "Nenhum provedor de IA ativo e configurado para esta organização",
+        message:
+          "Nenhum provedor de IA ativo e configurado para esta organização",
       },
       invocationId: null,
     };
@@ -331,7 +383,11 @@ export async function invoke<T = unknown>(
           model: call.model,
           inputTokens: call.inputTokens,
           outputTokens: call.outputTokens,
-          costUsd: estimateCostUsd(call.inputTokens, call.outputTokens, row.config?.pricing?.[call.model]),
+          costUsd: estimateCostUsd(
+            call.inputTokens,
+            call.outputTokens,
+            row.config?.pricing?.[call.model],
+          ),
           latencyMs: Date.now() - startedAt,
           status: fallbackFrom ? "fallback" : "success",
           fallbackFrom,
@@ -343,13 +399,21 @@ export async function invoke<T = unknown>(
           invocationId: invocationId ?? "",
           provider: row.key,
           model: call.model,
-          costUsd: estimateCostUsd(call.inputTokens, call.outputTokens, row.config?.pricing?.[call.model]),
+          costUsd: estimateCostUsd(
+            call.inputTokens,
+            call.outputTokens,
+            row.config?.pricing?.[call.model],
+          ),
         };
       }
 
       const result = validateOutput(prompt.output_schema, call.raw);
       if (result.valid) {
-        const costUsd = estimateCostUsd(call.inputTokens, call.outputTokens, row.config?.pricing?.[call.model]);
+        const costUsd = estimateCostUsd(
+          call.inputTokens,
+          call.outputTokens,
+          row.config?.pricing?.[call.model],
+        );
         const invocationId = await recordInvocation(db, {
           organizationId: input.organizationId,
           correlationId: input.correlationId,
@@ -377,8 +441,15 @@ export async function invoke<T = unknown>(
       }
 
       validationFeedback = result.message;
-      lastError = new AppError("bad_request", `Saída fora do schema: ${result.message}`);
-      log.warn("saída de IA fora do output_schema", { attempt, provider: row.key, message: result.message });
+      lastError = new AppError(
+        "bad_request",
+        `Saída fora do schema: ${result.message}`,
+      );
+      log.warn("saída de IA fora do output_schema", {
+        attempt,
+        provider: row.key,
+        message: result.message,
+      });
     }
 
     // As duas tentativas deste provedor esgotaram — registra e tenta o

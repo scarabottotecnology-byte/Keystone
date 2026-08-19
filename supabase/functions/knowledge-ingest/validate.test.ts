@@ -3,7 +3,11 @@ import { ingestSchema } from "./validate.ts";
 
 describe("ingestSchema", () => {
   it("aceita manual com content", () => {
-    const result = ingestSchema.safeParse({ title: "Nota", source_type: "manual", content: "texto" });
+    const result = ingestSchema.safeParse({
+      title: "Nota",
+      source_type: "manual",
+      content: "texto",
+    });
     expect(result.success).toBe(true);
   });
 
@@ -17,22 +21,36 @@ describe("ingestSchema", () => {
   });
 
   it("recusa manual sem content", () => {
-    const result = ingestSchema.safeParse({ title: "Nota", source_type: "manual" });
+    const result = ingestSchema.safeParse({
+      title: "Nota",
+      source_type: "manual",
+    });
     expect(result.success).toBe(false);
   });
 
   it("recusa url sem source_url", () => {
-    const result = ingestSchema.safeParse({ title: "Artigo", source_type: "url" });
+    const result = ingestSchema.safeParse({
+      title: "Artigo",
+      source_type: "url",
+    });
     expect(result.success).toBe(false);
   });
 
   it("recusa source_url malformado", () => {
-    const result = ingestSchema.safeParse({ title: "Artigo", source_type: "url", source_url: "não é url" });
+    const result = ingestSchema.safeParse({
+      title: "Artigo",
+      source_type: "url",
+      source_url: "não é url",
+    });
     expect(result.success).toBe(false);
   });
 
   it("recusa title vazio", () => {
-    const result = ingestSchema.safeParse({ title: "  ", source_type: "manual", content: "texto" });
+    const result = ingestSchema.safeParse({
+      title: "  ",
+      source_type: "manual",
+      content: "texto",
+    });
     expect(result.success).toBe(false);
   });
 

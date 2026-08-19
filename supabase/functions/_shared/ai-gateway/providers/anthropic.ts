@@ -15,7 +15,11 @@
  * defesa em profundidade, não confiança cega no provedor.
  */
 import { AppError } from "../../errors.ts";
-import type { AIProvider, ProviderCallInput, ProviderCallResult } from "../types.ts";
+import type {
+  AIProvider,
+  ProviderCallInput,
+  ProviderCallResult,
+} from "../types.ts";
 
 const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
 const ANTHROPIC_VERSION = "2023-06-01";
@@ -51,7 +55,9 @@ export function createAnthropicProvider(apiKey: string): AIProvider {
         max_tokens: MAX_TOKENS,
         system: input.systemPrompt,
         messages: [{ role: "user", content: userContent }],
-        ...(input.temperature !== null ? { temperature: input.temperature } : {}),
+        ...(input.temperature !== null
+          ? { temperature: input.temperature }
+          : {}),
       };
 
       if (input.outputSchema) {

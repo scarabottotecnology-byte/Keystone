@@ -13,7 +13,10 @@ const INSIGHT_SCHEMA = {
 
 describe("validateOutput", () => {
   it("aceita dado que casa com o schema", () => {
-    const result = validateOutput(INSIGHT_SCHEMA, { title: "x", relevance: 80 });
+    const result = validateOutput(INSIGHT_SCHEMA, {
+      title: "x",
+      relevance: 80,
+    });
     expect(result.valid).toBe(true);
   });
 
@@ -24,17 +27,27 @@ describe("validateOutput", () => {
   });
 
   it("rejeita tipo errado", () => {
-    const result = validateOutput(INSIGHT_SCHEMA, { title: "x", relevance: "alta" });
+    const result = validateOutput(INSIGHT_SCHEMA, {
+      title: "x",
+      relevance: "alta",
+    });
     expect(result.valid).toBe(false);
   });
 
   it("rejeita valor fora do intervalo declarado", () => {
-    const result = validateOutput(INSIGHT_SCHEMA, { title: "x", relevance: 150 });
+    const result = validateOutput(INSIGHT_SCHEMA, {
+      title: "x",
+      relevance: 150,
+    });
     expect(result.valid).toBe(false);
   });
 
   it("rejeita propriedade extra quando additionalProperties é false", () => {
-    const result = validateOutput(INSIGHT_SCHEMA, { title: "x", relevance: 10, extra: 1 });
+    const result = validateOutput(INSIGHT_SCHEMA, {
+      title: "x",
+      relevance: 10,
+      extra: 1,
+    });
     expect(result.valid).toBe(false);
   });
 

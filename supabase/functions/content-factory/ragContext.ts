@@ -34,7 +34,9 @@ const EMPTY_CONTEXT_MESSAGE = "(sem contexto de conhecimento disponível)";
  */
 export function formatRagContext(chunks: MatchedChunk[]): string {
   if (chunks.length === 0) return EMPTY_CONTEXT_MESSAGE;
-  return chunks.map((c) => `[${c.chunk_id}] (${c.document_title}): ${c.content}`).join("\n\n");
+  return chunks.map((c) =>
+    `[${c.chunk_id}] (${c.document_title}): ${c.content}`
+  ).join("\n\n");
 }
 
 export interface GroundedReference {
@@ -79,5 +81,7 @@ export function collectGroundedOn(
 
 /** Serializa a estrutura em texto legível para a etapa `copy`. */
 export function formatStructureForCopy(sections: StructureSection[]): string {
-  return sections.map((s) => `${s.title}: ${s.purpose} — ${s.key_point}`).join("\n");
+  return sections.map((s) => `${s.title}: ${s.purpose} — ${s.key_point}`).join(
+    "\n",
+  );
 }

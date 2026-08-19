@@ -7,16 +7,21 @@ describe("extractPlainText", () => {
   });
 
   it("remove script e style inteiros, não só as tags", () => {
-    const html = "<style>.x{color:red}</style><script>alert(1)</script><p>texto</p>";
+    const html =
+      "<style>.x{color:red}</style><script>alert(1)</script><p>texto</p>";
     expect(extractPlainText(html)).toBe("texto");
   });
 
   it("decodifica entidades comuns", () => {
-    expect(extractPlainText("A &amp; B &lt;tag&gt; &quot;citado&quot;")).toBe('A & B <tag> "citado"');
+    expect(extractPlainText("A &amp; B &lt;tag&gt; &quot;citado&quot;")).toBe(
+      'A & B <tag> "citado"',
+    );
   });
 
   it("normaliza espaço em branco repetido", () => {
-    expect(extractPlainText("linha 1\n\n\n  linha   2")).toBe("linha 1 linha 2");
+    expect(extractPlainText("linha 1\n\n\n  linha   2")).toBe(
+      "linha 1 linha 2",
+    );
   });
 });
 

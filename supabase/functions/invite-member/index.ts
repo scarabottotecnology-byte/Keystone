@@ -18,17 +18,25 @@ import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { authenticate } from "../_shared/auth.ts";
 import { AppError, toAppError } from "../_shared/errors.ts";
-import { CORRELATION_HEADER, correlationIdFrom } from "../_shared/correlation.ts";
+import {
+  CORRELATION_HEADER,
+  correlationIdFrom,
+} from "../_shared/correlation.ts";
 import { createLogger } from "../_shared/log.ts";
 import { invitePayloadSchema } from "./validate.ts";
 
 const CORS_HEADERS: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, content-type, x-correlation-id",
+  "Access-Control-Allow-Headers":
+    "authorization, content-type, x-correlation-id",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-function jsonResponse(body: unknown, status: number, correlationId: string): Response {
+function jsonResponse(
+  body: unknown,
+  status: number,
+  correlationId: string,
+): Response {
   return new Response(JSON.stringify(body), {
     status,
     headers: {
@@ -42,7 +50,10 @@ function jsonResponse(body: unknown, status: number, correlationId: string): Res
 function requiredEnv(name: string): string {
   const value = Deno.env.get(name);
   if (!value) {
-    throw new AppError("misconfigured", `Variável de ambiente ausente: ${name}`);
+    throw new AppError(
+      "misconfigured",
+      `Variável de ambiente ausente: ${name}`,
+    );
   }
   return value;
 }
@@ -67,7 +78,10 @@ Deno.serve(async (request) => {
     });
 
     const json = await request.json().catch(() => {
-      throw new AppError("bad_request", "Corpo da requisição não é JSON válido");
+      throw new AppError(
+        "bad_request",
+        "Corpo da requisição não é JSON válido",
+      );
     });
     const payload = invitePayloadSchema.parse(json);
 
@@ -83,9 +97,13 @@ Deno.serve(async (request) => {
       .maybeSingle();
 
     if (roleError) {
-      throw new AppError("internal", "Falha ao verificar papel do requisitante", {
-        cause: roleError,
-      });
+      throw new AppError(
+        "internal",
+        "Falha ao verificar papel do requisitante",
+        {
+          cause: roleError,
+        },
+      );
     }
     if (
       !callerMembership ||
@@ -105,7 +123,9 @@ Deno.serve(async (request) => {
       .inviteUserByEmail(payload.email);
 
     if (inviteError) {
-      const alreadyRegistered = /already.*(registered|exists)/i.test(inviteError.message);
+      const alreadyRegistered = /already.*(registered|exists)/i.test(
+        inviteError.message,
+      );
       if (!alreadyRegistered) {
         throw new AppError("upstream_error", "Falha ao convidar por e-mail", {
           cause: inviteError,
@@ -116,10 +136,12 @@ Deno.serve(async (request) => {
       // `getUserByEmail` direto; listar é a única saída, e perPage cobre a
       // escala real de uma ferramenta interna de uma organização só
       // (ADR-014) — não a de um produto com milhares de contas.
-      const { data: page, error: listError } = await admin.auth.admin.listUsers({
-        page: 1,
-        perPage: 200,
-      });
+      const { data: page, error: listError } = await admin.auth.admin.listUsers(
+        {
+          page: 1,
+          perPage: 200,
+        },
+      );
       if (listError) {
         throw new AppError("internal", "Falha ao localizar usuário existente", {
           cause: listError,
@@ -129,33 +151,48 @@ Deno.serve(async (request) => {
         (u) => u.email?.toLowerCase() === payload.email.toLowerCase(),
       );
       if (!existing) {
-        throw new AppError("upstream_error", "E-mail já registrado, mas não encontrado", {
-          cause: inviteError,
-        });
+        throw new AppError(
+          "upstream_error",
+          "E-mail já registrado, mas não encontrado",
+          {
+            cause: inviteError,
+          },
+        );
       }
       newUserId = existing.id;
     } else {
       newUserId = invited.user.id;
     }
 
-    const { error: membershipError } = await caller.db.from("memberships").insert({
-      organization_id: caller.organizationId,
-      user_id: newUserId,
-      role: payload.role,
-      status: "active",
-      invited_by: caller.userId,
-    });
+    const { error: membershipError } = await caller.db.from("memberships")
+      .insert({
+        organization_id: caller.organizationId,
+        user_id: newUserId,
+        role: payload.role,
+        status: "active",
+        invited_by: caller.userId,
+      });
 
     if (membershipError) {
       if (membershipError.code === "23505") {
-        throw new AppError("conflict", "Este e-mail já é membro da organização");
+        throw new AppError(
+          "conflict",
+          "Este e-mail já é membro da organização",
+        );
       }
-      throw new AppError("internal", "Usuário convidado, mas o vínculo não foi criado", {
-        cause: membershipError,
-      });
+      throw new AppError(
+        "internal",
+        "Usuário convidado, mas o vínculo não foi criado",
+        {
+          cause: membershipError,
+        },
+      );
     }
 
-    scoped.info("membro convidado", { invitedUserId: newUserId, role: payload.role });
+    scoped.info("membro convidado", {
+      invitedUserId: newUserId,
+      role: payload.role,
+    });
 
     return jsonResponse({ userId: newUserId }, 201, correlationId);
   } catch (thrown) {
@@ -166,6 +203,10 @@ Deno.serve(async (request) => {
       : toAppError(thrown);
 
     log.error("falha ao convidar membro", error);
-    return jsonResponse(error.toResponseBody(), error.httpStatus, correlationId);
+    return jsonResponse(
+      error.toResponseBody(),
+      error.httpStatus,
+      correlationId,
+    );
   }
 });

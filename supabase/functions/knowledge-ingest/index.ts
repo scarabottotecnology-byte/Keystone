@@ -35,9 +35,12 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { authenticate } from "../_shared/auth.ts";
 import { AppError, toAppError } from "../_shared/errors.ts";
-import { CORRELATION_HEADER, correlationIdFrom } from "../_shared/correlation.ts";
+import {
+  CORRELATION_HEADER,
+  correlationIdFrom,
+} from "../_shared/correlation.ts";
 import { createLogger } from "../_shared/log.ts";
-import { extractPlainText, truncate } from "../_shared/sourceContent.ts";
+import { extractPlainText } from "../_shared/sourceContent.ts";
 import { embed } from "../_shared/ai-gateway/embeddings.ts";
 import { chunkText } from "./chunk.ts";
 import { ingestSchema } from "./validate.ts";
@@ -45,7 +48,8 @@ import { z } from "zod";
 
 const CORS_HEADERS: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, content-type, x-correlation-id",
+  "Access-Control-Allow-Headers":
+    "authorization, content-type, x-correlation-id",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
@@ -59,7 +63,12 @@ const UNSUPPORTED_SOURCE_TYPES = new Set(["pdf", "pptx", "docx"]);
 
 function requiredEnv(name: string): string {
   const value = Deno.env.get(name);
-  if (!value) throw new AppError("misconfigured", `Variável de ambiente ausente: ${name}`);
+  if (!value) {
+    throw new AppError(
+      "misconfigured",
+      `Variável de ambiente ausente: ${name}`,
+    );
+  }
   return value;
 }
 
@@ -71,17 +80,27 @@ function serviceRoleClient(): SupabaseClient {
   );
 }
 
-function jsonResponse(body: unknown, status: number, correlationId: string): Response {
+function jsonResponse(
+  body: unknown,
+  status: number,
+  correlationId: string,
+): Response {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { ...CORS_HEADERS, "Content-Type": "application/json", [CORRELATION_HEADER]: correlationId },
+    headers: {
+      ...CORS_HEADERS,
+      "Content-Type": "application/json",
+      [CORRELATION_HEADER]: correlationId,
+    },
   });
 }
 
 async function sha256Hex(text: string): Promise<string> {
   const bytes = new TextEncoder().encode(text);
   const digest = await crypto.subtle.digest("SHA-256", bytes);
-  return Array.from(new Uint8Array(digest)).map((b) => b.toString(16).padStart(2, "0")).join("");
+  return Array.from(new Uint8Array(digest)).map((b) =>
+    b.toString(16).padStart(2, "0")
+  ).join("");
 }
 
 async function fetchAndClean(url: string): Promise<string> {
@@ -89,12 +108,21 @@ async function fetchAndClean(url: string): Promise<string> {
   const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
   try {
     const response = await fetch(url, { signal: controller.signal });
-    if (!response.ok) throw new AppError("bad_request", `Falha ao buscar URL: HTTP ${response.status}`);
+    if (!response.ok) {
+      throw new AppError(
+        "bad_request",
+        `Falha ao buscar URL: HTTP ${response.status}`,
+      );
+    }
     const raw = await response.text();
     return extractPlainText(raw);
   } catch (thrown) {
     if (thrown instanceof AppError) throw thrown;
-    throw new AppError("bad_request", "Falha ao buscar ou ler a URL informada", { cause: thrown });
+    throw new AppError(
+      "bad_request",
+      "Falha ao buscar ou ler a URL informada",
+      { cause: thrown },
+    );
   } finally {
     clearTimeout(timeout);
   }
@@ -114,7 +142,10 @@ Deno.serve(async (request) => {
     }
 
     const caller = await authenticate(request);
-    const scoped = log.child({ organizationId: caller.organizationId, userId: caller.userId });
+    const scoped = log.child({
+      organizationId: caller.organizationId,
+      userId: caller.userId,
+    });
 
     // Mesma checagem explícita de `content-strategist`: falhar aqui evita
     // gastar uma chamada de embedding com um resultado que nunca seria
@@ -127,15 +158,25 @@ Deno.serve(async (request) => {
       .eq("status", "active")
       .maybeSingle();
     if (membershipError) {
-      throw new AppError("internal", "Falha ao verificar papel do requisitante", { cause: membershipError });
+      throw new AppError(
+        "internal",
+        "Falha ao verificar papel do requisitante",
+        { cause: membershipError },
+      );
     }
     const role = membership?.role;
     if (!role || !["owner", "admin", "operator"].includes(role)) {
-      throw new AppError("forbidden", "Só owner, admin ou operator pode indexar conhecimento");
+      throw new AppError(
+        "forbidden",
+        "Só owner, admin ou operator pode indexar conhecimento",
+      );
     }
 
     const json = await request.json().catch(() => {
-      throw new AppError("bad_request", "Corpo da requisição não é JSON válido");
+      throw new AppError(
+        "bad_request",
+        "Corpo da requisição não é JSON válido",
+      );
     });
     const payload = ingestSchema.parse(json);
 
@@ -151,7 +192,10 @@ Deno.serve(async (request) => {
       : await fetchAndClean(payload.source_url!);
 
     if (content.length === 0) {
-      throw new AppError("bad_request", "Conteúdo vazio após extração — nada para indexar");
+      throw new AppError(
+        "bad_request",
+        "Conteúdo vazio após extração — nada para indexar",
+      );
     }
     if (content.length > MAX_INGEST_CHARS) {
       throw new AppError(
@@ -180,18 +224,29 @@ Deno.serve(async (request) => {
       // 23505 = unique_violation em (organization_id, checksum): mesmo
       // conteúdo já indexado antes — resposta clara, não erro genérico.
       if ((docError as { code?: string }).code === "23505") {
-        throw new AppError("conflict", "Um documento com este mesmo conteúdo já foi indexado nesta organização");
+        throw new AppError(
+          "conflict",
+          "Um documento com este mesmo conteúdo já foi indexado nesta organização",
+        );
       }
-      throw new AppError("internal", "Falha ao registrar documento", { cause: docError });
+      throw new AppError("internal", "Falha ao registrar documento", {
+        cause: docError,
+      });
     }
     const documentId = (doc as { id: string }).id;
 
     const chunks = chunkText(content);
     if (chunks.length === 0) {
       await caller.db.from("knowledge_documents")
-        .update({ status: "failed", error: "Nenhum chunk gerado a partir do conteúdo" })
+        .update({
+          status: "failed",
+          error: "Nenhum chunk gerado a partir do conteúdo",
+        })
         .eq("id", documentId);
-      throw new AppError("bad_request", "Conteúdo não gerou nenhum chunk indexável");
+      throw new AppError(
+        "bad_request",
+        "Conteúdo não gerou nenhum chunk indexável",
+      );
     }
 
     const chunksDb = serviceRoleClient();
@@ -217,17 +272,21 @@ Deno.serve(async (request) => {
         continue;
       }
 
-      const { error: chunkError } = await chunksDb.from("knowledge_chunks").insert({
-        organization_id: caller.organizationId,
-        document_id: documentId,
-        chunk_index: i,
-        content: chunk,
-        token_count: Math.ceil(chunk.length / 4),
-        embedding: embedResult.embedding,
-      });
+      const { error: chunkError } = await chunksDb.from("knowledge_chunks")
+        .insert({
+          organization_id: caller.organizationId,
+          document_id: documentId,
+          chunk_index: i,
+          content: chunk,
+          token_count: Math.ceil(chunk.length / 4),
+          embedding: embedResult.embedding,
+        });
 
       if (chunkError) {
-        scoped.warn("falha ao gravar um chunk — os demais seguem", { chunkIndex: i, error: chunkError.message });
+        scoped.warn("falha ao gravar um chunk — os demais seguem", {
+          chunkIndex: i,
+          error: chunkError.message,
+        });
         continue;
       }
       indexed++;
@@ -235,27 +294,48 @@ Deno.serve(async (request) => {
 
     if (indexed === 0) {
       await caller.db.from("knowledge_documents")
-        .update({ status: "failed", error: "Falha ao gerar ou gravar embedding de todos os chunks" })
+        .update({
+          status: "failed",
+          error: "Falha ao gerar ou gravar embedding de todos os chunks",
+        })
         .eq("id", documentId);
-      throw new AppError("upstream_error", "Nenhum chunk foi indexado — falha ao gerar embeddings");
+      throw new AppError(
+        "upstream_error",
+        "Nenhum chunk foi indexado — falha ao gerar embeddings",
+      );
     }
 
     await caller.db.from("knowledge_documents")
       .update({ status: "indexed", indexed_at: new Date().toISOString() })
       .eq("id", documentId);
 
-    scoped.info("documento indexado", { documentId, chunksTotal: chunks.length, chunksIndexed: indexed });
+    scoped.info("documento indexado", {
+      documentId,
+      chunksTotal: chunks.length,
+      chunksIndexed: indexed,
+    });
 
     return jsonResponse(
-      { document_id: documentId, status: "indexed", chunks_total: chunks.length, chunks_indexed: indexed },
+      {
+        document_id: documentId,
+        status: "indexed",
+        chunks_total: chunks.length,
+        chunks_indexed: indexed,
+      },
       201,
       correlationId,
     );
   } catch (thrown) {
     const error = thrown instanceof z.ZodError
-      ? new AppError("bad_request", "Payload inválido", { detail: { issues: thrown.issues } })
+      ? new AppError("bad_request", "Payload inválido", {
+        detail: { issues: thrown.issues },
+      })
       : toAppError(thrown);
     log.error("falha na ingestão de conhecimento", error);
-    return jsonResponse(error.toResponseBody(), error.httpStatus, correlationId);
+    return jsonResponse(
+      error.toResponseBody(),
+      error.httpStatus,
+      correlationId,
+    );
   }
 });

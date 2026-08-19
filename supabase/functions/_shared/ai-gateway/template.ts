@@ -12,7 +12,7 @@ export function renderTemplate(
   template: string,
   variables: Record<string, unknown>,
 ): string {
-  return template.replace(/\{\{(\w+)\}\}/g, (match, name: string) => {
+  return template.replace(/\{\{(\w+)\}\}/g, (_match, name: string) => {
     if (!(name in variables)) {
       throw new Error(`Variável ausente no template do prompt: ${name}`);
     }

@@ -13,7 +13,10 @@ describe("generateIdeaSchema", () => {
   });
 
   it("rejeita insight_id que não é uuid", () => {
-    expect(generateIdeaSchema.safeParse({ ...VALID, insight_id: "não-é-uuid" }).success).toBe(false);
+    expect(
+      generateIdeaSchema.safeParse({ ...VALID, insight_id: "não-é-uuid" })
+        .success,
+    ).toBe(false);
   });
 
   it("rejeita pillar_id ausente", () => {
@@ -22,12 +25,17 @@ describe("generateIdeaSchema", () => {
   });
 
   it("rejeita intent fora do enum", () => {
-    expect(generateIdeaSchema.safeParse({ ...VALID, intent: "venda-agressiva" }).success).toBe(false);
+    expect(
+      generateIdeaSchema.safeParse({ ...VALID, intent: "venda-agressiva" })
+        .success,
+    ).toBe(false);
   });
 
   it("aceita todas as cinco intenções", () => {
     for (const intent of ["educacao", "dor", "case", "insight", "comercial"]) {
-      expect(generateIdeaSchema.safeParse({ ...VALID, intent }).success).toBe(true);
+      expect(generateIdeaSchema.safeParse({ ...VALID, intent }).success).toBe(
+        true,
+      );
     }
   });
 });

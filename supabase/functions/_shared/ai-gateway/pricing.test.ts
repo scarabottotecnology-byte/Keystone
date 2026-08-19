@@ -11,7 +11,10 @@ describe("estimateCostUsd", () => {
   });
 
   it("calcula proporcionalmente para contagens menores", () => {
-    const cost = estimateCostUsd(500_000, 0, { input_per_million: 3, output_per_million: 15 });
+    const cost = estimateCostUsd(500_000, 0, {
+      input_per_million: 3,
+      output_per_million: 15,
+    });
     expect(cost).toBe(1.5);
   });
 
@@ -21,11 +24,16 @@ describe("estimateCostUsd", () => {
   });
 
   it("zero token com preço configurado é 0 de verdade, não confundido com 'sem preço'", () => {
-    expect(estimateCostUsd(0, 0, { input_per_million: 3, output_per_million: 15 })).toBe(0);
+    expect(
+      estimateCostUsd(0, 0, { input_per_million: 3, output_per_million: 15 }),
+    ).toBe(0);
   });
 
   it("arredonda em 6 casas decimais, mesma precisão da coluna numeric(12,6)", () => {
-    const cost = estimateCostUsd(1, 1, { input_per_million: 3, output_per_million: 15 });
+    const cost = estimateCostUsd(1, 1, {
+      input_per_million: 3,
+      output_per_million: 15,
+    });
     // (1/1e6)*3 + (1/1e6)*15 = 0.000018
     expect(cost).toBe(0.000018);
   });

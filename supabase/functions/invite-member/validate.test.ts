@@ -48,7 +48,12 @@ describe("invitePayloadSchema", () => {
   });
 
   it("rejeita campo ausente", () => {
-    expect(invitePayloadSchema.safeParse({ email: "pessoa@keystone.com.br" }).success).toBe(false);
-    expect(invitePayloadSchema.safeParse({ role: "viewer" }).success).toBe(false);
+    expect(
+      invitePayloadSchema.safeParse({ email: "pessoa@keystone.com.br" })
+        .success,
+    ).toBe(false);
+    expect(invitePayloadSchema.safeParse({ role: "viewer" }).success).toBe(
+      false,
+    );
   });
 });

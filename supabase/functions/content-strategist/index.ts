@@ -20,7 +20,10 @@
  */
 import { authenticate } from "../_shared/auth.ts";
 import { AppError, toAppError } from "../_shared/errors.ts";
-import { CORRELATION_HEADER, correlationIdFrom } from "../_shared/correlation.ts";
+import {
+  CORRELATION_HEADER,
+  correlationIdFrom,
+} from "../_shared/correlation.ts";
 import { createLogger } from "../_shared/log.ts";
 import { invoke } from "../_shared/ai-gateway/gateway.ts";
 import { generateIdeaSchema } from "./validate.ts";
@@ -28,14 +31,23 @@ import { z } from "zod";
 
 const CORS_HEADERS: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, content-type, x-correlation-id",
+  "Access-Control-Allow-Headers":
+    "authorization, content-type, x-correlation-id",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-function jsonResponse(body: unknown, status: number, correlationId: string): Response {
+function jsonResponse(
+  body: unknown,
+  status: number,
+  correlationId: string,
+): Response {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { ...CORS_HEADERS, "Content-Type": "application/json", [CORRELATION_HEADER]: correlationId },
+    headers: {
+      ...CORS_HEADERS,
+      "Content-Type": "application/json",
+      [CORRELATION_HEADER]: correlationId,
+    },
   });
 }
 
@@ -60,7 +72,10 @@ Deno.serve(async (request) => {
     }
 
     const caller = await authenticate(request);
-    const scoped = log.child({ organizationId: caller.organizationId, userId: caller.userId });
+    const scoped = log.child({
+      organizationId: caller.organizationId,
+      userId: caller.userId,
+    });
 
     // Checagem explícita antes da chamada de IA, que custa dinheiro: a RLS
     // de `operator_insert` bloquearia de qualquer forma na gravação final,
@@ -74,15 +89,25 @@ Deno.serve(async (request) => {
       .eq("status", "active")
       .maybeSingle();
     if (membershipError) {
-      throw new AppError("internal", "Falha ao verificar papel do requisitante", { cause: membershipError });
+      throw new AppError(
+        "internal",
+        "Falha ao verificar papel do requisitante",
+        { cause: membershipError },
+      );
     }
     const role = membership?.role;
     if (!role || !["owner", "admin", "operator"].includes(role)) {
-      throw new AppError("forbidden", "Só owner, admin ou operator pode gerar ideia de conteúdo");
+      throw new AppError(
+        "forbidden",
+        "Só owner, admin ou operator pode gerar ideia de conteúdo",
+      );
     }
 
     const json = await request.json().catch(() => {
-      throw new AppError("bad_request", "Corpo da requisição não é JSON válido");
+      throw new AppError(
+        "bad_request",
+        "Corpo da requisição não é JSON válido",
+      );
     });
     const payload = generateIdeaSchema.parse(json);
 
@@ -92,7 +117,9 @@ Deno.serve(async (request) => {
       .eq("id", payload.insight_id)
       .maybeSingle();
     if (insightError) {
-      throw new AppError("internal", "Falha ao carregar insight", { cause: insightError });
+      throw new AppError("internal", "Falha ao carregar insight", {
+        cause: insightError,
+      });
     }
     if (!insight) {
       throw new AppError("not_found", "Insight não encontrado");
@@ -104,7 +131,9 @@ Deno.serve(async (request) => {
       .eq("id", payload.pillar_id)
       .maybeSingle();
     if (pillarError) {
-      throw new AppError("internal", "Falha ao carregar pilar", { cause: pillarError });
+      throw new AppError("internal", "Falha ao carregar pilar", {
+        cause: pillarError,
+      });
     }
     if (!pillar) {
       throw new AppError("not_found", "Pilar de conteúdo não encontrado");
@@ -125,7 +154,10 @@ Deno.serve(async (request) => {
     });
 
     if (!result.ok) {
-      scoped.error("falha ao gerar ideia", null, { code: result.error.code, message: result.error.message });
+      scoped.error("falha ao gerar ideia", null, {
+        code: result.error.code,
+        message: result.error.message,
+      });
       return jsonResponse({ error: result.error }, 502, correlationId);
     }
 
@@ -147,16 +179,28 @@ Deno.serve(async (request) => {
       .single();
 
     if (insertError) {
-      throw new AppError("internal", "Ideia gerada, mas não foi possível gravar", { cause: insertError });
+      throw new AppError(
+        "internal",
+        "Ideia gerada, mas não foi possível gravar",
+        { cause: insertError },
+      );
     }
 
-    scoped.info("ideia de conteúdo gerada", { ideaId: (idea as { id: string }).id });
+    scoped.info("ideia de conteúdo gerada", {
+      ideaId: (idea as { id: string }).id,
+    });
     return jsonResponse(idea, 201, correlationId);
   } catch (thrown) {
     const error = thrown instanceof z.ZodError
-      ? new AppError("bad_request", "Payload inválido", { detail: { issues: thrown.issues } })
+      ? new AppError("bad_request", "Payload inválido", {
+        detail: { issues: thrown.issues },
+      })
       : toAppError(thrown);
     log.error("falha ao gerar ideia de conteúdo", error);
-    return jsonResponse(error.toResponseBody(), error.httpStatus, correlationId);
+    return jsonResponse(
+      error.toResponseBody(),
+      error.httpStatus,
+      correlationId,
+    );
   }
 });

@@ -8,12 +8,18 @@ describe("chunkText", () => {
   });
 
   it("devolve um único chunk quando o texto cabe no alvo", () => {
-    const result = chunkText("Texto curto que cabe inteiro.", { targetTokens: 100, overlapTokens: 10 });
+    const result = chunkText("Texto curto que cabe inteiro.", {
+      targetTokens: 100,
+      overlapTokens: 10,
+    });
     expect(result).toEqual(["Texto curto que cabe inteiro."]);
   });
 
   it("normaliza espaço em branco repetido mesmo no caso de chunk único", () => {
-    const result = chunkText("linha 1\n\n\n  linha   2", { targetTokens: 100, overlapTokens: 10 });
+    const result = chunkText("linha 1\n\n\n  linha   2", {
+      targetTokens: 100,
+      overlapTokens: 10,
+    });
     expect(result).toEqual(["linha 1 linha 2"]);
   });
 
@@ -53,7 +59,10 @@ describe("chunkText", () => {
     expect(result.length).toBeGreaterThan(1);
     const firstTailWord = result[0].split(" ").at(-1);
     expect(firstTailWord).toBeDefined();
-    expect(result[1].startsWith(firstTailWord!) || result[1].includes(firstTailWord!)).toBe(true);
+    expect(
+      result[1].startsWith(firstTailWord!) ||
+        result[1].includes(firstTailWord!),
+    ).toBe(true);
   });
 
   it("nunca entra em laço infinito quando a sobreposição configurada é maior que o próprio chunk", () => {

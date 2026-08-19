@@ -3,7 +3,9 @@ import { renderTemplate } from "./template.ts";
 
 describe("renderTemplate", () => {
   it("substitui uma variável simples", () => {
-    expect(renderTemplate("Olá, {{nome}}!", { nome: "Keystone" })).toBe("Olá, Keystone!");
+    expect(renderTemplate("Olá, {{nome}}!", { nome: "Keystone" })).toBe(
+      "Olá, Keystone!",
+    );
   });
 
   it("substitui a mesma variável repetida", () => {
@@ -11,7 +13,9 @@ describe("renderTemplate", () => {
   });
 
   it("serializa valor não-string como JSON", () => {
-    expect(renderTemplate("dados: {{lista}}", { lista: [1, 2, 3] })).toBe("dados: [1,2,3]");
+    expect(renderTemplate("dados: {{lista}}", { lista: [1, 2, 3] })).toBe(
+      "dados: [1,2,3]",
+    );
   });
 
   it("lança erro para variável ausente, em vez de deixar o literal passar", () => {

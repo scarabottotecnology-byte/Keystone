@@ -12,7 +12,9 @@
 import { z } from "zod";
 
 export const invitePayloadSchema = z.object({
-  email: z.string().trim().min(1, "E-mail obrigatório").max(320).email("E-mail inválido"),
+  email: z.string().trim().min(1, "E-mail obrigatório").max(320).email(
+    "E-mail inválido",
+  ),
   role: z.enum(["admin", "operator", "analyst", "viewer"]),
 });
 
