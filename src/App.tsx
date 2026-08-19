@@ -16,6 +16,7 @@ import { CommandCenterPage } from "@/modules/command-center/CommandCenterPage";
 import { IntelligencePage } from "@/modules/intelligence/IntelligencePage";
 import { CalendarPage } from "@/modules/calendar/CalendarPage";
 import { ContentPage } from "@/modules/content/ContentPage";
+import { SocialPage } from "@/modules/social/SocialPage";
 import { PLANNED_ITEMS } from "@/app/navigation";
 import NotFound from "@/app/NotFound";
 
@@ -101,6 +102,15 @@ const App = () => (
                 element={
                   <AppRoute>
                     <ContentPage />
+                  </AppRoute>
+                }
+              />
+
+              <Route
+                path="/social"
+                element={
+                  <AppRoute>
+                    <SocialPage />
                   </AppRoute>
                 }
               />

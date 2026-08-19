@@ -12,8 +12,15 @@
 // content_campaigns). FASE 5 acrescenta marca e metodologia (brand_profiles,
 // brand_services), a base de conhecimento com pgvector (knowledge_documents,
 // knowledge_chunks), a fábrica de conteúdo (content_assets, content_reviews)
-// e a RPC match_knowledge (wrapper público de app.match_knowledge — só o
-// wrapper aparece aqui, o gerador só introspecciona o schema public).
+// e a RPC match_knowledge. FASE 6 acrescenta publicação em rede social
+// (social_accounts, social_posts, social_post_metrics, publishing_jobs) e a
+// RPC claim_publishing_job.
+//
+// O schema `private` (oauth_tokens, oauth_states) NÃO aparece aqui, e é
+// justamente esse o ponto: o gerador só introspecciona o que o PostgREST
+// expõe, e o token de OAuth foi posto fora dessa fronteira de propósito
+// (docs/07 §3). Se um dia aparecer neste arquivo, algo abriu que não devia.
+//
 // Regenerar depois de cada migração.
 
 export type Json =
@@ -1617,6 +1624,278 @@ export type Database = {
         }
         Relationships: []
       }
+      publishing_jobs: {
+        Row: {
+          asset_id: string
+          attempt: number
+          calendar_id: string | null
+          correlation_id: string | null
+          created_at: string
+          id: string
+          last_error: string | null
+          locked_at: string | null
+          locked_by: string | null
+          max_attempts: number
+          organization_id: string
+          run_at: string
+          social_account_id: string
+          status: Database["public"]["Enums"]["publish_status"]
+        }
+        Insert: {
+          asset_id: string
+          attempt?: number
+          calendar_id?: string | null
+          correlation_id?: string | null
+          created_at?: string
+          id?: string
+          last_error?: string | null
+          locked_at?: string | null
+          locked_by?: string | null
+          max_attempts?: number
+          organization_id: string
+          run_at: string
+          social_account_id: string
+          status?: Database["public"]["Enums"]["publish_status"]
+        }
+        Update: {
+          asset_id?: string
+          attempt?: number
+          calendar_id?: string | null
+          correlation_id?: string | null
+          created_at?: string
+          id?: string
+          last_error?: string | null
+          locked_at?: string | null
+          locked_by?: string | null
+          max_attempts?: number
+          organization_id?: string
+          run_at?: string
+          social_account_id?: string
+          status?: Database["public"]["Enums"]["publish_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "publishing_jobs_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "content_assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "publishing_jobs_calendar_id_fkey"
+            columns: ["calendar_id"]
+            isOneToOne: false
+            referencedRelation: "content_calendar"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "publishing_jobs_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "publishing_jobs_social_account_id_fkey"
+            columns: ["social_account_id"]
+            isOneToOne: false
+            referencedRelation: "social_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      social_accounts: {
+        Row: {
+          avatar_url: string | null
+          connected_by: string | null
+          created_at: string
+          display_name: string | null
+          external_account_id: string
+          id: string
+          last_error: string | null
+          last_synced_at: string | null
+          organization_id: string
+          provider: Database["public"]["Enums"]["social_channel"]
+          scopes: string[]
+          status: Database["public"]["Enums"]["account_status"]
+          token_expires_at: string | null
+          token_ref: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          connected_by?: string | null
+          created_at?: string
+          display_name?: string | null
+          external_account_id: string
+          id?: string
+          last_error?: string | null
+          last_synced_at?: string | null
+          organization_id: string
+          provider: Database["public"]["Enums"]["social_channel"]
+          scopes?: string[]
+          status?: Database["public"]["Enums"]["account_status"]
+          token_expires_at?: string | null
+          token_ref: string
+        }
+        Update: {
+          avatar_url?: string | null
+          connected_by?: string | null
+          created_at?: string
+          display_name?: string | null
+          external_account_id?: string
+          id?: string
+          last_error?: string | null
+          last_synced_at?: string | null
+          organization_id?: string
+          provider?: Database["public"]["Enums"]["social_channel"]
+          scopes?: string[]
+          status?: Database["public"]["Enums"]["account_status"]
+          token_expires_at?: string | null
+          token_ref?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_accounts_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      social_post_metrics: {
+        Row: {
+          clicks: number | null
+          collected_at: string
+          collected_for: string
+          comments: number | null
+          id: string
+          impressions: number | null
+          likes: number | null
+          organization_id: string
+          raw: Json | null
+          reach: number | null
+          saves: number | null
+          shares: number | null
+          social_post_id: string
+          video_views: number | null
+        }
+        Insert: {
+          clicks?: number | null
+          collected_at?: string
+          collected_for: string
+          comments?: number | null
+          id?: string
+          impressions?: number | null
+          likes?: number | null
+          organization_id: string
+          raw?: Json | null
+          reach?: number | null
+          saves?: number | null
+          shares?: number | null
+          social_post_id: string
+          video_views?: number | null
+        }
+        Update: {
+          clicks?: number | null
+          collected_at?: string
+          collected_for?: string
+          comments?: number | null
+          id?: string
+          impressions?: number | null
+          likes?: number | null
+          organization_id?: string
+          raw?: Json | null
+          reach?: number | null
+          saves?: number | null
+          shares?: number | null
+          social_post_id?: string
+          video_views?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_post_metrics_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "social_post_metrics_social_post_id_fkey"
+            columns: ["social_post_id"]
+            isOneToOne: false
+            referencedRelation: "social_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      social_posts: {
+        Row: {
+          asset_id: string | null
+          channel: Database["public"]["Enums"]["social_channel"]
+          created_at: string
+          error: string | null
+          external_post_id: string | null
+          id: string
+          idempotency_key: string
+          organization_id: string
+          permalink: string | null
+          published_at: string | null
+          social_account_id: string
+          status: Database["public"]["Enums"]["content_status"]
+        }
+        Insert: {
+          asset_id?: string | null
+          channel: Database["public"]["Enums"]["social_channel"]
+          created_at?: string
+          error?: string | null
+          external_post_id?: string | null
+          id?: string
+          idempotency_key: string
+          organization_id: string
+          permalink?: string | null
+          published_at?: string | null
+          social_account_id: string
+          status?: Database["public"]["Enums"]["content_status"]
+        }
+        Update: {
+          asset_id?: string | null
+          channel?: Database["public"]["Enums"]["social_channel"]
+          created_at?: string
+          error?: string | null
+          external_post_id?: string | null
+          id?: string
+          idempotency_key?: string
+          organization_id?: string
+          permalink?: string | null
+          published_at?: string | null
+          social_account_id?: string
+          status?: Database["public"]["Enums"]["content_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_posts_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "content_assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "social_posts_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "social_posts_social_account_id_fkey"
+            columns: ["social_account_id"]
+            isOneToOne: false
+            referencedRelation: "social_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       ai_usage_daily: {
@@ -1643,6 +1922,31 @@ export type Database = {
       }
     }
     Functions: {
+      claim_publishing_job: {
+        Args: { p_limit?: number; p_organization_id: string; p_worker: string }
+        Returns: {
+          asset_id: string
+          attempt: number
+          calendar_id: string | null
+          correlation_id: string | null
+          created_at: string
+          id: string
+          last_error: string | null
+          locked_at: string | null
+          locked_by: string | null
+          max_attempts: number
+          organization_id: string
+          run_at: string
+          social_account_id: string
+          status: Database["public"]["Enums"]["publish_status"]
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "publishing_jobs"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       match_knowledge: {
         Args: {
           p_limit?: number
@@ -1662,6 +1966,7 @@ export type Database = {
       rpc_next_best_actions: { Args: never; Returns: Json }
     }
     Enums: {
+      account_status: "connected" | "expiring" | "expired" | "revoked" | "error"
       approval_mode: "auto" | "approval_required" | "manual"
       content_status:
         | "draft"
@@ -1674,6 +1979,14 @@ export type Database = {
       knowledge_status: "uploaded" | "processing" | "indexed" | "failed"
       membership_status: "invited" | "active" | "suspended"
       org_role: "owner" | "admin" | "operator" | "analyst" | "viewer"
+      publish_status:
+        | "pending"
+        | "locked"
+        | "running"
+        | "succeeded"
+        | "failed"
+        | "cancelled"
+        | "skipped"
       run_status: "running" | "succeeded" | "failed" | "partial" | "cancelled"
       social_channel:
         | "linkedin"
@@ -1810,6 +2123,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      account_status: ["connected", "expiring", "expired", "revoked", "error"],
       approval_mode: ["auto", "approval_required", "manual"],
       content_status: [
         "draft",
@@ -1823,6 +2137,15 @@ export const Constants = {
       knowledge_status: ["uploaded", "processing", "indexed", "failed"],
       membership_status: ["invited", "active", "suspended"],
       org_role: ["owner", "admin", "operator", "analyst", "viewer"],
+      publish_status: [
+        "pending",
+        "locked",
+        "running",
+        "succeeded",
+        "failed",
+        "cancelled",
+        "skipped",
+      ],
       run_status: ["running", "succeeded", "failed", "partial", "cancelled"],
       social_channel: [
         "linkedin",

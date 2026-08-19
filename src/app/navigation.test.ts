@@ -49,7 +49,14 @@ describe("registro de navegação", () => {
     // registrar a rota dele aqui (e em App.tsx) cai no NotFound, e a sidebar
     // prometeria algo que não abre.
     const active = ALL_NAV_ITEMS.filter((i) => i.status === "active");
-    expect(active.map((i) => i.to)).toEqual(["/", "/intelligence", "/content", "/calendar", "/settings"]);
+    expect(active.map((i) => i.to)).toEqual([
+      "/",
+      "/intelligence",
+      "/content",
+      "/calendar",
+      "/social",
+      "/settings",
+    ]);
   });
 
   it("nenhum grupo fica vazio", () => {

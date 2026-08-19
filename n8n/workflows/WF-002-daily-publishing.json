@@ -1,0 +1,138 @@
+{
+  "name": "WF-002 — Daily Publishing",
+  "meta": {
+    "description": "Publica as peças aprovadas cujo job venceu. Roda a cada 15 minutos, não uma vez por dia: o horário fino de cada publicação vive em content_calendar, e este workflow só pergunta se existe job vencido e não travado. É isso que faz a recuperação de falha ser automática — um job que falhou às 09:00 é retentado às 09:15 sem ninguém reenfileirar à mão (docs/12, FASE 6, subtarefa 9).\n\nNenhum segredo neste arquivo: o header x-automation-secret vem da credencial do n8n, referenciada por id/nome."
+  },
+  "nodes": [
+    {
+      "id": "cron-15min",
+      "name": "Cron — a cada 15 minutos",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ],
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "mode": "custom",
+              "cronExpression": "*/15 * * * *"
+            }
+          ]
+        }
+      },
+      "notes": "Intervalo curto de propósito. Com um disparo diário, um job que falhasse por indisponibilidade momentânea do LinkedIn só seria retentado no dia seguinte — a peça perderia a janela inteira."
+    },
+    {
+      "id": "generate-correlation-id",
+      "name": "Gerar correlation ID (ULID)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        460,
+        300
+      ],
+      "parameters": {
+        "jsCode": "// ULID simplificado — só precisa ser único e ordenável por tempo para\n// reconstruir a execução nos logs; não precisa da implementação completa\n// de supabase/functions/_shared/correlation.ts, que já cobre o caso mais\n// rigoroso (monotonicidade dentro do mesmo milissegundo) do lado da Edge\n// Function.\nconst ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';\nfunction encodeTime(ms) {\n  let out = '';\n  let t = ms;\n  for (let i = 0; i < 10; i++) {\n    out = ALPHABET[t % 32] + out;\n    t = Math.floor(t / 32);\n  }\n  return out;\n}\nfunction randomPart() {\n  let out = '';\n  for (let i = 0; i < 16; i++) {\n    out += ALPHABET[Math.floor(Math.random() * 32)];\n  }\n  return out;\n}\nreturn [{ json: { correlationId: encodeTime(Date.now()) + randomPart() } }];"
+      }
+    },
+    {
+      "id": "call-social-publish",
+      "name": "POST social-publish",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        680,
+        300
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SUPABASE_PROJECT_URL }}/functions/v1/social-publish",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-correlation-id",
+              "value": "={{ $json.correlationId }}"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "keystone-automation-webhook-secret",
+          "name": "Keystone — Automation Webhook Secret"
+        }
+      },
+      "notes": "timeout de 120s: a função processa uma leva de até 5 jobs, cada um com uma chamada ao LinkedIn. Um timeout aqui NÃO deve virar retentativa automática do workflow — a função já trata o caso de timeout por dentro, verificando na plataforma antes de republicar (subtarefa 7). Repetir a chamada do n8n por cima disso reintroduziria exatamente o risco de publicação duplicada que a função existe para evitar."
+    },
+    {
+      "id": "failure-placeholder",
+      "name": "Falha — registrar (placeholder até WF-014)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        900,
+        460
+      ],
+      "parameters": {},
+      "notes": "WF-014 (alertas) nasce na FASE 20. Até lá a falha fica visível em automation_runs, que social-publish já preenche por conta própria."
+    }
+  ],
+  "connections": {
+    "Cron — a cada 15 minutos": {
+      "main": [
+        [
+          {
+            "node": "Gerar correlation ID (ULID)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gerar correlation ID (ULID)": {
+      "main": [
+        [
+          {
+            "node": "POST social-publish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "POST social-publish": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Falha — registrar (placeholder até WF-014)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "timezone": "America/Sao_Paulo",
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "pinData": {}
+}

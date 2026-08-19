@@ -41,7 +41,11 @@ import type { LucideIcon } from "lucide-react";
  * de uma ideia e gravam `content_reviews` de verdade — falta o editor de
  * peça completo (hoje a biblioteca mostra e permite aprovar, mas não
  * editar campo a campo) e a fila de aprovação com filtro, ambos adiados
- * para a próxima sessão. Cada tela ativa que ainda não cobre tudo o que
+ * para a próxima sessão. Social virou `active` na FASE 6: o OAuth do
+ * LinkedIn, o worker de publicação com lock pessimista e a fila são reais —
+ * falta só a aprovação do Standard Tier do LinkedIn para uma publicação de
+ * fato sair, e enquanto ela não vem a tela mostra a fila e o erro real, não
+ * um sucesso simulado. Cada tela ativa que ainda não cobre tudo o que
  * promete declara a parte pendente nela mesma, com a fase em que chega —
  * nunca esconde atrás de um placeholder de tela inteira nem finge com
  * dado falso.
@@ -142,7 +146,7 @@ export const NAVIGATION: NavGroup[] = [
         label: "Social",
         to: "/social",
         icon: Share2,
-        status: "planned",
+        status: "active",
         phase: 6,
         purpose: "Publicar no LinkedIn e no Instagram sem duplicar e sem falhar em silêncio.",
         delivers: [
