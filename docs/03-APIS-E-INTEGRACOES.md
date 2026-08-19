@@ -37,7 +37,7 @@ Corrige o achado **H-02**: agregação sai do navegador e vai para o Postgres.
 | `rpc_pipeline_board(p_pipeline_id)` | oportunidades agrupadas por estágio | `/pipeline` |
 | `rpc_next_best_actions(p_limit)` | lista priorizada do dia | `/`, `/ai-insights` |
 | `rpc_prospect_search(p_filters, p_page)` | prospects paginados com score | `/prospects` |
-| `app.match_knowledge(p_query_embedding, p_limit)` | chunks similares | RAG |
+| `app.match_knowledge(p_organization_id, p_query_embedding, p_limit, p_min_similarity)` | chunks similares | RAG |
 
 Todas `SECURITY INVOKER` e `STABLE`. `SECURITY INVOKER` é obrigatório: uma função
 de agregação `SECURITY DEFINER` executaria com privilégio do dono e ignoraria a

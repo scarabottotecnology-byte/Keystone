@@ -278,6 +278,19 @@ vem da RLS e do filtro `organization_id` na query. A função de busca
 seja aplicada — uma função `SECURITY DEFINER` aqui vazaria conhecimento entre
 organizações. Detalhado em `07 §2`.
 
+**Achado da FASE 5, corrigindo a assinatura acima.** `SECURITY INVOKER`
+sozinho não basta: A1 e A3 chamam `app.match_knowledge` como `service_role`,
+sem sessão de usuário — e `service_role` tem `BYPASSRLS`, então a RLS de
+`knowledge_chunks` simplesmente não se aplica a ele. Sem um filtro explícito,
+a peça gerada para uma organização poderia citar a base de conhecimento de
+outra. A assinatura real, implementada na migração `brand_and_knowledge_
+base.sql`, é `app.match_knowledge(p_organization_id, p_query_embedding,
+p_limit, p_min_similarity)` — o parâmetro de organização é obrigatório e
+filtrado explicitamente em código, o mesmo princípio já usado em
+`market-intelligence`/`content-strategist` (FASE 4) para todo caminho onde
+quem chama pode ser `service_role`. Prova em
+`supabase/tests/database/match_knowledge_isolation.sql`.
+
 ### 4.3 Content
 
 ```sql
@@ -350,6 +363,7 @@ create table content_assets (
   hashtags        text[] not null default '{}',
   media           jsonb not null default '[]',  -- [{storage_path, alt, order}]
   visual_brief    text,
+  grounded_on     jsonb not null default '[]',  -- ids de knowledge_chunks usados (P7, docs/05 §3)
   variant_of      uuid references content_assets(id) on delete set null,
   version         int not null default 1,
   status          content_status not null default 'draft',
@@ -379,7 +393,11 @@ create table content_reviews (
 
 As dimensões do Content Score (seção 12) são as chaves de `dimensions`: clareza,
 relevância, aderência ao ICP, força do hook, argumentação, CTA, posicionamento,
-potencial comercial, risco de genérico, consistência de marca. Guardar como
+potencial comercial, risco de genérico, consistência de marca — como chave
+`jsonb`, em ASCII/snake_case (`clareza`, `relevancia`, `aderencia_icp`,
+`forca_hook`, `argumentacao`, `cta`, `posicionamento`, `potencial_comercial`,
+`risco_generico`, `consistencia_marca`), não o rótulo acentuado acima, que é
+só a versão legível para humano. Guardar como
 `jsonb` — e não como dez colunas — permite evoluir a rubrica sem migração, ao
 custo de não ter constraint. Aceitável porque a rubrica é validada por `zod` na
 Edge Function antes de gravar.

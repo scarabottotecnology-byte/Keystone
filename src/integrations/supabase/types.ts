@@ -9,7 +9,12 @@
 // error_logs) e o domínio de conteúdo (market_intelligence_sources,
 // ai_insights, content_pillars, content_topics, content_formats,
 // content_ideas, content_calendar_rules, content_calendar,
-// content_campaigns). Regenerar depois de cada migração.
+// content_campaigns). FASE 5 acrescenta marca e metodologia (brand_profiles,
+// brand_services), a base de conhecimento com pgvector (knowledge_documents,
+// knowledge_chunks) e a fábrica de conteúdo (content_assets, content_reviews).
+// app.match_knowledge não aparece aqui — vive no schema app, fora do que o
+// gerador introspecciona por padrão (só public). Regenerar depois de cada
+// migração.
 
 export type Json =
   | string
@@ -459,6 +464,229 @@ export type Database = {
           },
         ]
       }
+      brand_profiles: {
+        Row: {
+          audience: string | null
+          colors: Json
+          created_at: string
+          differentiators: string[] | null
+          forbidden_words: string[]
+          id: string
+          is_active: boolean
+          logo_path: string | null
+          name: string
+          organization_id: string
+          positioning: string | null
+          preferred_words: string[]
+          tone: string | null
+          typography: Json
+          updated_at: string
+        }
+        Insert: {
+          audience?: string | null
+          colors?: Json
+          created_at?: string
+          differentiators?: string[] | null
+          forbidden_words?: string[]
+          id?: string
+          is_active?: boolean
+          logo_path?: string | null
+          name: string
+          organization_id: string
+          positioning?: string | null
+          preferred_words?: string[]
+          tone?: string | null
+          typography?: Json
+          updated_at?: string
+        }
+        Update: {
+          audience?: string | null
+          colors?: Json
+          created_at?: string
+          differentiators?: string[] | null
+          forbidden_words?: string[]
+          id?: string
+          is_active?: boolean
+          logo_path?: string | null
+          name?: string
+          organization_id?: string
+          positioning?: string | null
+          preferred_words?: string[]
+          tone?: string | null
+          typography?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_profiles_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brand_services: {
+        Row: {
+          description: string | null
+          icp_fit: Json | null
+          id: string
+          is_active: boolean
+          is_proprietary: boolean
+          methodology: string | null
+          name: string
+          organization_id: string
+          slug: string
+          target_pain: string | null
+        }
+        Insert: {
+          description?: string | null
+          icp_fit?: Json | null
+          id?: string
+          is_active?: boolean
+          is_proprietary?: boolean
+          methodology?: string | null
+          name: string
+          organization_id: string
+          slug: string
+          target_pain?: string | null
+        }
+        Update: {
+          description?: string | null
+          icp_fit?: Json | null
+          id?: string
+          is_active?: boolean
+          is_proprietary?: boolean
+          methodology?: string | null
+          name?: string
+          organization_id?: string
+          slug?: string
+          target_pain?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_services_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      content_assets: {
+        Row: {
+          ai_generated: boolean
+          approved_at: string | null
+          approved_by: string | null
+          body: string | null
+          campaign_id: string | null
+          channel: Database["public"]["Enums"]["social_channel"]
+          created_at: string
+          cta: string | null
+          format_id: string | null
+          grounded_on: Json
+          hashtags: string[]
+          headline: string | null
+          hook: string | null
+          id: string
+          idea_id: string | null
+          media: Json
+          model: string | null
+          organization_id: string
+          status: Database["public"]["Enums"]["content_status"]
+          updated_at: string
+          variant_of: string | null
+          version: number
+          visual_brief: string | null
+        }
+        Insert: {
+          ai_generated?: boolean
+          approved_at?: string | null
+          approved_by?: string | null
+          body?: string | null
+          campaign_id?: string | null
+          channel: Database["public"]["Enums"]["social_channel"]
+          created_at?: string
+          cta?: string | null
+          format_id?: string | null
+          grounded_on?: Json
+          hashtags?: string[]
+          headline?: string | null
+          hook?: string | null
+          id?: string
+          idea_id?: string | null
+          media?: Json
+          model?: string | null
+          organization_id: string
+          status?: Database["public"]["Enums"]["content_status"]
+          updated_at?: string
+          variant_of?: string | null
+          version?: number
+          visual_brief?: string | null
+        }
+        Update: {
+          ai_generated?: boolean
+          approved_at?: string | null
+          approved_by?: string | null
+          body?: string | null
+          campaign_id?: string | null
+          channel?: Database["public"]["Enums"]["social_channel"]
+          created_at?: string
+          cta?: string | null
+          format_id?: string | null
+          grounded_on?: Json
+          hashtags?: string[]
+          headline?: string | null
+          hook?: string | null
+          id?: string
+          idea_id?: string | null
+          media?: Json
+          model?: string | null
+          organization_id?: string
+          status?: Database["public"]["Enums"]["content_status"]
+          updated_at?: string
+          variant_of?: string | null
+          version?: number
+          visual_brief?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_assets_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "content_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "content_assets_format_id_fkey"
+            columns: ["format_id"]
+            isOneToOne: false
+            referencedRelation: "content_formats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "content_assets_idea_id_fkey"
+            columns: ["idea_id"]
+            isOneToOne: false
+            referencedRelation: "content_ideas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "content_assets_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "content_assets_variant_of_fkey"
+            columns: ["variant_of"]
+            isOneToOne: false
+            referencedRelation: "content_assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       content_calendar: {
         Row: {
           asset_id: string | null
@@ -497,6 +725,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "content_calendar_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "content_assets"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "content_calendar_organization_id_fkey"
             columns: ["organization_id"]
@@ -769,7 +1004,71 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "content_pillars_methodology_id_fkey"
+            columns: ["methodology_id"]
+            isOneToOne: false
+            referencedRelation: "brand_services"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "content_pillars_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      content_reviews: {
+        Row: {
+          asset_id: string
+          created_at: string
+          dimensions: Json
+          id: string
+          issues: Json
+          model: string | null
+          organization_id: string
+          reviewer_id: string | null
+          reviewer_type: string
+          score: number
+          suggestions: string | null
+        }
+        Insert: {
+          asset_id: string
+          created_at?: string
+          dimensions: Json
+          id?: string
+          issues?: Json
+          model?: string | null
+          organization_id: string
+          reviewer_id?: string | null
+          reviewer_type?: string
+          score: number
+          suggestions?: string | null
+        }
+        Update: {
+          asset_id?: string
+          created_at?: string
+          dimensions?: Json
+          id?: string
+          issues?: Json
+          model?: string | null
+          organization_id?: string
+          reviewer_id?: string | null
+          reviewer_type?: string
+          score?: number
+          suggestions?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_reviews_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "content_assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "content_reviews_organization_id_fkey"
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
@@ -1063,6 +1362,113 @@ export type Database = {
           },
         ]
       }
+      knowledge_chunks: {
+        Row: {
+          chunk_index: number
+          content: string
+          document_id: string
+          embedding: string | null
+          id: string
+          metadata: Json
+          organization_id: string
+          token_count: number | null
+        }
+        Insert: {
+          chunk_index: number
+          content: string
+          document_id: string
+          embedding?: string | null
+          id?: string
+          metadata?: Json
+          organization_id: string
+          token_count?: number | null
+        }
+        Update: {
+          chunk_index?: number
+          content?: string
+          document_id?: string
+          embedding?: string | null
+          id?: string
+          metadata?: Json
+          organization_id?: string
+          token_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "knowledge_chunks_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "knowledge_documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "knowledge_chunks_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      knowledge_documents: {
+        Row: {
+          byte_size: number | null
+          checksum: string | null
+          created_at: string
+          created_by: string | null
+          error: string | null
+          id: string
+          indexed_at: string | null
+          mime_type: string | null
+          organization_id: string
+          source_type: string
+          source_url: string | null
+          status: Database["public"]["Enums"]["knowledge_status"]
+          storage_path: string | null
+          title: string
+        }
+        Insert: {
+          byte_size?: number | null
+          checksum?: string | null
+          created_at?: string
+          created_by?: string | null
+          error?: string | null
+          id?: string
+          indexed_at?: string | null
+          mime_type?: string | null
+          organization_id: string
+          source_type: string
+          source_url?: string | null
+          status?: Database["public"]["Enums"]["knowledge_status"]
+          storage_path?: string | null
+          title: string
+        }
+        Update: {
+          byte_size?: number | null
+          checksum?: string | null
+          created_at?: string
+          created_by?: string | null
+          error?: string | null
+          id?: string
+          indexed_at?: string | null
+          mime_type?: string | null
+          organization_id?: string
+          source_type?: string
+          source_url?: string | null
+          status?: Database["public"]["Enums"]["knowledge_status"]
+          storage_path?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "knowledge_documents_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       market_intelligence_sources: {
         Row: {
           created_at: string
@@ -1250,6 +1656,7 @@ export type Database = {
         | "published"
         | "failed"
         | "cancelled"
+      knowledge_status: "uploaded" | "processing" | "indexed" | "failed"
       membership_status: "invited" | "active" | "suspended"
       org_role: "owner" | "admin" | "operator" | "analyst" | "viewer"
       run_status: "running" | "succeeded" | "failed" | "partial" | "cancelled"
@@ -1398,6 +1805,7 @@ export const Constants = {
         "failed",
         "cancelled",
       ],
+      knowledge_status: ["uploaded", "processing", "indexed", "failed"],
       membership_status: ["invited", "active", "suspended"],
       org_role: ["owner", "admin", "operator", "analyst", "viewer"],
       run_status: ["running", "succeeded", "failed", "partial", "cancelled"],

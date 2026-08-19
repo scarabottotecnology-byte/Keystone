@@ -27,9 +27,17 @@
 -- (FASE 4) têm um representante de cada migração testado por comportamento
 -- (`ai_invocations`, `ai_prompts`, `content_pillars`) — o resto já está
 -- coberto estruturalmente pela varredura de catálogo, que não lista nome.
+-- Mesma convenção na FASE 5: um representante por migração
+-- (`brand_profiles`, `knowledge_chunks`, `content_assets`).
+--
+-- O isolamento entre organizações de `app.match_knowledge` (achado desta
+-- fase — ver a migração `brand_and_knowledge_base.sql`) tem prova própria
+-- em `match_knowledge_isolation.sql`, fora deste arquivo: não é um caso de
+-- `anon` versus política, é `service_role` versus filtro explícito em
+-- código, uma classe de teste diferente da que este arquivo cobre.
 begin;
 
-select plan(29);
+select plan(35);
 
 -- ── organizations ────────────────────────────────────────────────────────────
 set local role anon;
@@ -246,6 +254,63 @@ select throws_ok(
   '42501',
   null,
   'anon não consegue gravar pilar de conteúdo'
+);
+
+reset role;
+
+-- ── brand_profiles (FASE 5) ──────────────────────────────────────────────────
+set local role anon;
+
+select is(
+  (select count(*)::int from brand_profiles),
+  0,
+  'anon não enxerga nenhum perfil de marca'
+);
+
+select throws_ok(
+  $$ insert into brand_profiles (organization_id, name)
+     values ((select id from organizations limit 1), 'x') $$,
+  '42501',
+  null,
+  'anon não consegue gravar perfil de marca'
+);
+
+reset role;
+
+-- ── knowledge_chunks (FASE 5) ────────────────────────────────────────────────
+set local role anon;
+
+select is(
+  (select count(*)::int from knowledge_chunks),
+  0,
+  'anon não enxerga nenhum trecho da base de conhecimento'
+);
+
+select throws_ok(
+  $$ insert into knowledge_chunks (organization_id, document_id, chunk_index, content)
+     values ((select id from organizations limit 1), gen_random_uuid(), 0, 'x') $$,
+  '42501',
+  null,
+  'anon não consegue gravar trecho da base de conhecimento'
+);
+
+reset role;
+
+-- ── content_assets (FASE 5) ──────────────────────────────────────────────────
+set local role anon;
+
+select is(
+  (select count(*)::int from content_assets),
+  0,
+  'anon não enxerga nenhuma peça de conteúdo'
+);
+
+select throws_ok(
+  $$ insert into content_assets (organization_id, channel)
+     values ((select id from organizations limit 1), 'linkedin') $$,
+  '42501',
+  null,
+  'anon não consegue gravar peça de conteúdo'
 );
 
 reset role;
