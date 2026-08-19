@@ -51,3 +51,39 @@ externo existir.
    manual antes de habilitar o cron — mesma disciplina de "todo workflow
    nasce desabilitado" do documento 20, subtarefa 4, aplicada por
    antecipação.
+
+---
+
+## WF-002 — Daily Publishing (FASE 6)
+
+`WF-002-daily-publishing.json`. Cron a cada **15 minutos**, não uma vez por
+dia: o horário fino de cada publicação vive em `content_calendar`, e o
+workflow só pergunta se há job vencido e não travado. É isso que torna a
+recuperação de falha automática — um job que falhou às 09:00 é retentado às
+09:15, sem ninguém reenfileirar à mão.
+
+**Um timeout aqui não deve virar retentativa do workflow.** A função
+`social-publish` já trata timeout por dentro: consulta o LinkedIn para
+verificar se o post existe antes de qualquer republicação, e manda o job
+para revisão humana quando não consegue nem verificar. Repetir a chamada
+por cima disso reintroduziria exatamente o risco de publicação duplicada
+que a função existe para evitar. Por isso o nó HTTP tem timeout generoso
+(120s, para uma leva de até 5 jobs) e nenhuma política de retry própria.
+
+Mesma convenção do WF-015: nenhum segredo no arquivo, o header
+`x-automation-secret` vem da credencial nomeada do n8n.
+
+### Antes de ligar o WF-002
+
+1. Deployar `social-publish` (ainda não enviada ao projeto remoto — ver
+   docs/21-EXECUCAO-FASE-6.md).
+2. `LINKEDIN_CLIENT_ID`, `LINKEDIN_CLIENT_SECRET`, `LINKEDIN_REDIRECT_URI`,
+   `LINKEDIN_API_VERSION`, `OAUTH_STATE_SECRET` e `APP_URL` como Edge
+   Function secrets.
+3. Aprovação do **Community Management API** do LinkedIn para o app — sem
+   ela nenhuma publicação sai, e o documento 12 prevê o modo assistido como
+   degradação declarada, não como mock.
+4. Conectar a página da empresa em `/social` e confirmar que a conta
+   aparece como `connected`.
+5. Ter ao menos uma peça `approved` com job agendado — o worker recusa
+   publicar peça que não passou pela aprovação.
