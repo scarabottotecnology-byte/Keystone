@@ -11,10 +11,10 @@
 // content_ideas, content_calendar_rules, content_calendar,
 // content_campaigns). FASE 5 acrescenta marca e metodologia (brand_profiles,
 // brand_services), a base de conhecimento com pgvector (knowledge_documents,
-// knowledge_chunks) e a fábrica de conteúdo (content_assets, content_reviews).
-// app.match_knowledge não aparece aqui — vive no schema app, fora do que o
-// gerador introspecciona por padrão (só public). Regenerar depois de cada
-// migração.
+// knowledge_chunks), a fábrica de conteúdo (content_assets, content_reviews)
+// e a RPC match_knowledge (wrapper público de app.match_knowledge — só o
+// wrapper aparece aqui, o gerador só introspecciona o schema public).
+// Regenerar depois de cada migração.
 
 export type Json =
   | string
@@ -1643,6 +1643,21 @@ export type Database = {
       }
     }
     Functions: {
+      match_knowledge: {
+        Args: {
+          p_limit?: number
+          p_min_similarity?: number
+          p_organization_id: string
+          p_query_embedding: string
+        }
+        Returns: {
+          chunk_id: string
+          content: string
+          document_id: string
+          document_title: string
+          similarity: number
+        }[]
+      }
       rpc_command_center: { Args: never; Returns: Json }
       rpc_next_best_actions: { Args: never; Returns: Json }
     }

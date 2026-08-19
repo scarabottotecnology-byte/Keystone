@@ -1,14 +1,17 @@
-# 20 — Execução da FASE 5 (em andamento)
+# 20 — Execução da FASE 5
 
-Registro do que já foi construído da FASE 5 — AI Content Factory + Review.
+Registro do que foi construído na FASE 5 — AI Content Factory + Review.
 Segue os STEPs 11 e 12 do método (DOCUMENT e REPORT) do documento 09.
 
-**Status:** parcial, mesmo ritmo da FASE 4. A camada de dado — marca,
-metodologia, base de conhecimento com pgvector, `content_assets`/
-`content_reviews`, e os sete prompts globais de A3/A4 — está pronta e
-verificada. Os agentes A3 (Content Factory) e A4 (Content Reviewer) como
-Edge Functions, o pipeline de ingestão da base de conhecimento, o editor de
-peça, a biblioteca de conteúdo e o WF-001 ainda não.
+**Status:** completa, no que este projeto pode entregar sem uma biblioteca
+de parsing de PDF/PPTX/DOCX ainda avaliada (ver decisão de escopo no fim).
+A camada de dado (marca, metodologia, base de conhecimento com pgvector,
+`content_assets`/`content_reviews`, sete prompts globais), os agentes A3
+(Content Factory) e A4 (Content Reviewer) como Edge Functions, o pipeline
+de ingestão da base de conhecimento e as telas de ideias/biblioteca em
+`/content` estão prontos, deployados e verificados. WF-001 (n8n) e a
+geração de variações (`variant_of`) ficam para quando houver decisão de
+produto sobre seleção automática — ver "Pendente" no fim.
 
 ---
 
@@ -148,20 +151,180 @@ em toda tabela) continuam gerais e cobrem o resto sem listar nome.
 `match_knowledge_isolation.sql`, arquivo novo: as quatro asserções do
 achado de `app.match_knowledge`, descrito acima.
 
+## Achado real: `app.match_knowledge` inalcançável pelo cliente supabase-js
+
+Ao começar `content-factory`, ficou claro que `caller.db.rpc(...)` (a mesma
+API que `rpc_command_center`/`rpc_next_best_actions` já usam) só alcança
+funções do schema `public` — é assim que PostgREST expõe RPC por padrão, e
+este projeto não declara nenhum `db.schema` alternativo
+(`supabase/config.toml` não tem a chave). `app.match_knowledge` vive em
+`app`, pensado até aqui só para uso interno de RLS/trigger — inalcançável
+de fora.
+
+**Corrigido** com o mesmo padrão já usado para as duas RPCs do Command
+Center (`command_center_growth_score.sql`): um wrapper fino em
+`public.match_knowledge`, `SECURITY INVOKER`, que só repassa para
+`app.match_knowledge` — nenhuma lógica de segurança duplicada, só exposto.
+Migração `public_match_knowledge_wrapper.sql`.
+
+**Achado dentro do achado:** o primeiro `get_advisors(security)` depois de
+criar o wrapper voltou com `function_search_path_mutable` — o wrapper não
+fixava `search_path`, ao contrário de toda outra função deste projeto.
+Corrigido na migração seguinte (`match_knowledge_wrapper_search_path.sql`)
+antes de seguir. `anon` confirmado sem `EXECUTE` (`has_function_privilege`
+→ `false`) e uma chamada funcional real contra o banco remoto validaram o
+wrapper antes de ser usado por `content-factory`.
+
+## Achado real: `content_formats` estava vazia
+
+A FASE 4 criou a tabela mas nunca semeou nenhuma linha — não havia
+consumidor até A3 precisar de um `format_id` para saber canal e limites da
+peça (docs/05 §4: "ideia, formato, marca, RAG" são a entrada de A3). Sem
+isso, não haveria o que escolher no payload de `content-factory`. Corrigido
+com três formatos de partida (`text_post`/`carousel` no LinkedIn,
+`single_image` no Instagram) — migração `content_formats_seed.sql`, mesmo
+racional de "ponto de partida razoável, não regra do master prompt" da
+seed de `content_calendar_rules` na FASE 4.
+
+## `_shared/ai-gateway/embeddings.ts` — módulo novo, separado de `invoke()`
+
+`invoke()` é moldado para chat completions com `output_schema` estruturado
+por tool forçada — não existe endpoint de embeddings na Anthropic Messages
+API, e a forma da chamada (texto → vetor, sem prompt de sistema, sem
+schema) é fundamentalmente diferente. `embed()` chama a OpenAI diretamente,
+com a mesma disciplina de custo do resto do gateway: grava em
+`ai_invocations` (`provider: 'openai'`), e `costUsd` é `null` — nunca um
+zero fabricado — quando `ai_providers.config.pricing` não tem o modelo.
+Usado por `knowledge-ingest` (embedding de cada chunk) e por
+`content-factory` (embedding da consulta antes de `match_knowledge`).
+
+`sourceContent.ts` (limpeza de HTML) migrou de `market-intelligence/` para
+`_shared/` — `knowledge-ingest` precisa exatamente da mesma limpeza para o
+caminho `url`, e duplicar o módulo manteria duas cópias do mesmo
+comportamento. `market-intelligence/index.ts` só teve o import ajustado.
+
+## Edge Function `knowledge-ingest`
+
+Interativa (JWT de operador), mesmo padrão de auth de `content-strategist`.
+`source_type` aceita os cinco valores reais da coluna
+(`manual`/`url`/`pdf`/`pptx`/`docx`, docs/02 §4.2), mas o handler recusa
+`pdf`/`pptx`/`docx` com `bad_request` explícito — decisão de escopo
+detalhada no fim deste documento.
+
+Fluxo: verifica papel (`owner`/`admin`/`operator`) → extrai texto
+(`manual`: já vem pronto; `url`: busca + `extractPlainText`) → recusa
+conteúdo vazio ou maior que 200.000 caracteres (nunca trunca em silêncio —
+truncar apagaria parte real do documento, diferente do truncamento
+deliberado de A1 sobre um único prompt) → calcula checksum SHA-256 e grava
+`knowledge_documents` (`status: 'processing'`) pelo `caller.db`, contando
+com a constraint `unique(organization_id, checksum)` para detectar
+reenvio do mesmo conteúdo e devolver `conflict`, não indexar de novo →
+`chunk.ts` fatia o texto (~800 tokens/~120 de sobreposição, fronteira de
+frase quando possível) → cada chunk vira um `embed()` e é gravado em
+`knowledge_chunks` por um cliente `service_role` próprio da função —
+`knowledge_documents` usa `caller.db` (política `operator_insert`/
+`operator_update` de verdade), mas `knowledge_chunks` não tem política de
+escrita para `authenticated` por desenho, então só `service_role` grava.
+Falha de embedding num chunk não derruba os demais; documento fica
+`failed` só se **nenhum** chunk foi indexado.
+
+`chunk.ts` é módulo puro — 8 testes, incluindo cobertura total do texto
+entre chunks e ausência de laço infinito quando a sobreposição configurada
+excede o próprio chunk.
+
+## Edge Function `content-factory` (Agentes A3 + A4)
+
+Interativa (JWT de operador), disparada por "gerar peça a partir desta
+ideia" — mesmo padrão de A2. Recebe `idea_id` + `format_id`, carrega
+ideia/formato/pilar/marca pelo `caller.db`, e executa o pipeline de seis
+etapas de A3 em sequência via `invoke()` (ângulo → hook → RAG → estrutura
+→ copy → CTA → briefing visual), sem passar `caller.db` para `invoke()`/
+`embed()` — mesmo racional já registrado em `content-strategist`: um
+`operator` não tem `INSERT` em `ai_invocations`, e usar o cliente do
+chamador ali descartaria o registro de custo em silêncio.
+
+**RAG com degradação, não aborto.** A consulta vetorial (`embed()` +
+`match_knowledge` via `caller.db.rpc`) roda entre as etapas hook e
+estrutura. Se o embedding falhar (ex.: `OPENAI_API_KEY` ausente), o
+pipeline segue com contexto vazio em vez de abortar a geração inteira —
+"recuperação vazia" já é um estado válido e tratado pela regra de
+fundamentação (docs/05 §3), então uma etapa auxiliar falhando não deveria
+impedir a peça de existir.
+
+**Falha em qualquer etapa de A3 aborta antes de gravar.** Nada é inserido
+em `content_assets` até as seis etapas terminarem — uma peça pela metade
+seria pior que nenhuma. As chamadas já feitas continuam registradas em
+`ai_invocations` (custo real e visível) mesmo que o resultado final não
+seja salvo.
+
+**Por que A4 roda dentro da mesma função, não numa Edge Function
+separada.** A3 e A4 continuam distintos onde importa — prompts,
+`output_schema` e `model_hint` diferentes (`content_factory.*` em
+`claude-sonnet-5`, `content_reviewer.evaluate` em `claude-opus-5`), com o
+gateway escolhendo o modelo por prompt, não por função que chama. O padrão
+documentado (docs/04 §1) prevê n8n orquestrando duas chamadas via um
+`automation-dispatch` compartilhado — escopo da FASE 20, ainda não
+construído (mesma lacuna já registrada para `market-intelligence` na FASE
+4). Sem esse orquestrador, separar A3/A4 em duas funções só empurraria a
+responsabilidade de encadear as duas chamadas para o frontend, sem ganho
+real. Falha só de A4 (depois de A3 já ter gravado a peça) não desfaz a
+peça — ela fica `status: 'review'` sem `content_reviews`, visível como
+pendente de revisão, nunca escondida.
+
+`ragContext.ts` (formatação do contexto de RAG e consolidação de
+`grounded_on`) é módulo puro, separado do `index.ts` — 7 testes, incluindo
+o caso de um `chunk_id` citado pelo modelo que não bate com nenhum chunk
+recuperado (preservado com campos nulos, nunca descartado em silêncio).
+
+## Deploy
+
+Cinco Edge Functions ativas no projeto remoto: `invite-member`,
+`market-intelligence`, `content-strategist` (FASES 2 e 4) e agora
+`content-factory` e `knowledge-ingest` (`verify_jwt: true` nas duas —
+ambas interativas). Confirmado por `list_edge_functions`. Mesma limitação
+de sempre: verificação ponta a ponta por HTTP direto não foi possível
+nesta sandbox (proxy de saída bloqueia HTTPS a `*.supabase.co`); a
+confiança vem do deploy bem-sucedido, dos testes unitários dos módulos
+puros e da revisão de código.
+
+## Frontend: `/content`
+
+`src/modules/content/` — `ContentPage.tsx` reúne `ContentIdeasSection`
+(lista `content_ideas`, cada uma com o botão "Gerar peça" que abre
+`GeneratePieceDialog` — escolhe o formato e chama `content-factory`) e
+`ContentLibrary` (lista `content_assets` com a revisão mais recente de
+`content_reviews` embutida, canal, status, hashtags, contagem de
+`grounded_on`, e um botão "Aprovar").
+
+**Aprovação bloqueada por score, não só avisada.** Score abaixo de 70
+(padrão citado em docs/05 §4, ainda sem tela de configuração — mesmo
+racional de `slot_time`/`channel` fixos na seed da FASE 4) desabilita o
+botão e mostra a sugestão de A4 em vez dele; sem revisão nenhuma (A4
+falhou), o botão também fica desabilitado — nunca aprova o que não foi
+avaliado. Aprovar grava `approved_by`/`approved_at` pelo `caller.db` do
+próprio operador, sujeito a `operator_update`.
+
+`Content` virou `active` em `navigation.ts` (fase 5) — mesmo padrão de
+Intelligence/Calendar na FASE 4: o módulo ativo declara na própria
+descrição o que ainda falta (editor de peça campo a campo, fila de
+aprovação com filtro), nunca esconde atrás de um placeholder de tela
+inteira.
+
 ---
 
 ## Verificação
 
 | | |
 |---|---|
-| Migrações | 3 aplicadas ao projeto remoto (`brand_and_knowledge_base`, `content_factory_and_review`, `content_factory_seed`), cada uma verificada antes da próxima |
-| `get_advisors(security)` | zero lints, após cada migração |
+| Migrações | 6 aplicadas ao projeto remoto (`brand_and_knowledge_base`, `content_factory_and_review`, `content_factory_seed`, `public_match_knowledge_wrapper`, `match_knowledge_wrapper_search_path`, `content_formats_seed`), cada uma verificada antes da próxima |
+| `get_advisors(security)` | zero lints — inclusive depois de corrigir o `search_path` do wrapper |
 | RLS | `ENABLE` + `FORCE` em toda tabela nova, confirmado por catálogo generalizado |
 | `anon` × tabelas novas | zero políticas — testado por catálogo e por comportamento (`brand_profiles`, `knowledge_chunks`, `content_assets`) |
-| `anon` × `app.match_knowledge` | `has_function_privilege('anon', ..., 'EXECUTE')` → `false`, sem revoke extra necessário — `app.*` não recebe o `pg_default_acl` automático que atinge `public.*` |
+| `anon` × `match_knowledge` | `has_function_privilege('anon', ..., 'EXECUTE')` → `false` para `app.match_knowledge` (schema sem grant automático) e para `public.match_knowledge` (revoke explícito, achado do wrapper) |
 | `app.match_knowledge` isolamento cross-org | 4/4 asserções — verificado manualmente contra o banco remoto, dado de teste revertido |
-| Seed | `brand_profiles` (1), `brand_services` (2), `content_pillars` com `methodology_id` (2), `ai_providers` `openai` (1), `ai_prompts` A3+A4 (7) — todos confirmados por contagem direta |
-| Typecheck/lint/test/build | pendente nesta entrada — roda na conclusão desta camada, junto com a regeneração de `types.ts` |
+| Seed | `brand_profiles` (1), `brand_services` (2), `content_pillars` com `methodology_id` (2), `ai_providers` `openai` (1), `ai_prompts` A3+A4 (7), `content_formats` (3) — todos confirmados por contagem direta |
+| Edge Functions | `content-factory` e `knowledge-ingest` deployadas, `status: ACTIVE`, confirmado por `list_edge_functions` |
+| Typecheck/lint/test/build | limpos — 148 testes (25 novos: `chunk` 8, `knowledge-ingest/validate` 7, `content-factory/validate` 3, `content-factory/ragContext` 7); `types.ts` regenerado duas vezes (schema, depois `match_knowledge`) |
 
 ---
 
@@ -169,25 +332,37 @@ achado de `app.match_knowledge`, descrito acima.
 
 | Subtarefa | O que falta |
 |---|---|
-| 3 | Pipeline de ingestão (upload → Storage → extração de texto → chunking → embedding → indexação) — nenhuma Edge Function ainda |
-| 6 | Agente A3 (Content Factory) como Edge Function — hoje só os seis prompts e o schema existem |
-| 7 | Geração de variações (`variant_of`) — depende de A3 existir |
-| 8 | Agente A4 (Content Reviewer) como Edge Function |
-| 9 | Editor de peça no frontend |
-| 10 | Biblioteca de conteúdo e fila de aprovação |
-| 11 | WF-001 (n8n), cron 07:00 |
-| 12 | Teste de respeito à marca e ao limiar — a regra existe no prompt de A4, mas não foi exercitada ponta a ponta porque A3/A4 ainda não rodam de verdade |
+| 7 | Geração de variações (`variant_of`) — o pipeline gera uma peça por vez; um botão "gerar variação" reusando a mesma ideia/formato é extensão direta quando houver demanda de comparação de performance (FASE 9) |
+| 9 | Editor de peça campo a campo — a biblioteca hoje mostra e permite aprovar, mas editar manualmente headline/hook/body/cta ainda não tem tela |
+| 10 | Fila de aprovação com filtro (por status, canal, score) — a biblioteca lista tudo, sem filtro ainda |
+| 11 | WF-001 (n8n) — não construído nesta sessão; ver decisão abaixo |
+| 12 | Teste de respeito à marca e ao limiar ponta a ponta com IA real — a regra existe nos prompts e o bloqueio de aprovação por score é real no frontend, mas não foi exercitado com uma chamada de IA de verdade (sem `ANTHROPIC_API_KEY`/`OPENAI_API_KEY` configuradas nesta sessão) |
+| — | Upload de documento na base de conhecimento não tem tela — `knowledge-ingest` está real e deployada, mas só chamável hoje via `supabase.functions.invoke` direto, sem formulário |
 
-**Decisão de escopo pendente para a subtarefa 3:** extrair texto de PDF/
-PPTX/DOCX em runtime Deno (Edge Function) exige uma biblioteca de parsing
-binário ainda não avaliada neste projeto. Os dois caminhos que não dependem
-disso — `url` (reaproveitando `extractPlainText`/`truncate` de
-`market-intelligence/sourceContent.ts`) e `manual` (texto colado
-diretamente) — são o que a próxima sessão implementa primeiro; PDF/PPTX/DOCX
-ficam como `source_type` aceito no schema, mas a ingestão desses três
-recusa com erro explícito até a biblioteca ser escolhida — nunca finge
-sucesso com texto mal extraído.
+**Decisão de escopo: WF-001 adiado.** Diferente de A1/A2 na FASE 4, A3
+(`content-factory`) foi construído como **interativo** (JWT de operador),
+não automação — decisão deliberada: "Daily Content Generation" (cron
+07:00) implica selecionar automaticamente quais ideias geram peça a cada
+manhã, uma decisão de produto (que critério? quantas por dia?) que este
+projeto ainda não tomou. Construir o cron sem essa decisão significaria
+inventar um critério de seleção que ninguém pediu. O botão "Gerar peça" no
+frontend é o caminho real e testável entregue agora; WF-001 fica para
+quando a seleção automática for de fato especificada.
 
-**Ação humana antes de qualquer execução real:** além de `ANTHROPIC_API_KEY`
-(já pendente da FASE 4), `OPENAI_API_KEY` precisa ser configurada como Edge
-Function secret antes que a ingestão gere qualquer embedding real.
+**Decisão de escopo definitiva para a subtarefa 3: PDF/PPTX/DOCX
+continuam fora.** Extrair texto desses formatos em runtime Deno exige uma
+biblioteca de parsing binário que este projeto não avaliou e que estava
+fora do orçamento razoável desta sessão. Os dois caminhos que não
+dependem disso — `url` (reaproveitando `extractPlainText`/`truncate`,
+agora em `_shared/sourceContent.ts`) e `manual` (texto colado diretamente)
+— estão implementados e reais. `pdf`/`pptx`/`docx` continuam no
+vocabulário aceito pelo schema (é o valor real da coluna, docs/02 §4.2),
+mas `knowledge-ingest` recusa os três com `bad_request` explícito — nunca
+finge sucesso com texto mal extraído. Revisitar quando uma biblioteca for
+avaliada e escolhida.
+
+**Ação humana antes de qualquer execução real:** `ANTHROPIC_API_KEY` (A1,
+A2, A3, A4) e `OPENAI_API_KEY` (embeddings de `knowledge-ingest` e do RAG
+de A3) precisam ser configuradas como Edge Function secrets — nenhuma foi
+configurada nesta sessão. Sem elas, os agentes devolvem `misconfigured`
+corretamente, nunca uma simulação.

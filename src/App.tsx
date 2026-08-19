@@ -15,6 +15,7 @@ import { SettingsPage } from "@/app/settings/SettingsPage";
 import { CommandCenterPage } from "@/modules/command-center/CommandCenterPage";
 import { IntelligencePage } from "@/modules/intelligence/IntelligencePage";
 import { CalendarPage } from "@/modules/calendar/CalendarPage";
+import { ContentPage } from "@/modules/content/ContentPage";
 import { PLANNED_ITEMS } from "@/app/navigation";
 import NotFound from "@/app/NotFound";
 
@@ -91,6 +92,15 @@ const App = () => (
                 element={
                   <AppRoute>
                     <CalendarPage />
+                  </AppRoute>
+                }
+              />
+
+              <Route
+                path="/content"
+                element={
+                  <AppRoute>
+                    <ContentPage />
                   </AppRoute>
                 }
               />

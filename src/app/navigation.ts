@@ -36,7 +36,12 @@ import type { LucideIcon } from "lucide-react";
  * agentes A1/A2 e o schema de conteúdo são reais, mas `content_calendar`
  * segue vazia até a FASE 5 dar a uma peça gerada algo para agendar — as
  * quatro visualizações do calendário leem a tabela de verdade, só não têm
- * o que mostrar ainda. Cada tela ativa que ainda não cobre tudo o que
+ * o que mostrar ainda. Content virou `active` na FASE 5: os agentes A3
+ * (pipeline de seis etapas) e A4 (revisor) são reais, geram peça a partir
+ * de uma ideia e gravam `content_reviews` de verdade — falta o editor de
+ * peça completo (hoje a biblioteca mostra e permite aprovar, mas não
+ * editar campo a campo) e a fila de aprovação com filtro, ambos adiados
+ * para a próxima sessão. Cada tela ativa que ainda não cobre tudo o que
  * promete declara a parte pendente nela mesma, com a fase em que chega —
  * nunca esconde atrás de um placeholder de tela inteira nem finge com
  * dado falso.
@@ -109,7 +114,7 @@ export const NAVIGATION: NavGroup[] = [
         label: "Content",
         to: "/content",
         icon: PenLine,
-        status: "planned",
+        status: "active",
         phase: 5,
         purpose:
           "Produzir peças fundamentadas na base de conhecimento e reprovar o que estiver abaixo do padrão.",

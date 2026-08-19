@@ -18,7 +18,7 @@ import { invoke } from "../_shared/ai-gateway/gateway.ts";
 import { AppError, toAppError } from "../_shared/errors.ts";
 import { CORRELATION_HEADER, correlationIdFrom } from "../_shared/correlation.ts";
 import { createLogger } from "../_shared/log.ts";
-import { extractPlainText, truncate } from "./sourceContent.ts";
+import { extractPlainText, truncate } from "../_shared/sourceContent.ts";
 
 const CORS_HEADERS: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",

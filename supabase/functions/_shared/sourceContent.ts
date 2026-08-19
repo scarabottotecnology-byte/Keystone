@@ -5,9 +5,15 @@
  * neste projeto ainda, e trazer uma só para isto seria desproporcional ao
  * que a FASE 4 pede. É uma limpeza pragmática: remove tag, decodifica
  * entidade comum, normaliza espaço. Produz texto bom o bastante para o
- * agente A1 ler — não um documento estruturado. Revisitar se a qualidade do
- * insight mostrar que não basta (o mesmo raciocínio de "prompt versionado,
- * avaliável e substituível" vale para este pré-processamento).
+ * agente A1 ler e para a ingestão de conhecimento indexar — não um
+ * documento estruturado. Revisitar se a qualidade mostrar que não basta (o
+ * mesmo raciocínio de "prompt versionado, avaliável e substituível" vale
+ * para este pré-processamento).
+ *
+ * Movido de `market-intelligence/sourceContent.ts` para `_shared` na FASE 5,
+ * subtarefa 3: `knowledge-ingest` (ingestão de URL) precisa exatamente da
+ * mesma limpeza que A1 já usava — duplicar o módulo seria manter duas cópias
+ * do mesmo comportamento.
  *
  * Módulo puro: sem Deno, sem rede.
  */
