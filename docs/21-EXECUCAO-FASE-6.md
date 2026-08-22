@@ -3,11 +3,20 @@
 Registro do que foi construído na FASE 6 — publicação em rede social. Segue
 os STEPs 11 e 12 do método (DOCUMENT e REPORT) do documento 09.
 
-**Status:** construída e verificada; **não deployada**. Schema, lock,
-OAuth, worker de publicação, WF-002, tela `/social` e a suíte pgTAP estão
-prontos, com todos os portões locais verdes. As três Edge Functions novas
-(`oauth-start`, `oauth-callback`, `social-publish`) ainda não foram
-enviadas ao projeto remoto — ver "Pendente" no fim.
+**Status:** construída, verificada e **deployada**. Schema, lock, OAuth,
+worker de publicação, WF-002, tela `/social` e a suíte pgTAP estão prontos,
+com todos os portões locais verdes. As três Edge Functions novas foram
+enviadas ao projeto remoto e estão `ACTIVE`:
+
+| Função | ID | `verify_jwt` | Por quê |
+|---|---|---|---|
+| `oauth-start` | `b719507a-6c57-4f5e-9a0f-a32bc861c2d0` | `true` | chamada pelo frontend com a sessão do admin |
+| `oauth-callback` | `ae7007f7-3d08-46ff-a8fa-22ae90c99f73` | `false` | quem chama é o navegador vindo do LinkedIn, sem cabeçalho `Authorization`; a autenticação é o `state` assinado |
+| `social-publish` | `5c0431fa-f0d9-4d86-83b9-9bb7758a92be` | `false` | quem chama é o cron do WF-002, sem usuário; a autenticação é o `x-automation-secret` |
+
+Deployada ≠ funcional: sem os segredos do LinkedIn e sem a aprovação do
+Community Management API, `oauth-start` responde `misconfigured` e nenhuma
+publicação sai — ver "Ação humana" no fim.
 
 ---
 
@@ -214,11 +223,28 @@ fases anteriores, em vez de aceito em silêncio ou consertado errado.
 
 ---
 
+## Uma divergência do deploy que precisa ser dita
+
+O deploy é feito pelo MCP do Supabase, montando a carga arquivo a arquivo,
+não pelo `supabase functions deploy` lendo o diretório. Consequência: os
+módulos de `_shared` que viajaram na carga são **versões enxutas** dos do
+repositório — os comentários longos foram condensados e, no caso de
+`idempotency.ts`, o `IdempotencyStore` e o `runOnce` ficaram de fora porque
+`social-publish` só usa `deriveIdempotencyKey`.
+
+O comportamento executado é o mesmo; o texto não é. Quem for depurar em
+produção lendo o código servido não verá exatamente o que está no
+repositório. A correção certa é o deploy pelo CLI a partir do diretório, e
+ela entra quando o pipeline de CI/CD for montado (FASE 24). Registrado aqui
+porque uma divergência silenciosa entre repositório e produção é o tipo de
+coisa que só aparece na pior hora.
+
+---
+
 ## Pendente nesta fase
 
 | Subtarefa | O que falta |
 |---|---|
-| — | **Deploy das três Edge Functions novas.** Escritas, formatadas, checadas e commitadas, mas ainda não enviadas ao projeto remoto. |
 | 4 | Publicação com mídia (imagem/carrossel). Só post de texto está implementado; `content_assets.media` existe e o briefing visual é gerado, mas o upload de imagem ao LinkedIn é um fluxo próprio, de duas etapas, não coberto aqui. |
 | 8 | **Renovação** de token. A expiração é detectada e a conta é pausada (`expiring`/`expired`), mas a renovação antecipada via `refresh_token` não está implementada — o `refresh_token` é guardado, e o caminho de renovação fica para quando houver uma conta real para exercitar. |
 | 11 | O teste de concorrência prova a transição de estado numa conexão; o paralelismo real de duas conexões simultâneas (que é o que o `skip locked` existe para resolver) não é exercitado pelo pgTAP, que roda numa conexão só. |
