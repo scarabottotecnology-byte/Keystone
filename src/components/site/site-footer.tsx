@@ -12,21 +12,42 @@ export function SiteFooter() {
           <span className="font-display text-base text-cream">Keystone</span>
         </Link>
         <nav className="flex flex-wrap justify-center gap-7 text-[11px] uppercase tracking-[0.18em] text-cream-mute">
-          <Link to="/" className="hover:text-gold">Home</Link>
-          <a href="/#servicos" className="hover:text-gold">Serviços</a>
-          <a href="/#metodologia" className="hover:text-gold">Metodologia</a>
-          <a href="/#sobre" className="hover:text-gold">Sobre</a>
-          <Link to="/ferramentas" className="hover:text-gold">Ferramentas</Link>
-          <Link to="/diagnostico" className="hover:text-gold">Diagnóstico</Link>
-          <a href="/#contato" className="hover:text-gold">Contato</a>
+          <Link to="/" className="hover:text-gold">
+            Home
+          </Link>
+          <Link to="/servicos" className="hover:text-gold">
+            Serviços
+          </Link>
+          <Link to="/metodologias" className="hover:text-gold">
+            Metodologias
+          </Link>
+          <Link to="/cases" className="hover:text-gold">
+            Cases
+          </Link>
+          <Link to="/indicadores" className="hover:text-gold">
+            Indicadores
+          </Link>
+          <Link to="/calculadoras" className="hover:text-gold">
+            Calculadoras
+          </Link>
+          <a href="/#sobre" className="hover:text-gold">
+            Sobre
+          </a>
+          <Link to="/ferramentas" className="hover:text-gold">
+            Ferramentas
+          </Link>
+          <Link to="/diagnostico" className="hover:text-gold">
+            Diagnóstico
+          </Link>
+          <Link to="/contato" className="hover:text-gold">
+            Contato
+          </Link>
         </nav>
         <div className="md:text-right">
           <p className="font-accent text-sm italic text-gold-light">
             Clareza financeira para decisões que importam.
           </p>
-          <p className="mt-2 text-[11px] text-cream-mute">
-            © {new Date().getFullYear()} Keystone
-          </p>
+          <p className="mt-2 text-[11px] text-cream-mute">© {new Date().getFullYear()} Keystone</p>
         </div>
       </div>
     </footer>

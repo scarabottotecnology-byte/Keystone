@@ -4,12 +4,12 @@ import { Menu, X } from "lucide-react";
 import { LogoMark } from "@/components/site/logo-mark";
 
 const navItems = [
-  { label: "Serviços", to: "/#servicos" as const, hash: true },
-  { label: "Metodologia", to: "/#metodologia" as const, hash: true },
-  { label: "Sobre", to: "/#sobre" as const, hash: true },
+  { label: "Serviços", to: "/servicos" as const },
+  { label: "Metodologias", to: "/metodologias" as const },
+  { label: "Cases", to: "/cases" as const },
   { label: "Ferramentas", to: "/ferramentas" as const },
   { label: "Diagnóstico", to: "/diagnostico" as const },
-  { label: "Contato", to: "/#contato" as const, hash: true },
+  { label: "Contato", to: "/contato" as const },
 ];
 
 export function SiteHeader() {
@@ -54,28 +54,18 @@ export function SiteHeader() {
         </Link>
 
         <nav className="hidden items-center gap-10 md:flex">
-          {navItems.map((item) =>
-            item.hash ? (
-              <a
-                key={item.label}
-                href={item.to}
-                className="text-[11px] font-medium uppercase tracking-[0.2em] text-cream-dim transition-colors hover:text-gold"
-              >
-                {item.label}
-              </a>
-            ) : (
-              <Link
-                key={item.label}
-                to={item.to as "/diagnostico" | "/ferramentas"}
-                className={`text-[11px] font-medium uppercase tracking-[0.2em] transition-colors hover:text-gold ${
-                  item.label === "Diagnóstico" ? "text-gold" : "text-cream-dim"
-                }`}
-                activeProps={{ className: "text-gold" }}
-              >
-                {item.label}
-              </Link>
-            ),
-          )}
+          {navItems.map((item) => (
+            <Link
+              key={item.label}
+              to={item.to}
+              className={`text-[11px] font-medium uppercase tracking-[0.2em] transition-colors hover:text-gold ${
+                item.label === "Diagnóstico" ? "text-gold" : "text-cream-dim"
+              }`}
+              activeProps={{ className: "text-gold" }}
+            >
+              {item.label}
+            </Link>
+          ))}
         </nav>
 
         <Link to="/diagnostico" className="btn-gold hidden md:inline-flex">
@@ -96,28 +86,17 @@ export function SiteHeader() {
       {open && (
         <div className="md:hidden border-t border-border-sub bg-navy">
           <nav className="mx-auto flex max-w-[1400px] flex-col px-6 py-6">
-            {navItems.map((item) =>
-              item.hash ? (
-                <a
-                  key={item.label}
-                  href={item.to}
-                  onClick={() => setOpen(false)}
-                  className="border-b border-border-sub/60 py-4 text-xs font-medium uppercase tracking-[0.2em] text-cream-dim hover:text-gold"
-                >
-                  {item.label}
-                </a>
-              ) : (
-                <Link
-                  key={item.label}
-                  to={item.to as "/diagnostico" | "/ferramentas"}
-                  onClick={() => setOpen(false)}
-                  className="border-b border-border-sub/60 py-4 text-xs font-medium uppercase tracking-[0.2em] text-cream-dim hover:text-gold"
-                  activeProps={{ className: "text-gold" }}
-                >
-                  {item.label}
-                </Link>
-              ),
-            )}
+            {navItems.map((item) => (
+              <Link
+                key={item.label}
+                to={item.to}
+                onClick={() => setOpen(false)}
+                className="border-b border-border-sub/60 py-4 text-xs font-medium uppercase tracking-[0.2em] text-cream-dim hover:text-gold"
+                activeProps={{ className: "text-gold" }}
+              >
+                {item.label}
+              </Link>
+            ))}
             <Link
               to="/diagnostico"
               onClick={() => setOpen(false)}

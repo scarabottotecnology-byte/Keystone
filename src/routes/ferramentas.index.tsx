@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
@@ -18,13 +18,14 @@ export const Route = createFileRoute("/ferramentas/")({
   component: FerramentasPage,
 });
 
-const brl = (v: number) =>
-  v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 const pct = (v: number, digits = 2) =>
   `${v.toLocaleString("pt-BR", { minimumFractionDigits: digits, maximumFractionDigits: digits })}%`;
 
 function FerramentasPage() {
-  const [tab, setTab] = useState<"simples"|"reforma"|"breakeven"|"valuation"|"ncg"|"vpl">("simples");
+  const [tab, setTab] = useState<"simples" | "reforma" | "breakeven" | "valuation" | "ncg" | "vpl">(
+    "simples",
+  );
 
   return (
     <div className="min-h-screen bg-navy">
@@ -33,16 +34,25 @@ function FerramentasPage() {
       <main className="mx-auto max-w-[1200px] px-8 py-16">
         {/* Hero da página de ferramentas */}
         <div className="mb-16 border-b border-border-sub pb-16">
-          <span className="text-[11px] uppercase tracking-[0.3em] text-gold">
-            Ferramentas de Decisão de Capital
-          </span>
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] uppercase tracking-[0.3em] text-gold">
+              Ferramentas de Decisão de Capital
+            </span>
+            <Link
+              to="/ferramentas/social"
+              className="text-[11px] uppercase tracking-[0.2em] text-cream-mute hover:text-gold"
+            >
+              Calendário Social Media →
+            </Link>
+          </div>
           <h1 className="mt-5 font-display text-5xl font-light leading-[1.05] text-cream md:text-6xl">
             Cálculos rápidos para
             <br />
             <strong className="font-semibold">decisões de capital.</strong>
           </h1>
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-cream-dim">
-            Simule cenários tributários, operacionais e de valuation. Tenha números confiáveis antes de sentar à mesa de negociação.
+            Simule cenários tributários, operacionais e de valuation. Tenha números confiáveis antes
+            de sentar à mesa de negociação.
           </p>
           <div className="mt-8 flex flex-wrap gap-8">
             {[
@@ -68,17 +78,31 @@ function FerramentasPage() {
           <div>
             <p className="mb-2 text-[9px] uppercase tracking-[0.3em] text-cream-mute">Tributário</p>
             <div className="flex flex-wrap gap-2 border-b border-border-sub">
-              <TabButton active={tab==="simples"} onClick={()=>setTab("simples")}>Simples Nacional 2024</TabButton>
-              <TabButton active={tab==="reforma"} onClick={()=>setTab("reforma")}>Reforma Tributária</TabButton>
+              <TabButton active={tab === "simples"} onClick={() => setTab("simples")}>
+                Simples Nacional 2024
+              </TabButton>
+              <TabButton active={tab === "reforma"} onClick={() => setTab("reforma")}>
+                Reforma Tributária
+              </TabButton>
             </div>
           </div>
           <div>
-            <p className="mb-2 text-[9px] uppercase tracking-[0.3em] text-cream-mute">Decisões de Capital</p>
+            <p className="mb-2 text-[9px] uppercase tracking-[0.3em] text-cream-mute">
+              Decisões de Capital
+            </p>
             <div className="flex flex-wrap gap-2 border-b border-border-sub">
-              <TabButton active={tab==="breakeven"} onClick={()=>setTab("breakeven")}>Ponto de Equilíbrio</TabButton>
-              <TabButton active={tab==="valuation"} onClick={()=>setTab("valuation")}>Valuation EBITDA</TabButton>
-              <TabButton active={tab==="ncg"} onClick={()=>setTab("ncg")}>Capital de Giro</TabButton>
-              <TabButton active={tab==="vpl"} onClick={()=>setTab("vpl")}>VPL & Payback</TabButton>
+              <TabButton active={tab === "breakeven"} onClick={() => setTab("breakeven")}>
+                Ponto de Equilíbrio
+              </TabButton>
+              <TabButton active={tab === "valuation"} onClick={() => setTab("valuation")}>
+                Valuation EBITDA
+              </TabButton>
+              <TabButton active={tab === "ncg"} onClick={() => setTab("ncg")}>
+                Capital de Giro
+              </TabButton>
+              <TabButton active={tab === "vpl"} onClick={() => setTab("vpl")}>
+                VPL & Payback
+              </TabButton>
             </div>
           </div>
         </div>
@@ -100,7 +124,6 @@ function FerramentasPage() {
   );
 }
 
-
 function TabButton({
   active,
   onClick,
@@ -114,9 +137,7 @@ function TabButton({
     <button
       onClick={onClick}
       className={`px-5 py-3 text-[11px] uppercase tracking-[0.2em] transition-colors border-b-2 -mb-px ${
-        active
-          ? "text-gold border-gold"
-          : "text-cream-mute border-transparent hover:text-cream"
+        active ? "text-gold border-gold" : "text-cream-mute border-transparent hover:text-cream"
       }`}
     >
       {children}
@@ -197,7 +218,7 @@ function SimplesNacional() {
       anexoData.faixas.find((f) => rbt12 <= f.teto) ??
       anexoData.faixas[anexoData.faixas.length - 1];
     const aliquotaEfetiva =
-      rbt12 > 0 ? ((rbt12 * (faixa.aliquota / 100)) - faixa.deduzir) / rbt12 : 0;
+      rbt12 > 0 ? (rbt12 * (faixa.aliquota / 100) - faixa.deduzir) / rbt12 : 0;
     const efetivaPct = Math.max(aliquotaEfetiva * 100, 0);
     const imposto = receitaMes * (efetivaPct / 100);
     const progresso = Math.min((rbt12 / faixa.teto) * 100, 100);
@@ -405,9 +426,9 @@ function ReformaTributaria() {
       </div>
 
       <div className="mb-8 border border-gold/25 bg-gold/5 p-5 text-sm text-cream-dim">
-        <strong className="text-gold font-medium">Nota:</strong> baseado na EC 132/2023 e PLP 68/2024.
-        Alíquotas de referência sujeitas a regulamentação complementar. Use para planejamento e
-        análise de impacto — não substitui consultoria tributária.
+        <strong className="text-gold font-medium">Nota:</strong> baseado na EC 132/2023 e PLP
+        68/2024. Alíquotas de referência sujeitas a regulamentação complementar. Use para
+        planejamento e análise de impacto — não substitui consultoria tributária.
       </div>
 
       <div className="grid gap-10 lg:grid-cols-[1fr_1fr]">
@@ -483,8 +504,7 @@ function ReformaTributaria() {
             </div>
             <div className="mt-1 text-sm text-cream-dim">
               {isReducao ? "" : "+"}
-              {pct(result.variacaoPct)} vs. carga atual · anual:{" "}
-              {brl(result.variacao * 12)}
+              {pct(result.variacaoPct)} vs. carga atual · anual: {brl(result.variacao * 12)}
             </div>
           </div>
         </div>
@@ -492,9 +512,7 @@ function ReformaTributaria() {
 
       {/* Comparativo */}
       <div className="mt-10 border border-border-sub bg-navy-card p-8">
-        <h3 className="font-display text-xl font-light text-cream">
-          Comparativo por tributo
-        </h3>
+        <h3 className="font-display text-xl font-light text-cream">Comparativo por tributo</h3>
         <div className="mt-6 grid gap-8 md:grid-cols-2">
           <BarBlock title="Regime atual" bars={result.breakdown.atual} max={maxBar} tone="dim" />
           <BarBlock title="Pós-reforma" bars={result.breakdown.novo} max={maxBar} tone="gold" />
@@ -503,7 +521,8 @@ function ReformaTributaria() {
 
       {result.cashbackAgro ? (
         <p className="mt-6 text-xs leading-relaxed text-cream-mute">
-          Agronegócio: previsão de cashback de IBS para produtor rural pessoa física — não incluso nesta simulação.
+          Agronegócio: previsão de cashback de IBS para produtor rural pessoa física — não incluso
+          nesta simulação.
         </p>
       ) : null}
 
@@ -572,9 +591,7 @@ function NumField({
 }) {
   return (
     <label className="block">
-      <span className="text-[11px] uppercase tracking-[0.2em] text-cream-dim">
-        {label}
-      </span>
+      <span className="text-[11px] uppercase tracking-[0.2em] text-cream-dim">{label}</span>
       <div className="mt-2 relative">
         {money ? (
           <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-cream-mute text-sm">
@@ -596,20 +613,10 @@ function NumField({
   );
 }
 
-function ResultCard({
-  label,
-  value,
-  hint,
-}: {
-  label: string;
-  value: string;
-  hint?: string;
-}) {
+function ResultCard({ label, value, hint }: { label: string; value: string; hint?: string }) {
   return (
     <div className="border border-gold/30 bg-gradient-to-br from-navy-card to-navy p-8">
-      <div className="text-[11px] uppercase tracking-[0.25em] text-cream-mute">
-        {label}
-      </div>
+      <div className="text-[11px] uppercase tracking-[0.25em] text-cream-mute">{label}</div>
       <div className="mt-3 font-display text-4xl font-light text-gold">{value}</div>
       {hint ? <div className="mt-2 text-xs text-cream-dim">{hint}</div> : null}
     </div>
@@ -624,7 +631,9 @@ function LeadCapture() {
     e.preventDefault();
     setStatus("loading");
     const { createHubspotLead } = await import("@/lib/hubspot.functions");
-    const result = await createHubspotLead({ data: { ...form, origem: "Ferramentas Tributárias" } });
+    const result = await createHubspotLead({
+      data: { ...form, origem: "Ferramentas Tributárias" },
+    });
     setStatus(result.ok ? "done" : "error");
   }
 
@@ -641,7 +650,8 @@ function LeadCapture() {
             <em className="italic text-gold">uma oportunidade?</em>
           </h2>
           <p className="mt-5 text-base leading-relaxed text-cream-dim">
-            Deixe seu contato e receba uma análise tributária personalizada para a realidade da sua empresa — sem custo, sem compromisso.
+            Deixe seu contato e receba uma análise tributária personalizada para a realidade da sua
+            empresa — sem custo, sem compromisso.
           </p>
           <ul className="mt-8 space-y-3">
             {[
@@ -678,7 +688,8 @@ function LeadCapture() {
               ).map(({ name, label, type, required }) => (
                 <label key={name} className="block">
                   <span className="text-[11px] uppercase tracking-[0.2em] text-cream-dim">
-                    {label}{required && " *"}
+                    {label}
+                    {required && " *"}
                   </span>
                   <input
                     type={type}
@@ -733,27 +744,56 @@ function PontoEquilibrio() {
   return (
     <section>
       <div className="mb-8">
-        <h2 className="font-display text-3xl font-light text-cream">Ponto de Equilíbrio Operacional</h2>
-        <p className="mt-2 text-sm text-cream-dim">Calcule o volume mínimo de vendas para cobrir todos os custos da operação.</p>
+        <h2 className="font-display text-3xl font-light text-cream">
+          Ponto de Equilíbrio Operacional
+        </h2>
+        <p className="mt-2 text-sm text-cream-dim">
+          Calcule o volume mínimo de vendas para cobrir todos os custos da operação.
+        </p>
       </div>
       <div className="grid gap-10 lg:grid-cols-[1fr_1fr]">
         <div className="border border-border-sub bg-navy-card p-8 space-y-6">
           <NumField label="Custos fixos mensais totais (R$)" value={cf} onChange={setCf} money />
           <NumField label="Preço de venda unitário (R$)" value={pv} onChange={setPv} money />
           <NumField label="Custo variável unitário (R$)" value={cvu} onChange={setCvu} money />
-          <NumField label="Produção / vendas atuais (unidades/mês)" value={producaoAtual} onChange={setProducaoAtual} />
+          <NumField
+            label="Produção / vendas atuais (unidades/mês)"
+            value={producaoAtual}
+            onChange={setProducaoAtual}
+          />
         </div>
         <div className="space-y-5">
-          <ResultCard label="Ponto de equilíbrio (unidades)" value={Math.ceil(result.peQtd).toLocaleString("pt-BR")} hint={`Margem de contribuição unitária: ${brl(result.mc)} · MC%: ${pct(result.mcPct)}`} />
-          <ResultCard label="Receita de equilíbrio" value={brl(result.peReceita)} hint="Receita mínima necessária para cobrir custos fixos" />
-          <div className={`border p-6 ${isViavel ? "border-emerald-500/40 bg-emerald-500/5" : "border-red-500/40 bg-red-500/5"}`}>
-            <div className="text-[11px] uppercase tracking-[0.25em] text-cream-mute">Margem de segurança operacional</div>
-            <div className={`mt-3 font-display text-4xl font-light ${isViavel ? "text-emerald-400" : "text-red-400"}`}>{pct(result.margemSeguranca, 1)}</div>
+          <ResultCard
+            label="Ponto de equilíbrio (unidades)"
+            value={Math.ceil(result.peQtd).toLocaleString("pt-BR")}
+            hint={`Margem de contribuição unitária: ${brl(result.mc)} · MC%: ${pct(result.mcPct)}`}
+          />
+          <ResultCard
+            label="Receita de equilíbrio"
+            value={brl(result.peReceita)}
+            hint="Receita mínima necessária para cobrir custos fixos"
+          />
+          <div
+            className={`border p-6 ${isViavel ? "border-emerald-500/40 bg-emerald-500/5" : "border-red-500/40 bg-red-500/5"}`}
+          >
+            <div className="text-[11px] uppercase tracking-[0.25em] text-cream-mute">
+              Margem de segurança operacional
+            </div>
+            <div
+              className={`mt-3 font-display text-4xl font-light ${isViavel ? "text-emerald-400" : "text-red-400"}`}
+            >
+              {pct(result.margemSeguranca, 1)}
+            </div>
             <div className="mt-1 text-sm text-cream-dim">
-              {isViavel ? `Resultado estimado: ${brl(result.lucroAtual)} / mês` : "Operação abaixo do ponto de equilíbrio — prejuízo operacional"}
+              {isViavel
+                ? `Resultado estimado: ${brl(result.lucroAtual)} / mês`
+                : "Operação abaixo do ponto de equilíbrio — prejuízo operacional"}
             </div>
           </div>
-          <p className="text-xs text-cream-mute leading-relaxed">Válido para estrutura de custo linear. Não considera impostos, depreciação ou variações sazonais.</p>
+          <p className="text-xs text-cream-mute leading-relaxed">
+            Válido para estrutura de custo linear. Não considera impostos, depreciação ou variações
+            sazonais.
+          </p>
         </div>
       </div>
     </section>
@@ -790,48 +830,108 @@ function ValuationEbitda() {
     const equity = ev - dividaLiquida;
     const equityMin = evMin - dividaLiquida;
     const equityMax = evMax - dividaLiquida;
-    return { mult, multMin, multMax, ev, evMin, evMax, equity, equityMin, equityMax, setorNome: s.nome };
+    return {
+      mult,
+      multMin,
+      multMax,
+      ev,
+      evMin,
+      evMax,
+      equity,
+      equityMin,
+      equityMax,
+      setorNome: s.nome,
+    };
   }, [ebitda, setor, multiplicadorCustom, dividaLiquida, useCustom]);
 
   return (
     <section>
       <div className="mb-8">
-        <h2 className="font-display text-3xl font-light text-cream">Valuation Rápido por Múltiplos de EBITDA</h2>
-        <p className="mt-2 text-sm text-cream-dim">Estime o valor da empresa usando múltiplos de mercado por setor. Base para negociações de M&A e entrada de sócios.</p>
+        <h2 className="font-display text-3xl font-light text-cream">
+          Valuation Rápido por Múltiplos de EBITDA
+        </h2>
+        <p className="mt-2 text-sm text-cream-dim">
+          Estime o valor da empresa usando múltiplos de mercado por setor. Base para negociações de
+          M&A e entrada de sócios.
+        </p>
       </div>
       <div className="grid gap-10 lg:grid-cols-[1fr_1fr]">
         <div className="border border-border-sub bg-navy-card p-8 space-y-6">
           <NumField label="EBITDA anual (R$)" value={ebitda} onChange={setEbitda} money />
           <label className="block">
-            <span className="text-[11px] uppercase tracking-[0.2em] text-cream-dim">Setor da empresa</span>
-            <select value={setor} onChange={e => setSetor(e.target.value)} className="mt-2 w-full border border-border-sub bg-navy px-4 py-3 text-cream outline-none transition-colors focus:border-gold">
-              {Object.entries(MULTIPLOS_SETOR).map(([k, v]) => <option key={k} value={k} className="bg-navy">{v.nome} ({v.min}x – {v.max}x)</option>)}
+            <span className="text-[11px] uppercase tracking-[0.2em] text-cream-dim">
+              Setor da empresa
+            </span>
+            <select
+              value={setor}
+              onChange={(e) => setSetor(e.target.value)}
+              className="mt-2 w-full border border-border-sub bg-navy px-4 py-3 text-cream outline-none transition-colors focus:border-gold"
+            >
+              {Object.entries(MULTIPLOS_SETOR).map(([k, v]) => (
+                <option key={k} value={k} className="bg-navy">
+                  {v.nome} ({v.min}x – {v.max}x)
+                </option>
+              ))}
             </select>
           </label>
           <label className="flex items-center gap-3 cursor-pointer">
-            <input type="checkbox" checked={useCustom} onChange={e => setUseCustom(e.target.checked)} className="accent-gold h-4 w-4" />
-            <span className="text-[11px] uppercase tracking-[0.2em] text-cream-dim">Usar múltiplo customizado</span>
+            <input
+              type="checkbox"
+              checked={useCustom}
+              onChange={(e) => setUseCustom(e.target.checked)}
+              className="accent-gold h-4 w-4"
+            />
+            <span className="text-[11px] uppercase tracking-[0.2em] text-cream-dim">
+              Usar múltiplo customizado
+            </span>
           </label>
-          {useCustom && <NumField label="Múltiplo customizado (ex: 6)" value={multiplicadorCustom} onChange={setMultiplicadorCustom} />}
-          <NumField label="Dívida líquida (R$)" value={dividaLiquida} onChange={setDividaLiquida} money />
+          {useCustom && (
+            <NumField
+              label="Múltiplo customizado (ex: 6)"
+              value={multiplicadorCustom}
+              onChange={setMultiplicadorCustom}
+            />
+          )}
+          <NumField
+            label="Dívida líquida (R$)"
+            value={dividaLiquida}
+            onChange={setDividaLiquida}
+            money
+          />
         </div>
         <div className="space-y-5">
-          <ResultCard label={`Enterprise Value — ${result.mult.toFixed(1)}x EBITDA`} value={brl(result.ev)} hint={`Faixa: ${brl(result.evMin)} – ${brl(result.evMax)} · ${result.setorNome}`} />
-          <ResultCard label="Equity Value (EV − Dívida Líquida)" value={brl(result.equity)} hint={`Faixa: ${brl(result.equityMin)} – ${brl(result.equityMax)}`} />
+          <ResultCard
+            label={`Enterprise Value — ${result.mult.toFixed(1)}x EBITDA`}
+            value={brl(result.ev)}
+            hint={`Faixa: ${brl(result.evMin)} – ${brl(result.evMax)} · ${result.setorNome}`}
+          />
+          <ResultCard
+            label="Equity Value (EV − Dívida Líquida)"
+            value={brl(result.equity)}
+            hint={`Faixa: ${brl(result.equityMin)} – ${brl(result.equityMax)}`}
+          />
           <div className="border border-gold/20 bg-navy-card p-6 space-y-3">
-            <div className="text-[11px] uppercase tracking-[0.25em] text-cream-mute">Faixa de múltiplos do setor</div>
+            <div className="text-[11px] uppercase tracking-[0.25em] text-cream-mute">
+              Faixa de múltiplos do setor
+            </div>
             {[
               { label: "Conservador", mult: result.multMin, ev: result.evMin },
               { label: "Base de mercado", mult: result.mult, ev: result.ev },
               { label: "Otimista", mult: result.multMax, ev: result.evMax },
             ].map(({ label, mult, ev }) => (
               <div key={label} className="flex items-center justify-between text-sm">
-                <span className="text-cream-mute text-xs">{label} · {mult.toFixed(1)}x</span>
+                <span className="text-cream-mute text-xs">
+                  {label} · {mult.toFixed(1)}x
+                </span>
                 <span className="text-cream font-medium">{brl(ev)}</span>
               </div>
             ))}
           </div>
-          <p className="text-xs text-cream-mute leading-relaxed">Múltiplos de referência para o mercado brasileiro. Valuation real depende de crescimento, qualidade do EBITDA e estrutura de capital. Solicite uma avaliação PRISMA para due diligence completa.</p>
+          <p className="text-xs text-cream-mute leading-relaxed">
+            Múltiplos de referência para o mercado brasileiro. Valuation real depende de
+            crescimento, qualidade do EBITDA e estrutura de capital. Solicite uma avaliação PRISMA
+            para due diligence completa.
+          </p>
         </div>
       </div>
     </section>
@@ -864,7 +964,9 @@ function CapitalDeGiro() {
     <section>
       <div className="mb-8">
         <h2 className="font-display text-3xl font-light text-cream">Capital de Giro e NCG</h2>
-        <p className="mt-2 text-sm text-cream-dim">Calcule a necessidade operacional de caixa, prazo médio e ciclo financeiro.</p>
+        <p className="mt-2 text-sm text-cream-dim">
+          Calcule a necessidade operacional de caixa, prazo médio e ciclo financeiro.
+        </p>
       </div>
       <div className="grid gap-10 lg:grid-cols-[1fr_1fr]">
         <div className="border border-border-sub bg-navy-card p-8 space-y-5">
@@ -875,14 +977,29 @@ function CapitalDeGiro() {
             <NumField label="PMR (dias)" value={pmr} onChange={setPmr} />
             <NumField label="Estoque médio (R$)" value={estoques} onChange={setEstoques} money />
             <NumField label="PME (dias)" value={pme} onChange={setPme} />
-            <NumField label="Saldo mínimo operacional (R$)" value={saldoMinimo} onChange={setSaldoMinimo} money />
+            <NumField
+              label="Saldo mínimo operacional (R$)"
+              value={saldoMinimo}
+              onChange={setSaldoMinimo}
+              money
+            />
           </div>
         </div>
         <div className="space-y-5">
-          <ResultCard label="Necessidade de Capital de Giro (NCG)" value={brl(result.ncg)} hint={`Ciclo financeiro: ${result.ciclo.toFixed(0)} dias`} />
-          <ResultCard label="Necessidade total de caixa" value={brl(result.necessidadeTotal)} hint="NCG + saldo mínimo operacional" />
+          <ResultCard
+            label="Necessidade de Capital de Giro (NCG)"
+            value={brl(result.ncg)}
+            hint={`Ciclo financeiro: ${result.ciclo.toFixed(0)} dias`}
+          />
+          <ResultCard
+            label="Necessidade total de caixa"
+            value={brl(result.necessidadeTotal)}
+            hint="NCG + saldo mínimo operacional"
+          />
           <div className="border border-gold/20 bg-navy-card p-6 space-y-3">
-            <div className="text-[11px] uppercase tracking-[0.25em] text-cream-mute">Composição operacional</div>
+            <div className="text-[11px] uppercase tracking-[0.25em] text-cream-mute">
+              Composição operacional
+            </div>
             {[
               { label: "Contas a receber", value: result.co },
               { label: "Estoque em giro", value: result.estoqueGiro },
@@ -890,11 +1007,16 @@ function CapitalDeGiro() {
             ].map(({ label, value }) => (
               <div key={label} className="flex items-center justify-between text-sm">
                 <span className="text-cream-mute text-xs">{label}</span>
-                <span className={`font-medium ${value >= 0 ? "text-cream" : "text-red-400"}`}>{brl(value)}</span>
+                <span className={`font-medium ${value >= 0 ? "text-cream" : "text-red-400"}`}>
+                  {brl(value)}
+                </span>
               </div>
             ))}
           </div>
-          <p className="text-xs text-cream-mute leading-relaxed">Fórmula: NCG = Contas a Receber + Estoques − Contas a Pagar. Saldo mínimo representa caixa operacional desejado.</p>
+          <p className="text-xs text-cream-mute leading-relaxed">
+            Fórmula: NCG = Contas a Receber + Estoques − Contas a Pagar. Saldo mínimo representa
+            caixa operacional desejado.
+          </p>
         </div>
       </div>
     </section>
@@ -933,34 +1055,70 @@ function VplPayback() {
     <section>
       <div className="mb-8">
         <h2 className="font-display text-3xl font-light text-cream">VPL & Payback Descontado</h2>
-        <p className="mt-2 text-sm text-cream-dim">Avalie o retorno de investimentos com valor presente líquido e prazo de recuperação.</p>
+        <p className="mt-2 text-sm text-cream-dim">
+          Avalie o retorno de investimentos com valor presente líquido e prazo de recuperação.
+        </p>
       </div>
       <div className="grid gap-10 lg:grid-cols-[1fr_1fr]">
         <div className="border border-border-sub bg-navy-card p-8 space-y-6">
-          <NumField label="Investimento inicial (R$)" value={investimento} onChange={setInvestimento} money />
+          <NumField
+            label="Investimento inicial (R$)"
+            value={investimento}
+            onChange={setInvestimento}
+            money
+          />
           <NumField label="Taxa de desconto anual (%)" value={taxa} onChange={setTaxa} />
           <div className="space-y-3">
-            <span className="text-[11px] uppercase tracking-[0.2em] text-cream-dim">Fluxos de caixa anuais (R$)</span>
+            <span className="text-[11px] uppercase tracking-[0.2em] text-cream-dim">
+              Fluxos de caixa anuais (R$)
+            </span>
             {fluxosAnuais.map((v, i) => (
-              <NumField key={i} label={`Ano ${i + 1}`} value={v} onChange={(val) => {
-                const next = [...fluxosAnuais];
-                next[i] = val;
-                setFluxosAnuais(next);
-              }} money />
+              <NumField
+                key={i}
+                label={`Ano ${i + 1}`}
+                value={v}
+                onChange={(val) => {
+                  const next = [...fluxosAnuais];
+                  next[i] = val;
+                  setFluxosAnuais(next);
+                }}
+                money
+              />
             ))}
           </div>
         </div>
         <div className="space-y-5">
-          <ResultCard label="Valor Presente Líquido (VPL)" value={brl(result.vpl)} hint={isViavel ? "Projeto viável — VPL > 0" : "Projeto inviável — VPL ≤ 0"} />
-          <ResultCard label="Payback descontado" value={result.payback === Infinity ? "Não recupera" : `${result.payback.toFixed(1)} anos`} hint="Prazo estimado para recuperar o investimento" />
-          <div className={`border p-6 ${isViavel ? "border-emerald-500/40 bg-emerald-500/5" : "border-red-500/40 bg-red-500/5"}`}>
-            <div className="text-[11px] uppercase tracking-[0.25em] text-cream-mute">Recomendação preliminar</div>
-            <div className={`mt-3 font-display text-2xl font-light ${isViavel ? "text-emerald-400" : "text-red-400"}`}>
+          <ResultCard
+            label="Valor Presente Líquido (VPL)"
+            value={brl(result.vpl)}
+            hint={isViavel ? "Projeto viável — VPL > 0" : "Projeto inviável — VPL ≤ 0"}
+          />
+          <ResultCard
+            label="Payback descontado"
+            value={
+              result.payback === Infinity ? "Não recupera" : `${result.payback.toFixed(1)} anos`
+            }
+            hint="Prazo estimado para recuperar o investimento"
+          />
+          <div
+            className={`border p-6 ${isViavel ? "border-emerald-500/40 bg-emerald-500/5" : "border-red-500/40 bg-red-500/5"}`}
+          >
+            <div className="text-[11px] uppercase tracking-[0.25em] text-cream-mute">
+              Recomendação preliminar
+            </div>
+            <div
+              className={`mt-3 font-display text-2xl font-light ${isViavel ? "text-emerald-400" : "text-red-400"}`}
+            >
               {isViavel ? "Investimento recomendado" : "Investimento não recomendado"}
             </div>
-            <div className="mt-1 text-sm text-cream-dim">Taxa de desconto: {pct(taxa)} · TIR estimada: {pct(result.tir)}</div>
+            <div className="mt-1 text-sm text-cream-dim">
+              Taxa de desconto: {pct(taxa)} · TIR estimada: {pct(result.tir)}
+            </div>
           </div>
-          <p className="text-xs text-cream-mute leading-relaxed">O TIR é uma simplificação educativa. Para análises de capex reais, use uma avaliação com taxa mínima de atratividade ajustada ao risco do projeto.</p>
+          <p className="text-xs text-cream-mute leading-relaxed">
+            O TIR é uma simplificação educativa. Para análises de capex reais, use uma avaliação com
+            taxa mínima de atratividade ajustada ao risco do projeto.
+          </p>
         </div>
       </div>
     </section>

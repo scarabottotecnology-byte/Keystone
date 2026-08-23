@@ -1,12 +1,51 @@
-import { BarChart3, Building2, Droplet, ClipboardList, Scale, Radio, ArrowRight } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import {
+  BarChart3,
+  Building2,
+  Droplet,
+  ClipboardList,
+  Scale,
+  Radio,
+  ArrowRight,
+} from "lucide-react";
 
 const services = [
-  { n: "01", Icon: BarChart3, name: "FP&A Estratégico", desc: "Planejamento financeiro integrado com análise de desvios, forecasting e suporte à decisão executiva." },
-  { n: "02", Icon: Building2, name: "Controladoria", desc: "Estruturação da função de Controladoria com processos, controles e governança financeira robusta." },
-  { n: "03", Icon: Droplet, name: "Gestão de Caixa", desc: "Controle de liquidez, ciclo financeiro e capital de giro com visibilidade total do fluxo de caixa." },
-  { n: "04", Icon: ClipboardList, name: "DRE Gerencial", desc: "Resultado gerencial por BU e segmento, do EBITDA ao resultado líquido, em formato board-ready." },
-  { n: "05", Icon: Scale, name: "Tax & Fiscal", desc: "Análise tributária estratégica em Lucro Real, JCP, depreciação e adequação à Reforma Tributária." },
-  { n: "06", Icon: Radio, name: "BI & Inteligência", desc: "Pipeline de dados com integração ERP e dashboards executivos em Power BI para decisão em tempo real." },
+  {
+    n: "01",
+    Icon: BarChart3,
+    name: "FP&A Estratégico",
+    desc: "Planejamento financeiro integrado com análise de desvios, forecasting e suporte à decisão executiva.",
+  },
+  {
+    n: "02",
+    Icon: Building2,
+    name: "Controladoria",
+    desc: "Estruturação da função de Controladoria com processos, controles e governança financeira robusta.",
+  },
+  {
+    n: "03",
+    Icon: Droplet,
+    name: "Gestão de Caixa",
+    desc: "Controle de liquidez, ciclo financeiro e capital de giro com visibilidade total do fluxo de caixa.",
+  },
+  {
+    n: "04",
+    Icon: ClipboardList,
+    name: "DRE Gerencial",
+    desc: "Resultado gerencial por BU e segmento, do EBITDA ao resultado líquido, em formato board-ready.",
+  },
+  {
+    n: "05",
+    Icon: Scale,
+    name: "Tax & Fiscal",
+    desc: "Análise tributária estratégica em Lucro Real, JCP, depreciação e adequação à Reforma Tributária.",
+  },
+  {
+    n: "06",
+    Icon: Radio,
+    name: "BI & Inteligência",
+    desc: "Pipeline de dados com integração ERP e dashboards executivos em Power BI para decisão em tempo real.",
+  },
 ];
 
 export function ServicesPreview() {
@@ -24,13 +63,13 @@ export function ServicesPreview() {
           </div>
           <div>
             <p className="text-[15px] font-light leading-relaxed text-cream-dim">
-              Cada entrega é projetada para que o C-Level tenha as informações certas,
-              no formato certo, no momento certo.
+              Cada entrega é projetada para que o C-Level tenha as informações certas, no formato
+              certo, no momento certo.
             </p>
-            <a href="#contato" className="btn-ghost mt-6">
-              Tirar Dúvidas
+            <Link to="/servicos" className="btn-ghost mt-6">
+              Ver Todos os Serviços
               <ArrowRight className="h-3.5 w-3.5" />
-            </a>
+            </Link>
           </div>
         </div>
 
@@ -47,9 +86,7 @@ export function ServicesPreview() {
                 <Icon className="h-5 w-5 text-gold" strokeWidth={1.5} />
               </div>
               <h3 className="font-display text-[22px] font-medium text-cream">{name}</h3>
-              <p className="mt-3 text-[13px] font-light leading-relaxed text-cream-dim">
-                {desc}
-              </p>
+              <p className="mt-3 text-[13px] font-light leading-relaxed text-cream-dim">{desc}</p>
               <div
                 aria-hidden
                 className="absolute inset-x-0 bottom-0 h-0.5 w-0 bg-gold transition-all duration-500 group-hover:w-full"

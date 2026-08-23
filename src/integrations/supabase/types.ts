@@ -162,6 +162,42 @@ export type Database = {
           },
         ]
       }
+      social_posts: {
+        Row: {
+          created_at: string
+          data_publicacao: string
+          dia_semana: string
+          id: string
+          imagem: string | null
+          pilar: string
+          post_numero: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          data_publicacao: string
+          dia_semana: string
+          id?: string
+          imagem?: string | null
+          pilar: string
+          post_numero: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          data_publicacao?: string
+          dia_semana?: string
+          id?: string
+          imagem?: string | null
+          pilar?: string
+          post_numero?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
           cargo: string | null
