@@ -233,16 +233,72 @@ function DiagnosticoPage() {
   );
 }
 
+type Profile = "fundador" | "cfo" | null;
+
+const PROFILE_COPY: Record<Exclude<Profile, null>, { title: React.ReactNode; sub: string }> = {
+  fundador: {
+    title: (
+      <>
+        Você decide o futuro da empresa com números que <em>resistem</em> — ou com a
+        sensação de que está certo?
+      </>
+    ),
+    sub: "10 perguntas, 3 minutos. Descubra se as decisões mais importantes do seu negócio estão apoiadas em dado real ou em intuição — antes que o mercado faça essa pergunta por você.",
+  },
+  cfo: {
+    title: (
+      <>
+        Sua estrutura financeira está no nível que a empresa exige — ou ainda{" "}
+        <em>correndo atrás</em> do tamanho que ela virou?
+      </>
+    ),
+    sub: "10 perguntas, 3 minutos. Um raio-x objetivo da maturidade dos processos que você lidera, para embasar a próxima conversa com a diretoria.",
+  },
+};
+
 function Intro({ onStart }: { onStart: () => void }) {
+  const [profile, setProfile] = useState<Profile>(null);
+  const copy = profile ? PROFILE_COPY[profile] : null;
+
   return (
     <section className="mx-auto max-w-3xl px-6 text-center">
       <span className="eyebrow">Diagnóstico Executivo</span>
+
+      <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+        <span className="mr-1 text-[11px] uppercase tracking-[0.2em] text-cream-mute">
+          Personalizar para:
+        </span>
+        {(
+          [
+            { key: "fundador" as const, label: "Sou fundador/sócio" },
+            { key: "cfo" as const, label: "Sou CFO/controller" },
+          ]
+        ).map((opt) => (
+          <button
+            key={opt.key}
+            onClick={() => setProfile((p) => (p === opt.key ? null : opt.key))}
+            className={`border px-4 py-1.5 text-[11px] uppercase tracking-[0.12em] transition-colors ${
+              profile === opt.key
+                ? "border-gold text-gold"
+                : "border-border-sub text-cream-mute hover:border-gold/50 hover:text-cream"
+            }`}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
+
       <h1 className="section-title mt-6 text-4xl md:text-5xl">
-        Qual o grau de <em>maturidade financeira</em> da sua empresa?
+        {copy ? copy.title : (
+          <>
+            Qual o grau de <em>maturidade financeira</em> da sua empresa?
+          </>
+        )}
       </h1>
       <p className="mx-auto mt-6 max-w-2xl text-base font-light text-cream-dim">
-        10 perguntas. 3 minutos. Um score claro de onde sua gestão financeira
-        está — e o que falta para decisões de capital seguras.
+        {copy
+          ? copy.sub
+          : "10 perguntas. 3 minutos. Um score claro de onde sua gestão financeira está — e o que falta para decisões de capital seguras."}
       </p>
       <div className="mt-10 flex flex-wrap justify-center gap-6 text-[11px] uppercase tracking-[0.2em] text-cream-mute">
         <span>Score 0–100</span>

@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, RefreshCw } from "lucide-react";
+import { ArrowRight, Award, RefreshCw } from "lucide-react";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
 
@@ -50,6 +50,20 @@ const orbitaPhases = [
     name: "Ação",
     desc: "Planos de ação para corrigir desvios e aproveitar oportunidades.",
   },
+];
+
+const orbitaSteps = [
+  { step: "01", title: "Diagnóstico do ciclo atual", desc: "Mapeamento de como orçamento, indicadores e decisão se conectam (ou não) hoje." },
+  { step: "02", title: "Implantação do ciclo ÓRBITA™", desc: "Objetivos, roadmap e budget estruturados e parametrizados por área." },
+  { step: "03", title: "Rotina de tracking", desc: "Acompanhamento mensal do realizado vs. orçado, com leitura de causa raiz." },
+  { step: "04", title: "Ação e recalibragem", desc: "Planos de correção executados e o ciclo reinicia no trimestre seguinte." },
+];
+
+const riceSteps = [
+  { step: "01", title: "Levantamento e reclassificação", desc: "Centros de custo estruturados e despesas reclassificadas por natureza real." },
+  { step: "02", title: "Mapeamento de direcionadores", desc: "Identificação de onde a operação desperdiça — muitas vezes sem que ninguém veja." },
+  { step: "03", title: "Custeio multidimensional", desc: "Rentabilidade real calculada por produto, canal, cliente e unidade de negócio." },
+  { step: "04", title: "Decisão estratégica", desc: "Precificação e mix de produtos ajustados para maximizar margem de contribuição." },
 ];
 
 const ricePillars = [
@@ -103,9 +117,14 @@ function MetodologiasPage() {
             <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
               <div>
                 <span className="eyebrow">Método proprietário</span>
-                <h2 className="section-title mt-6">
-                  Método <em>ÓRBITA™</em>
-                </h2>
+                <div className="mt-6 flex items-center gap-3">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-gold/50 text-gold">
+                    <Award className="h-4 w-4" strokeWidth={2} />
+                  </span>
+                  <h2 className="section-title">
+                    Método <em>ÓRBITA™</em>
+                  </h2>
+                </div>
                 <p className="mt-3 text-sm font-medium uppercase tracking-[0.12em] text-cream-mute">
                   Planejamento Financeiro &amp; Acompanhamento Gerencial
                 </p>
@@ -133,6 +152,21 @@ function MetodologiasPage() {
                 ))}
               </div>
             </div>
+
+            <div className="mt-16 border-t border-border-sub pt-12">
+              <span className="text-[11px] uppercase tracking-[0.2em] text-cream-mute">
+                Como funciona
+              </span>
+              <div className="mt-6 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+                {orbitaSteps.map((s) => (
+                  <div key={s.step}>
+                    <div className="font-display text-2xl italic text-gold">{s.step}</div>
+                    <div className="mt-2 text-sm font-semibold text-cream">{s.title}</div>
+                    <p className="mt-1.5 text-[12.5px] leading-relaxed text-cream-mute">{s.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </section>
 
@@ -142,9 +176,14 @@ function MetodologiasPage() {
             <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
               <div>
                 <span className="eyebrow">Método proprietário</span>
-                <h2 className="section-title mt-6">
-                  Método <em>RICE™</em>
-                </h2>
+                <div className="mt-6 flex items-center gap-3">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-gold/50 text-gold">
+                    <Award className="h-4 w-4" strokeWidth={2} />
+                  </span>
+                  <h2 className="section-title">
+                    Método <em>RICE™</em>
+                  </h2>
+                </div>
                 <p className="mt-3 text-sm font-medium uppercase tracking-[0.12em] text-cream-mute">
                   Gestão Estratégica de Custos
                 </p>
@@ -165,6 +204,21 @@ function MetodologiasPage() {
                         {pillar.desc}
                       </p>
                     </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-16 border-t border-border-sub pt-12">
+              <span className="text-[11px] uppercase tracking-[0.2em] text-cream-mute">
+                Como funciona
+              </span>
+              <div className="mt-6 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+                {riceSteps.map((s) => (
+                  <div key={s.step}>
+                    <div className="font-display text-2xl italic text-gold">{s.step}</div>
+                    <div className="mt-2 text-sm font-semibold text-cream">{s.title}</div>
+                    <p className="mt-1.5 text-[12.5px] leading-relaxed text-cream-mute">{s.desc}</p>
                   </div>
                 ))}
               </div>

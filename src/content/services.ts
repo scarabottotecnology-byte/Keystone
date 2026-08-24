@@ -79,7 +79,7 @@ export const services: ServiceContent[] = [
     titlePrefix: "Controladoria",
     titleAccent: "Estratégica",
     heroDescription:
-      "Estruturação completa de processos de controladoria, compliance e governança financeira para empresas que exigem excelência operacional e transparência com investidores, conselhos e auditores.",
+      "Fechamento que atrasa, controles que dependem da memória de uma pessoa, conselho e investidores questionando números que não resistem a uma auditoria mais rigorosa — sinais de que a controladoria não acompanhou o tamanho que a empresa ganhou. Estruturamos processos, compliance e governança financeira à altura da exigência que sua operação já tem.",
     sections: [
       {
         kind: "problems",
@@ -171,7 +171,7 @@ export const services: ServiceContent[] = [
     titlePrefix: "FP&A e Planejamento",
     titleAccent: "Financeiro",
     heroDescription:
-      "Budget, forecast e acompanhamento gerencial com o Método ÓRBITA™. Conectamos visão estratégica com execução trimestral, transformando orçamento corporativo em ferramenta de decisão.",
+      "Orçamento fechado em dezembro e esquecido em fevereiro. Forecast que erra porque copia o ano anterior com um ajuste por cima. Desvio identificado sem que ninguém saiba, na prática, o que fazer a respeito. O Método ÓRBITA™ existe para resolver exatamente isso — conecta budget, forecast e acompanhamento gerencial trimestral, transformando orçamento em ferramenta de decisão, não em exercício contábil.",
     sections: [
       {
         kind: "problems",
@@ -227,7 +227,7 @@ export const services: ServiceContent[] = [
     titlePrefix: "Gestão Estratégica",
     titleAccent: "de Custos",
     heroDescription:
-      "Inteligência analítica e precisão na gestão de custos. Identifique desperdícios, mapeie direcionadores e descubra a rentabilidade real do seu negócio com o Método RICE™.",
+      "Você sabe a margem bruta consolidada — mas não sabe qual produto dá lucro de verdade, qual cliente custa mais do que paga, ou qual canal está sustentando os outros. O Método RICE™ entrega a inteligência analítica que falta: identifica desperdícios, mapeia direcionadores e revela a rentabilidade real do negócio, por produto, canal, cliente e unidade.",
     sections: [
       {
         kind: "method",
@@ -287,7 +287,7 @@ export const services: ServiceContent[] = [
     titlePrefix: "Business Intelligence",
     titleAccent: "Financeiro",
     heroDescription:
-      "Dashboards financeiros e operacionais com visualização de dados em tempo real. Transformamos dados brutos em inteligência acionável para decisões rápidas e precisas.",
+      "Planilha que demora para atualizar, indicador que cada área calcula de um jeito, reunião de resultado que gasta mais tempo discutindo se o número está certo do que decidindo o que fazer com ele. Construímos dashboards financeiros e operacionais em tempo real — instrumentos de navegação, não relatórios, desenhados para responder uma pergunta de negócio e gerar uma decisão.",
     sections: [
       {
         kind: "features",
@@ -341,7 +341,7 @@ export const services: ServiceContent[] = [
     titlePrefix: "Valuation",
     titleAccent: "& M&A",
     heroDescription:
-      "Avaliação de empresas, due diligence financeira e estruturação de operações societárias com rigor técnico comparável ao das grandes consultorias.",
+      "Vender, captar ou estruturar uma operação societária sem um valuation que resista a perguntas técnicas do outro lado da mesa é abrir mão de poder de negociação antes mesmo de sentar para negociar. Entregamos avaliação de empresas, due diligence financeira e estruturação societária com o mesmo rigor técnico das grandes consultorias.",
     sections: [
       {
         kind: "features",
@@ -376,7 +376,7 @@ export const services: ServiceContent[] = [
     titlePrefix: "Planejamento",
     titleAccent: "Tributário",
     heroDescription:
-      "Otimização da carga tributária com legalidade, eficiência e visão estratégica. Análise de regimes, estruturas societárias e benefícios fiscais.",
+      "Regime tributário escolhido uma vez, anos atrás, e nunca mais recalculado enquanto faturamento, margem e mix de produto mudaram por completo — é assim que empresa em crescimento acaba pagando mais imposto do que precisaria. Cuidamos da otimização da carga tributária com legalidade e visão estratégica: regime, estrutura societária e benefícios fiscais revisados com rigor.",
     sections: [
       {
         kind: "features",
