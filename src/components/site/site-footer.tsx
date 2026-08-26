@@ -11,7 +11,7 @@ export function SiteFooter() {
             alt="Keystone Capital Advisory"
             className="h-11 w-11 shrink-0 object-contain"
           />
-          <span className="font-display text-base text-cream">Keystone</span>
+          <span className="font-display text-base text-cream">Keystone Capital Advisory</span>
         </Link>
         <nav className="flex flex-wrap justify-center gap-7 text-[11px] uppercase tracking-[0.18em] text-cream-mute">
           <Link to="/" className="hover:text-gold">

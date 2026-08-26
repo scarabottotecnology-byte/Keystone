@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ArrowUp, ArrowDown } from "lucide-react";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
+import { Marquee } from "@/components/ui/marquee";
 
 export const Route = createFileRoute("/indicadores")({
   head: () => ({
@@ -104,6 +105,25 @@ function IndicadoresPage() {
               cotação em tempo real. Para dados oficiais, consulte BCB, B3, FGV e IBGE.
             </p>
           </div>
+
+          <Marquee pauseOnHover className="mt-10 border-y border-border-sub bg-navy-card [--duration:35s]">
+            {[...mainIndicators, ...currencies, ...stockIndices].map((ind, i) => (
+              <div key={`${ind.name}-${i}`} className="mx-6 flex shrink-0 items-center gap-3">
+                <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-cream-mute">
+                  {ind.name}
+                </span>
+                <span className="font-display text-sm font-medium text-cream">{ind.value}</span>
+                <span
+                  className={`flex items-center gap-1 text-xs font-medium ${
+                    ind.up ? "text-gold" : "text-red-400"
+                  }`}
+                >
+                  {ind.up ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />}
+                  {ind.change}
+                </span>
+              </div>
+            ))}
+          </Marquee>
 
           <section className="mt-16">
             <h2 className="font-display text-2xl font-medium text-cream">
