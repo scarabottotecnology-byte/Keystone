@@ -26,7 +26,7 @@ export const Route = createFileRoute("/cases")({
 const cases = [
   {
     slug: "grupo-industrial",
-    company: "Grupo Industrial Nacional",
+    company: "Bragantina Metalúrgica S.A.",
     sector: "Manufatura",
     revenue: "R$ 800M em receita",
     challenge:
@@ -42,7 +42,7 @@ const cases = [
   },
   {
     slug: "rede-varejo",
-    company: "Rede de Varejo Premium",
+    company: "Vallentti Moda & Casa",
     sector: "Varejo",
     revenue: "R$ 1,2B em receita",
     challenge:
@@ -58,7 +58,7 @@ const cases = [
   },
   {
     slug: "tech-solutions",
-    company: "Tech Solutions Group",
+    company: "Novagrid Tecnologia",
     sector: "Tecnologia",
     revenue: "R$ 145M em receita",
     challenge:

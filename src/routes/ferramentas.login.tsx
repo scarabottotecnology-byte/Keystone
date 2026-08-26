@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import keystoneIcon from "@/assets/keystone-icon.png";
 
 export const Route = createFileRoute("/ferramentas/login")({
   ssr: false,
@@ -46,9 +47,11 @@ function LoginPage() {
     <div className="min-h-screen bg-navy flex items-center justify-center px-6 py-16">
       <div className="w-full max-w-md">
         <Link to="/" className="flex items-center justify-center gap-3 mb-10">
-          <span className="grid h-12 w-12 place-items-center border border-gold/40 font-display text-[13px] font-semibold tracking-wider text-gold">
-            K
-          </span>
+          <img
+            src={keystoneIcon}
+            alt="Keystone Capital Advisory"
+            className="h-14 w-14 object-contain"
+          />
         </Link>
         <div className="border border-border-sub bg-navy-2 p-10">
           <h1 className="font-display text-3xl font-light text-cream text-center">

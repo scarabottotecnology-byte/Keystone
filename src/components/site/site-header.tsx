@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
-import { LogoMark } from "@/components/site/logo-mark";
+import keystoneIcon from "@/assets/keystone-icon.png";
 
 const navItems = [
   { label: "Serviços", to: "/servicos" as const },
@@ -40,9 +40,11 @@ export function SiteHeader() {
     >
       <div className="mx-auto flex h-20 max-w-[1400px] items-center justify-between px-6 md:px-8">
         <Link to="/" className="flex items-center gap-3" onClick={() => setOpen(false)}>
-          <span className="grid h-10 w-10 place-items-center border border-gold/40" aria-hidden>
-            <LogoMark size={24} />
-          </span>
+          <img
+            src={keystoneIcon}
+            alt="Keystone Capital Advisory"
+            className="h-11 w-11 shrink-0 object-contain"
+          />
           <div className="leading-none">
             <div className="font-display text-base font-medium tracking-wide text-cream">
               Keystone

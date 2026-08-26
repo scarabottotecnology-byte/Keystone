@@ -18,6 +18,7 @@ import { Route as DiagnosticoRouteImport } from './routes/diagnostico'
 import { Route as FerramentasRouteImport } from './routes/ferramentas'
 import { Route as IndicadoresRouteImport } from './routes/indicadores'
 import { Route as MetodologiasRouteImport } from './routes/metodologias'
+import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as FerramentasIndexRouteImport } from './routes/ferramentas.index'
@@ -71,6 +72,11 @@ const MetodologiasRoute = MetodologiasRouteImport.update({
   path: '/metodologias',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacidadeRoute = PrivacidadeRouteImport.update({
+  id: '/privacidade',
+  path: '/privacidade',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BlogIndexRoute = BlogIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -117,6 +123,7 @@ export interface FileRoutesByFullPath {
   '/ferramentas': typeof FerramentasRouteWithChildren
   '/indicadores': typeof IndicadoresRoute
   '/metodologias': typeof MetodologiasRoute
+  '/privacidade': typeof PrivacidadeRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/ferramentas/login': typeof FerramentasLoginRoute
   '/ferramentas/social': typeof FerramentasSocialRoute
@@ -133,6 +140,7 @@ export interface FileRoutesByTo {
   '/diagnostico': typeof DiagnosticoRoute
   '/indicadores': typeof IndicadoresRoute
   '/metodologias': typeof MetodologiasRoute
+  '/privacidade': typeof PrivacidadeRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/ferramentas/login': typeof FerramentasLoginRoute
   '/ferramentas/social': typeof FerramentasSocialRoute
@@ -152,6 +160,7 @@ export interface FileRoutesById {
   '/ferramentas': typeof FerramentasRouteWithChildren
   '/indicadores': typeof IndicadoresRoute
   '/metodologias': typeof MetodologiasRoute
+  '/privacidade': typeof PrivacidadeRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/ferramentas/login': typeof FerramentasLoginRoute
   '/ferramentas/social': typeof FerramentasSocialRoute
@@ -172,6 +181,7 @@ export interface FileRouteTypes {
     | '/ferramentas'
     | '/indicadores'
     | '/metodologias'
+    | '/privacidade'
     | '/blog/$slug'
     | '/ferramentas/login'
     | '/ferramentas/social'
@@ -188,6 +198,7 @@ export interface FileRouteTypes {
     | '/diagnostico'
     | '/indicadores'
     | '/metodologias'
+    | '/privacidade'
     | '/blog/$slug'
     | '/ferramentas/login'
     | '/ferramentas/social'
@@ -206,6 +217,7 @@ export interface FileRouteTypes {
     | '/ferramentas'
     | '/indicadores'
     | '/metodologias'
+    | '/privacidade'
     | '/blog/$slug'
     | '/ferramentas/login'
     | '/ferramentas/social'
@@ -225,6 +237,7 @@ export interface RootRouteChildren {
   FerramentasRoute: typeof FerramentasRouteWithChildren
   IndicadoresRoute: typeof IndicadoresRoute
   MetodologiasRoute: typeof MetodologiasRoute
+  PrivacidadeRoute: typeof PrivacidadeRoute
   ServicosSlugRoute: typeof ServicosSlugRoute
   ServicosIndexRoute: typeof ServicosIndexRoute
 }
@@ -292,6 +305,13 @@ declare module '@tanstack/react-router' {
       path: '/metodologias'
       fullPath: '/metodologias'
       preLoaderRoute: typeof MetodologiasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacidade': {
+      id: '/privacidade'
+      path: '/privacidade'
+      fullPath: '/privacidade'
+      preLoaderRoute: typeof PrivacidadeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blog/': {
@@ -384,6 +404,7 @@ const rootRouteChildren: RootRouteChildren = {
   FerramentasRoute: FerramentasRouteWithChildren,
   IndicadoresRoute: IndicadoresRoute,
   MetodologiasRoute: MetodologiasRoute,
+  PrivacidadeRoute: PrivacidadeRoute,
   ServicosSlugRoute: ServicosSlugRoute,
   ServicosIndexRoute: ServicosIndexRoute,
 }
