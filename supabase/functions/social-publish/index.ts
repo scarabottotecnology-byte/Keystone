@@ -43,6 +43,12 @@ import {
   findRecentPostByCommentary,
   publishTextPost,
 } from "../_shared/linkedin.ts";
+import {
+  bufferAccessToken,
+  findRecentBufferPostByText,
+  publishViaBuffer,
+  resolveBufferOrganizationId,
+} from "../_shared/buffer.ts";
 import { composeCommentary } from "./commentary.ts";
 
 const CORS_HEADERS: Record<string, string> = {
@@ -182,6 +188,108 @@ async function assertAccountUsable(
   return true;
 }
 
+/**
+ * Uma via de publicação, com os dois verbos que o worker precisa.
+ *
+ * Existe para que o tratamento de timeout seja o mesmo nos dois caminhos.
+ * Sem isto, cada `if (integration === 'buffer')` espalhado pelo fluxo seria
+ * mais um lugar onde a regra "não republicar cegamente" poderia ser escrita
+ * de forma diferente — e basta um deles errar para duplicar publicação.
+ */
+interface Publisher {
+  /** Publica. Lança `timeout` quando não dá para saber se saiu. */
+  publish(text: string): Promise<{
+    externalPostId: string;
+    permalink: string | null;
+  }>;
+  /**
+   * Procura na plataforma um post com este texto exato.
+   *
+   * `null` = verifiquei e não publicou (pode retentar).
+   * Lança = não consegui verificar (não pode retentar às cegas).
+   */
+  verify(text: string): Promise<
+    { externalPostId: string; permalink: string | null } | null
+  >;
+}
+
+interface PublishableAccount {
+  external_account_id: string;
+  token_ref: string;
+  integration: string;
+}
+
+async function resolvePublisher(
+  account: PublishableAccount,
+  privateDb: PrivateDb,
+): Promise<Publisher> {
+  if (account.integration === "buffer") {
+    const accessToken = bufferAccessToken();
+    const channelId = account.external_account_id;
+    // Resolvido uma vez por job, não por chamada: a verificação de timeout
+    // precisa da mesma organização que a publicação usou.
+    const organizationId = await resolveBufferOrganizationId(accessToken);
+
+    return {
+      publish: (text) => publishViaBuffer({ accessToken, channelId, text }),
+      verify: (text) =>
+        findRecentBufferPostByText({
+          accessToken,
+          organizationId,
+          channelId,
+          text,
+        }),
+    };
+  }
+
+  if (account.integration !== "direct") {
+    throw new AppError(
+      "misconfigured",
+      `Integração desconhecida na conta: '${account.integration}'`,
+    );
+  }
+
+  const { data: tokenRow, error: tokenError } = await privateDb
+    .from("oauth_tokens")
+    .select("access_token")
+    .eq("ref", account.token_ref)
+    .maybeSingle();
+  if (tokenError || !tokenRow) {
+    throw new AppError("misconfigured", "Token da conta não encontrado", {
+      cause: tokenError,
+    });
+  }
+  const accessToken = tokenRow.access_token as string;
+  const authorUrn = account.external_account_id;
+
+  return {
+    publish: async (text) => {
+      const published = await publishTextPost({
+        accessToken,
+        authorUrn,
+        commentary: text,
+      });
+      return {
+        externalPostId: published.externalPostId,
+        permalink: published.permalink,
+      };
+    },
+    verify: async (text) => {
+      const found = await findRecentPostByCommentary({
+        accessToken,
+        authorUrn,
+        commentary: text,
+      });
+      return found
+        ? {
+          externalPostId: found.externalPostId,
+          permalink: found.permalink,
+        }
+        : null;
+    },
+  };
+}
+
 async function processJob(
   job: Job,
   deps: {
@@ -196,7 +304,7 @@ async function processJob(
   const { data: account, error: accountError } = await publicDb
     .from("social_accounts")
     .select(
-      "id, provider, external_account_id, token_ref, status, token_expires_at",
+      "id, provider, external_account_id, token_ref, status, token_expires_at, integration",
     )
     .eq("id", job.social_account_id)
     .maybeSingle();
@@ -296,23 +404,13 @@ async function processJob(
     postId = (created as { id: string }).id;
   }
 
-  const { data: tokenRow, error: tokenError } = await privateDb
-    .from("oauth_tokens")
-    .select("access_token")
-    .eq("ref", account.token_ref)
-    .maybeSingle();
-  if (tokenError || !tokenRow) {
-    throw new AppError("misconfigured", "Token da conta não encontrado", {
-      cause: tokenError,
-    });
-  }
+  const publisher = await resolvePublisher(
+    account as unknown as PublishableAccount,
+    privateDb,
+  );
 
   try {
-    const published = await publishTextPost({
-      accessToken: tokenRow.access_token as string,
-      authorUrn: account.external_account_id as string,
-      commentary,
-    });
+    const published = await publisher.publish(commentary);
 
     await publicDb.from("social_posts").update({
       external_post_id: published.externalPostId,
@@ -340,11 +438,7 @@ async function processJob(
         jobId: job.id,
       });
       try {
-        const found = await findRecentPostByCommentary({
-          accessToken: tokenRow.access_token as string,
-          authorUrn: account.external_account_id as string,
-          commentary,
-        });
+        const found = await publisher.verify(commentary);
 
         if (found) {
           await publicDb.from("social_posts").update({
@@ -458,6 +552,30 @@ Deno.serve(async (request) => {
       trigger_type: "schedule",
     }).select("id").single();
     runId = (run as { id: string } | null)?.id ?? null;
+
+    // ── Passo 0: o calendário vira fila ──────────────────────────────────
+    //
+    // Sem isto o worker roda a cada 15 minutos sobre uma fila que ninguém
+    // enche: até aqui `publishing_jobs` só recebia linha por INSERT manual.
+    // É o elo que fecha o ciclo pauta → peça → aprovação → publicação.
+    //
+    // Falha aqui não derruba a leva: pode haver job de execuções anteriores
+    // esperando, e não publicá-los por causa de um erro no enfileiramento
+    // seria transformar um problema em dois.
+    const { data: enqueued, error: enqueueError } = await publicDb.rpc(
+      "enqueue_due_publications",
+      { p_organization_id: organizationId, p_horizon_minutes: 60 },
+    );
+    if (enqueueError) {
+      log.error("falha ao enfileirar o calendário", enqueueError);
+    } else {
+      const rows = (enqueued ?? []) as { outcome: string }[];
+      const queued = rows.filter((r) => r.outcome === "queued").length;
+      const skipped = rows.filter((r) => r.outcome === "skipped").length;
+      if (rows.length > 0) {
+        log.info("calendário varrido", { queued, skipped });
+      }
+    }
 
     // ── Camada 1: lock pessimista ────────────────────────────────────────
     const worker = `social-publish:${correlationId}`;
