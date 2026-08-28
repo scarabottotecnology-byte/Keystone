@@ -7,6 +7,7 @@ import { QueryState, extractMessage } from "@/components/shared/QueryState";
 import { useAuth } from "@/app/auth/AuthProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { useContentAssets, type ContentAsset } from "./useContentAssets";
+import { ScheduleButton } from "./ScheduleButton";
 
 /**
  * Padrão: "abaixo do limiar configurado (padrão: 70)" (docs/05 §4). Ainda
@@ -126,7 +127,10 @@ export function ContentLibrary() {
                     </div>
                     <h3 className="text-sm font-semibold">{asset.headline ?? "(sem headline)"}</h3>
                   </div>
-                  <ApproveButton asset={asset} />
+                  <div className="flex items-center gap-2">
+                    <ApproveButton asset={asset} />
+                    <ScheduleButton asset={asset} />
+                  </div>
                 </div>
 
                 {asset.hook && <p className="mt-2 text-sm font-medium">{asset.hook}</p>}

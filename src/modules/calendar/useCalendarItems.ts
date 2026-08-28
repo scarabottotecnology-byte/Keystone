@@ -7,13 +7,26 @@ export interface CalendarItem {
   channel: string;
   status: string;
   notes: string | null;
+  /** Quando virou job de publicação. Nulo = ainda não entrou na fila. */
+  enqueuedAt: string | null;
+  /**
+   * Por que ainda não virou job.
+   *
+   * O worker varre o calendário a cada 15 minutos; quando não consegue
+   * enfileirar um item — peça não aprovada, nenhuma conta conectada no
+   * canal, mais de uma conta no mesmo canal — ele grava o motivo aqui em
+   * vez de descartar em silêncio. É o que faz a tela conseguir dizer
+   * "não saiu, e foi por isto".
+   */
+  enqueueError: string | null;
 }
 
 /**
- * `content_calendar` nasce vazia nesta fase, de propósito: uma linha aqui
- * exige uma peça para agendar (`asset_id`), e `content_assets` só nasce na
- * FASE 5. As quatro visualizações são reais e a consulta é real — só não
- * há o que mostrar ainda. Ver `EmptyCalendarNotice`.
+ * Itens do calendário editorial.
+ *
+ * Uma linha aqui nasce de `schedule_asset_publication` (agendamento manual,
+ * pelo botão da biblioteca de conteúdo) e é consumida pelo worker, que a
+ * transforma em `publishing_jobs` quando o horário chega.
  */
 export function useCalendarItems(): UseQueryResult<CalendarItem[]> {
   return useQuery({
@@ -21,7 +34,9 @@ export function useCalendarItems(): UseQueryResult<CalendarItem[]> {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("content_calendar")
-        .select("id, scheduled_for, channel, status, notes")
+        .select(
+          "id, scheduled_for, channel, status, notes, enqueued_at, enqueue_error",
+        )
         .order("scheduled_for");
       if (error) throw error;
       return data.map((item) => ({
@@ -30,6 +45,8 @@ export function useCalendarItems(): UseQueryResult<CalendarItem[]> {
         channel: item.channel,
         status: item.status,
         notes: item.notes,
+        enqueuedAt: item.enqueued_at,
+        enqueueError: item.enqueue_error,
       }));
     },
   });

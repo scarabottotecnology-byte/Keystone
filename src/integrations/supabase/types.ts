@@ -14,7 +14,10 @@
 // knowledge_chunks), a fábrica de conteúdo (content_assets, content_reviews)
 // e a RPC match_knowledge. FASE 6 acrescenta publicação em rede social
 // (social_accounts, social_posts, social_post_metrics, publishing_jobs) e a
-// RPC claim_publishing_job.
+// RPC claim_publishing_job. A ponte calendário → fila acrescenta
+// enqueue_due_publications e schedule_asset_publication, além das colunas
+// content_calendar.enqueued_at/enqueue_error. A integração com o Buffer
+// acrescenta social_accounts.integration.
 //
 // O schema `private` (oauth_tokens, oauth_states) NÃO aparece aqui, e é
 // justamente esse o ponto: o gerador só introspecciona o que o PostgREST
@@ -35,10 +38,67 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.15"
+    PostgrestVersion: "14.17"
   }
   public: {
     Tables: {
+      activities: {
+        Row: {
+          agendada_para: string | null
+          concluida_em: string | null
+          created_at: string
+          deal_id: string | null
+          descricao: string | null
+          id: string
+          lead_id: string | null
+          owner_id: string | null
+          tipo: Database["public"]["Enums"]["activity_type"]
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          agendada_para?: string | null
+          concluida_em?: string | null
+          created_at?: string
+          deal_id?: string | null
+          descricao?: string | null
+          id?: string
+          lead_id?: string | null
+          owner_id?: string | null
+          tipo?: Database["public"]["Enums"]["activity_type"]
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          agendada_para?: string | null
+          concluida_em?: string | null
+          created_at?: string
+          deal_id?: string | null
+          descricao?: string | null
+          id?: string
+          lead_id?: string | null
+          owner_id?: string | null
+          tipo?: Database["public"]["Enums"]["activity_type"]
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activities_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "deals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activities_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ai_insights: {
         Row: {
           ai_invocation_id: string | null
@@ -699,6 +759,8 @@ export type Database = {
           asset_id: string | null
           channel: Database["public"]["Enums"]["social_channel"]
           created_at: string
+          enqueue_error: string | null
+          enqueued_at: string | null
           id: string
           notes: string | null
           organization_id: string
@@ -711,6 +773,8 @@ export type Database = {
           asset_id?: string | null
           channel: Database["public"]["Enums"]["social_channel"]
           created_at?: string
+          enqueue_error?: string | null
+          enqueued_at?: string | null
           id?: string
           notes?: string | null
           organization_id: string
@@ -723,6 +787,8 @@ export type Database = {
           asset_id?: string | null
           channel?: Database["public"]["Enums"]["social_channel"]
           created_at?: string
+          enqueue_error?: string | null
+          enqueued_at?: string | null
           id?: string
           notes?: string | null
           organization_id?: string
@@ -1125,6 +1191,97 @@ export type Database = {
           },
         ]
       }
+      deals: {
+        Row: {
+          created_at: string
+          descricao: string | null
+          estagio: Database["public"]["Enums"]["deal_stage"]
+          fechamento_previsto: string | null
+          id: string
+          lead_id: string | null
+          owner_id: string | null
+          probabilidade: number | null
+          titulo: string
+          updated_at: string
+          valor: number | null
+        }
+        Insert: {
+          created_at?: string
+          descricao?: string | null
+          estagio?: Database["public"]["Enums"]["deal_stage"]
+          fechamento_previsto?: string | null
+          id?: string
+          lead_id?: string | null
+          owner_id?: string | null
+          probabilidade?: number | null
+          titulo: string
+          updated_at?: string
+          valor?: number | null
+        }
+        Update: {
+          created_at?: string
+          descricao?: string | null
+          estagio?: Database["public"]["Enums"]["deal_stage"]
+          fechamento_previsto?: string | null
+          id?: string
+          lead_id?: string | null
+          owner_id?: string | null
+          probabilidade?: number | null
+          titulo?: string
+          updated_at?: string
+          valor?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deals_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      downloads: {
+        Row: {
+          arquivo: string
+          created_at: string
+          email: string | null
+          id: string
+          ip: string | null
+          lead_id: string | null
+          recurso: string
+          user_agent: string | null
+        }
+        Insert: {
+          arquivo: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          ip?: string | null
+          lead_id?: string | null
+          recurso: string
+          user_agent?: string | null
+        }
+        Update: {
+          arquivo?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          ip?: string | null
+          lead_id?: string | null
+          recurso?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "downloads_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       error_logs: {
         Row: {
           context: Json | null
@@ -1476,6 +1633,69 @@ export type Database = {
           },
         ]
       }
+      leads: {
+        Row: {
+          cargo: string | null
+          created_at: string
+          email: string
+          empresa: string | null
+          id: string
+          interesse: string | null
+          mensagem: string | null
+          nome: string
+          notas: string | null
+          origem: string | null
+          owner_id: string | null
+          status: Database["public"]["Enums"]["lead_status"]
+          telefone: string | null
+          track: Database["public"]["Enums"]["lead_track"] | null
+          updated_at: string
+          utm_campaign: string | null
+          utm_medium: string | null
+          utm_source: string | null
+        }
+        Insert: {
+          cargo?: string | null
+          created_at?: string
+          email: string
+          empresa?: string | null
+          id?: string
+          interesse?: string | null
+          mensagem?: string | null
+          nome: string
+          notas?: string | null
+          origem?: string | null
+          owner_id?: string | null
+          status?: Database["public"]["Enums"]["lead_status"]
+          telefone?: string | null
+          track?: Database["public"]["Enums"]["lead_track"] | null
+          updated_at?: string
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Update: {
+          cargo?: string | null
+          created_at?: string
+          email?: string
+          empresa?: string | null
+          id?: string
+          interesse?: string | null
+          mensagem?: string | null
+          nome?: string
+          notas?: string | null
+          origem?: string | null
+          owner_id?: string | null
+          status?: Database["public"]["Enums"]["lead_status"]
+          telefone?: string | null
+          track?: Database["public"]["Enums"]["lead_track"] | null
+          updated_at?: string
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Relationships: []
+      }
       market_intelligence_sources: {
         Row: {
           created_at: string
@@ -1712,6 +1932,7 @@ export type Database = {
           display_name: string | null
           external_account_id: string
           id: string
+          integration: string
           last_error: string | null
           last_synced_at: string | null
           organization_id: string
@@ -1728,6 +1949,7 @@ export type Database = {
           display_name?: string | null
           external_account_id: string
           id?: string
+          integration?: string
           last_error?: string | null
           last_synced_at?: string | null
           organization_id: string
@@ -1744,6 +1966,7 @@ export type Database = {
           display_name?: string | null
           external_account_id?: string
           id?: string
+          integration?: string
           last_error?: string | null
           last_synced_at?: string | null
           organization_id?: string
@@ -1947,6 +2170,15 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      enqueue_due_publications: {
+        Args: { p_horizon_minutes?: number; p_organization_id: string }
+        Returns: {
+          calendar_id: string
+          job_id: string
+          outcome: string
+          reason: string
+        }[]
+      }
       match_knowledge: {
         Args: {
           p_limit?: number
@@ -1964,9 +2196,20 @@ export type Database = {
       }
       rpc_command_center: { Args: never; Returns: Json }
       rpc_next_best_actions: { Args: never; Returns: Json }
+      schedule_asset_publication: {
+        Args: { p_asset_id: string; p_notes?: string; p_scheduled_for: string }
+        Returns: string
+      }
     }
     Enums: {
       account_status: "connected" | "expiring" | "expired" | "revoked" | "error"
+      activity_type:
+        | "ligacao"
+        | "email"
+        | "reuniao"
+        | "whatsapp"
+        | "nota"
+        | "tarefa"
       approval_mode: "auto" | "approval_required" | "manual"
       content_status:
         | "draft"
@@ -1976,7 +2219,23 @@ export type Database = {
         | "published"
         | "failed"
         | "cancelled"
+      deal_stage:
+        | "descoberta"
+        | "diagnostico"
+        | "proposta"
+        | "negociacao"
+        | "fechado_ganho"
+        | "fechado_perdido"
       knowledge_status: "uploaded" | "processing" | "indexed" | "failed"
+      lead_status:
+        | "novo"
+        | "qualificando"
+        | "qualificado"
+        | "proposta"
+        | "ganho"
+        | "perdido"
+        | "descartado"
+      lead_track: "orbita" | "mfi" | "custos" | "prisma" | "geral"
       membership_status: "invited" | "active" | "suspended"
       org_role: "owner" | "admin" | "operator" | "analyst" | "viewer"
       publish_status:
@@ -2124,6 +2383,14 @@ export const Constants = {
   public: {
     Enums: {
       account_status: ["connected", "expiring", "expired", "revoked", "error"],
+      activity_type: [
+        "ligacao",
+        "email",
+        "reuniao",
+        "whatsapp",
+        "nota",
+        "tarefa",
+      ],
       approval_mode: ["auto", "approval_required", "manual"],
       content_status: [
         "draft",
@@ -2134,7 +2401,25 @@ export const Constants = {
         "failed",
         "cancelled",
       ],
+      deal_stage: [
+        "descoberta",
+        "diagnostico",
+        "proposta",
+        "negociacao",
+        "fechado_ganho",
+        "fechado_perdido",
+      ],
       knowledge_status: ["uploaded", "processing", "indexed", "failed"],
+      lead_status: [
+        "novo",
+        "qualificando",
+        "qualificado",
+        "proposta",
+        "ganho",
+        "perdido",
+        "descartado",
+      ],
+      lead_track: ["orbita", "mfi", "custos", "prisma", "geral"],
       membership_status: ["invited", "active", "suspended"],
       org_role: ["owner", "admin", "operator", "analyst", "viewer"],
       publish_status: [
