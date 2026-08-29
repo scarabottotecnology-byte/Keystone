@@ -37,7 +37,10 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter>
+        {/* O basename acompanha o `base` do Vite. Servido sob um prefixo
+            (GitHub Pages), sem ele as rotas caem no NotFound mesmo com os
+            assets carregando — ver a nota em `vite.config.ts`. */}
+        <BrowserRouter basename={import.meta.env.BASE_URL}>
           <AuthProvider>
             <Routes>
               {/* Sem AppLayout: ninguém está logado ainda quando estas
