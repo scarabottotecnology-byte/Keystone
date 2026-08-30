@@ -1,16 +1,12 @@
 import { Link } from "@tanstack/react-router";
-import keystoneIcon from "@/assets/keystone-icon.png";
+import { KeystoneMonogram } from "@/components/site/keystone-monogram";
 
 export function SiteFooter() {
   return (
     <footer className="border-t border-border-sub bg-navy">
       <div className="mx-auto grid max-w-[1400px] gap-10 px-8 py-14 md:grid-cols-3 md:items-center">
         <Link to="/" className="flex items-center gap-3">
-          <img
-            src={keystoneIcon}
-            alt="Keystone Capital Advisory"
-            className="h-11 w-11 shrink-0 object-contain"
-          />
+          <KeystoneMonogram size={30} />
           <span className="font-display text-base text-cream">Keystone Capital Advisory</span>
         </Link>
         <nav className="flex flex-wrap justify-center gap-7 text-[11px] uppercase tracking-[0.18em] text-cream-mute">
