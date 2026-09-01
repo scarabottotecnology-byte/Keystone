@@ -31,20 +31,13 @@ import { AppError } from "./errors.ts";
 
 const BUFFER_API_URL = "https://api.buffer.com";
 
-/** Marcador em `social_accounts.token_ref` para conta que usa o Buffer. */
+/**
+ * Marcador em `social_accounts.token_ref` para conta que usa o Buffer.
+ *
+ * A credencial em si não mora na linha da conta: é uma chave só, da
+ * organização, resolvida por `secrets.ts` (ambiente ou Vault).
+ */
 export const BUFFER_TOKEN_REF = "env:BUFFER_ACCESS_TOKEN";
-
-export function bufferAccessToken(): string {
-  const token = Deno.env.get("BUFFER_ACCESS_TOKEN");
-  if (!token) {
-    throw new AppError(
-      "misconfigured",
-      "BUFFER_ACCESS_TOKEN ausente — gere a chave em " +
-        "https://publish.buffer.com/settings/api e cadastre como segredo",
-    );
-  }
-  return token;
-}
 
 interface GraphQLError {
   message?: string;
@@ -189,15 +182,15 @@ export async function getBufferAccount(
 /**
  * Descobre a organização do Buffer a ser usada.
  *
- * `BUFFER_ORGANIZATION_ID` tem prioridade, para quem tem mais de uma. Sem
+ * `configured` tem prioridade, para quem tem mais de uma organização. Sem
  * ele, resolve pela conta — **exigindo que haja exatamente uma**. Com duas,
  * lança em vez de escolher a primeira: publicar na organização errada é o
  * tipo de engano que só se descobre depois de sair no feed.
  */
 export async function resolveBufferOrganizationId(
   accessToken: string,
+  configured?: string | null,
 ): Promise<string> {
-  const configured = Deno.env.get("BUFFER_ORGANIZATION_ID");
   if (configured) return configured;
 
   const account = await getBufferAccount(accessToken);

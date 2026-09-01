@@ -44,11 +44,15 @@ import {
   publishTextPost,
 } from "../_shared/linkedin.ts";
 import {
-  bufferAccessToken,
   findRecentBufferPostByText,
   publishViaBuffer,
   resolveBufferOrganizationId,
 } from "../_shared/buffer.ts";
+import {
+  findSecret,
+  isAutomationSecretValid,
+  requireSecret,
+} from "../_shared/secrets.ts";
 import { composeCommentary } from "./commentary.ts";
 
 const CORS_HEADERS: Record<string, string> = {
@@ -115,10 +119,18 @@ function jsonResponse(
   });
 }
 
-function verifyAutomationSecret(request: Request): void {
-  const expected = requiredEnv("AUTOMATION_WEBHOOK_SECRET");
+/**
+ * Confere o segredo de automação contra o Vault, dentro do banco.
+ *
+ * O valor esperado nunca chega até aqui — a função do banco devolve só
+ * `true`/`false`. Nem um log acidental deste lado poderia vazá-lo.
+ */
+async function verifyAutomationSecret(
+  request: Request,
+  publicDb: PublicDb,
+): Promise<void> {
   const provided = request.headers.get("x-automation-secret");
-  if (!provided || provided !== expected) {
+  if (!await isAutomationSecretValid(publicDb, provided)) {
     throw new AppError(
       "unauthorized",
       "Segredo de automação ausente ou inválido",
@@ -221,14 +233,18 @@ interface PublishableAccount {
 
 async function resolvePublisher(
   account: PublishableAccount,
+  publicDb: PublicDb,
   privateDb: PrivateDb,
 ): Promise<Publisher> {
   if (account.integration === "buffer") {
-    const accessToken = bufferAccessToken();
+    const accessToken = await requireSecret(publicDb, "buffer_access_token");
     const channelId = account.external_account_id;
     // Resolvido uma vez por job, não por chamada: a verificação de timeout
     // precisa da mesma organização que a publicação usou.
-    const organizationId = await resolveBufferOrganizationId(accessToken);
+    const organizationId = await resolveBufferOrganizationId(
+      accessToken,
+      await findSecret(publicDb, "buffer_organization_id"),
+    );
 
     return {
       publish: (text) => publishViaBuffer({ accessToken, channelId, text }),
@@ -406,6 +422,7 @@ async function processJob(
 
   const publisher = await resolvePublisher(
     account as unknown as PublishableAccount,
+    publicDb,
     privateDb,
   );
 
@@ -531,7 +548,7 @@ Deno.serve(async (request) => {
     if (request.method !== "POST") {
       throw new AppError("bad_request", "Método não suportado — use POST");
     }
-    verifyAutomationSecret(request);
+    await verifyAutomationSecret(request, publicDb);
 
     const { data: org, error: orgError } = await publicDb
       .from("organizations")
@@ -623,15 +640,24 @@ Deno.serve(async (request) => {
         // Um job com problema não pode impedir os outros da leva de rodar.
         const error = toAppError(thrown);
         scoped.error("job abortado", error);
+
+        // Credencial ausente não é defeito do job: é do ambiente. Consumir
+        // tentativa aqui esgotaria a fila em poucas horas só porque uma
+        // chave não foi cadastrada ainda — e depois, com a chave no lugar,
+        // nada publicaria e pareceria quebrado. Mesmo raciocínio de
+        // `skipped_token`: volta para a fila sem gastar tentativa.
+        const misconfigured = error.code === "misconfigured";
         await publicDb.from("publishing_jobs").update({
-          status: "failed",
+          status: misconfigured ? "pending" : "failed",
+          ...(misconfigured ? { attempt: job.attempt - 1 } : {}),
           locked_at: null,
           locked_by: null,
           last_error: error.message,
         }).eq("id", job.id);
+
         results.push({
           jobId: job.id,
-          result: "failed",
+          result: misconfigured ? "skipped_token" : "failed",
           detail: error.message,
         });
       }
