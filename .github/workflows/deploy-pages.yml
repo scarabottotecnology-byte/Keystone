@@ -1,0 +1,96 @@
+name: Publicar interface (GitHub Pages)
+
+# Coloca a interface do Growth OS no ar sem infraestrutura paga. O backend já
+# roda sozinho no Supabase (Edge Functions + pg_cron); faltava só o lugar
+# onde a tela vive.
+#
+# Este arquivo mora na `main` só para o GitHub aceitar disparar o workflow —
+# `main` é o site institucional (outro projeto). O código que de fato é
+# buildado vem de `checkout-ref` abaixo, por padrão a branch do Growth OS.
+# Por isso não há gatilho `push: branches: [main]`: um commit no site
+# institucional não deve republicar a tela do Growth OS.
+#
+# As duas variáveis são **públicas por natureza**: vão dentro do bundle e
+# ficam legíveis para qualquer visitante. É por isso que são `vars` e não
+# `secrets` — chamar de segredo o que está no JavaScript da página só cria
+# uma falsa sensação de proteção. O que protege o dado é a RLS.
+#
+# A `service_role` NUNCA entra aqui. Ela ignora RLS: no bundle, daria acesso
+# total ao banco a qualquer pessoa que abrisse o DevTools.
+
+on:
+  workflow_dispatch:
+    inputs:
+      checkout-ref:
+        description: Branch com o código a publicar
+        default: claude/keystone-growth-os-architecture-62okww
+        required: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Uma publicação por vez, e sem cancelar a que está em andamento: interromper
+# um deploy no meio deixaria a página num estado indefinido.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.checkout-ref }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      # Falha alto se as variáveis não estiverem configuradas. Sem isto o
+      # build passaria e a página subiria sem conseguir falar com o banco —
+      # um erro que só aparece para quem abre o site, não para quem publica.
+      - name: Conferir configuração
+        env:
+          URL: ${{ vars.VITE_SUPABASE_URL }}
+          KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
+        run: |
+          if [ -z "$URL" ] || [ -z "$KEY" ]; then
+            echo "::error::Defina as variáveis VITE_SUPABASE_URL e VITE_SUPABASE_PUBLISHABLE_KEY em Settings → Secrets and variables → Actions → Variables."
+            exit 1
+          fi
+
+      - name: Build
+        env:
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
+          # O Pages serve em `usuario.github.io/<repo>/`.
+          VITE_BASE_PATH: /${{ github.event.repository.name }}/
+        run: npm run build
+
+      # O Pages não conhece as rotas do React Router: abrir /content direto
+      # ou dar F5 numa rota interna devolveria 404 do servidor. Servir o
+      # index.html como página de erro faz o roteador assumir no cliente.
+      - name: Fallback de rota para SPA
+        run: cp dist/index.html dist/404.html
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    name: Publicar
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
