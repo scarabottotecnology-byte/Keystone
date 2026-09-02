@@ -42,6 +42,15 @@ function postNode(overrides: Record<string, unknown> = {}) {
   };
 }
 
+/**
+ * `createPost` devolve a union `PostActionPayload`, nunca o post direto —
+ * é exatamente o formato que o schema real do Buffer exige (confirmado via
+ * `introspect_schema`) e que a versão anterior deste cliente não respeitava.
+ */
+function postActionSuccess(overrides: Record<string, unknown> = {}) {
+  return { __typename: "PostActionSuccess", post: postNode(overrides) };
+}
+
 afterEach(() => {
   vi.unstubAllGlobals();
 });
@@ -49,7 +58,7 @@ afterEach(() => {
 describe("cliente do Buffer", () => {
   it("manda a chave como Bearer e fala GraphQL por POST", async () => {
     const spy = stubFetch(() => ({
-      json: { data: { createPost: postNode() } },
+      json: { data: { createPost: postActionSuccess() } },
     }));
 
     await publishViaBuffer({
@@ -116,7 +125,7 @@ describe("cliente do Buffer", () => {
     stubFetch(() => ({
       json: {
         data: {
-          createPost: postNode({
+          createPost: postActionSuccess({
             status: "error",
             error: { message: "LinkedIn recusou: texto muito longo" },
           }),
@@ -132,9 +141,35 @@ describe("cliente do Buffer", () => {
     });
   });
 
+  it("createPost devolvendo variante de erro da union (não __typename PostActionSuccess) é falha", async () => {
+    // Este é o caso que quebrou em produção: a query em si era inválida
+    // contra o schema (campo direto na union), o que o Buffer rejeita como
+    // erro de validação (`json.errors`, já coberto acima). Este teste cobre
+    // o outro caminho, que a query correta precisa saber tratar: a query é
+    // válida, mas o Buffer recusa a operação e devolve um membro de erro da
+    // union em vez de `PostActionSuccess`.
+    stubFetch(() => ({
+      json: {
+        data: {
+          createPost: {
+            __typename: "InvalidInputError",
+            message: "channelId não pertence à organização",
+          },
+        },
+      },
+    }));
+
+    await expect(
+      publishViaBuffer({ accessToken: TOKEN, channelId: CHANNEL, text: "x" }),
+    ).rejects.toMatchObject({
+      code: "upstream_error",
+      message: expect.stringContaining("channelId não pertence à organização"),
+    });
+  });
+
   it("permalink ausente é nulo, nunca uma URL inventada", async () => {
     stubFetch(() => ({
-      json: { data: { createPost: postNode({ externalLink: null }) } },
+      json: { data: { createPost: postActionSuccess({ externalLink: null }) } },
     }));
 
     const result = await publishViaBuffer({
@@ -152,7 +187,7 @@ describe("cliente do Buffer", () => {
     // chega aqui. Uma segunda fila de aprovação dentro do Buffer seria uma
     // fila que ninguém combinou de olhar.
     const spy = stubFetch(() => ({
-      json: { data: { createPost: postNode() } },
+      json: { data: { createPost: postActionSuccess() } },
     }));
 
     await publishViaBuffer({

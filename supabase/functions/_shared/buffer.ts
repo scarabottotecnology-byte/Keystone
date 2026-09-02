@@ -272,13 +272,28 @@ const POST_FIELDS = `
  * Pedir aprovação de novo dentro do Buffer criaria uma segunda fila humana
  * que ninguém combinou de olhar.
  */
+/**
+ * `createPost` devolve `PostActionPayload`, uma union — `PostActionSuccess`
+ * (com o post dentro) ou um dos tipos de erro, todos implementando
+ * `MutationError { message }`. Selecionar campo direto na union (como
+ * `id`/`status`) é erro de validação do GraphQL, não erro de execução: o
+ * Buffer nem chega a tentar publicar, só recusa a query. Só apareceu porque
+ * o contrato foi montado por inspeção, sem confirmar contra o schema real —
+ * `introspect_schema` do MCP do Buffer teria pego isto antes do deploy.
+ */
+interface CreatePostResponse {
+  __typename: string;
+  message?: string;
+  post?: BufferPost;
+}
+
 export async function publishViaBuffer(input: {
   accessToken: string;
   channelId: string;
   text: string;
   timeoutMs?: number;
 }): Promise<BufferPublishResult> {
-  const data = await graphql<{ createPost: BufferPost }>({
+  const data = await graphql<{ createPost: CreatePostResponse }>({
     accessToken: input.accessToken,
     label: "publicação",
     timeoutMs: input.timeoutMs,
@@ -294,12 +309,27 @@ export async function publishViaBuffer(input: {
       },
     },
     query: `mutation CreatePost($input: CreatePostInput!) {
-      createPost(input: $input) { ${POST_FIELDS} }
+      createPost(input: $input) {
+        __typename
+        ... on PostActionSuccess { post { ${POST_FIELDS} } }
+        ... on MutationError { message }
+      }
     }`,
   });
 
-  const post = data.createPost;
-  if (!post?.id) {
+  const result = data.createPost;
+  if (result.__typename !== "PostActionSuccess" || !result.post) {
+    throw new AppError(
+      "upstream_error",
+      `A plataforma recusou a publicação: ${
+        result.message ?? `erro ${result.__typename} sem mensagem`
+      }`,
+      { detail: { typename: result.__typename } },
+    );
+  }
+
+  const post = result.post;
+  if (!post.id) {
     throw new AppError(
       "upstream_error",
       "Buffer aceitou a publicação mas não devolveu o identificador do post",
