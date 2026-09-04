@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
-import { createHubspotLead } from "@/lib/hubspot.functions";
+import { saveLead } from "@/lib/leads";
 
 export const Route = createFileRoute("/diagnostico")({
   head: () => ({
@@ -407,16 +407,13 @@ function Result({
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setStatus("loading");
-    const [firstname, ...rest] = form.nome.trim().split(" ");
-    const res = await createHubspotLead({
-      data: {
-        firstname: firstname || form.nome,
-        lastname: rest.join(" "),
-        email: form.email,
-        company: form.empresa,
-        phone: form.telefone,
-        origem: `Diagnóstico Maturidade — Score ${score} (${level.name})`,
-      },
+    const res = await saveLead({
+      nome: form.nome,
+      email: form.email,
+      empresa: form.empresa,
+      telefone: form.telefone,
+      origem: `Diagnóstico Maturidade — Score ${score} (${level.name})`,
+      track: "geral",
     });
     setStatus(res.ok ? "done" : "error");
   }

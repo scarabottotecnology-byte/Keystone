@@ -630,9 +630,14 @@ function LeadCapture() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setStatus("loading");
-    const { createHubspotLead } = await import("@/lib/hubspot.functions");
-    const result = await createHubspotLead({
-      data: { ...form, origem: "Ferramentas Tributárias" },
+    const { saveLead } = await import("@/lib/leads");
+    const result = await saveLead({
+      nome: form.firstname,
+      email: form.email,
+      empresa: form.company,
+      telefone: form.phone,
+      origem: "Ferramentas Tributárias",
+      track: "geral",
     });
     setStatus(result.ok ? "done" : "error");
   }

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { saveLead } from "@/lib/leads";
 
 export function ContactForm() {
   const [form, setForm] = useState({
@@ -13,19 +14,14 @@ export function ContactForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setStatus("loading");
-    const [firstname, ...rest] = form.nome.trim().split(" ");
-    const lastname = rest.join(" ");
-    const { createHubspotLead } = await import("@/lib/hubspot.functions");
-    const result = await createHubspotLead({
-      data: {
-        firstname: firstname || form.nome,
-        lastname,
-        email: form.email,
-        company: form.empresa,
-        phone: form.telefone,
-        origem: "Site — Agendar Diagnóstico",
-        mensagem: form.mensagem,
-      },
+    const result = await saveLead({
+      nome: form.nome,
+      email: form.email,
+      empresa: form.empresa,
+      telefone: form.telefone,
+      mensagem: form.mensagem,
+      origem: "Site — Agendar Diagnóstico",
+      track: "geral",
     });
     setStatus(result.ok ? "done" : "error");
   }

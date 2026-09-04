@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { CookieConsent } from "@/components/site/cookie-consent";
+import { captureUtm } from "@/lib/leads";
 
 function NotFoundComponent() {
   return (
@@ -118,6 +119,13 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+
+  // Guarda a origem da visita (utm_*) logo na chegada: quem vem de um post
+  // costuma navegar antes de preencher qualquer formulário, e sem isso a
+  // atribuição se perde entre a primeira página e a conversão.
+  useEffect(() => {
+    captureUtm();
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>

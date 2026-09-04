@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Mail, MapPin, Clock, MessageSquare } from "lucide-react";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
-import { supabase } from "@/integrations/supabase/client";
+import { saveLead } from "@/lib/leads";
 
 /**
  * Deixe vazio enquanto a caixa de entrada do domínio não existir de verdade.
@@ -52,25 +52,16 @@ function ContatoPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setStatus("loading");
-    // Sem o try/catch, qualquer exceção (Supabase fora do ar, variável de ambiente
-    // faltando, rede caída) deixava o botão preso em "Enviando..." para sempre,
-    // sem erro visível — o visitante achava que tinha enviado e ia embora.
-    try {
-      const { error } = await supabase.from("leads").insert({
-        nome: form.nome,
-        email: form.email,
-        empresa: form.empresa || null,
-        telefone: form.telefone || null,
-        mensagem: form.mensagem || null,
-        origem: "Site — Página de Contato",
-        track: "geral",
-      });
-      if (error) throw error;
-      setStatus("done");
-    } catch (err) {
-      console.error("Falha ao gravar lead:", err);
-      setStatus("error");
-    }
+    const result = await saveLead({
+      nome: form.nome,
+      email: form.email,
+      empresa: form.empresa,
+      telefone: form.telefone,
+      mensagem: form.mensagem,
+      origem: "Site — Página de Contato",
+      track: "geral",
+    });
+    setStatus(result.ok ? "done" : "error");
   }
 
   return (
