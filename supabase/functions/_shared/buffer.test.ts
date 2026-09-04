@@ -208,6 +208,53 @@ describe("cliente do Buffer", () => {
     });
   });
 
+  it("anexa a imagem quando a peça tem uma — o bug que saiu sem imagem era assets:[] fixo", async () => {
+    const spy = stubFetch(() => ({
+      json: { data: { createPost: postActionSuccess() } },
+    }));
+
+    await publishViaBuffer({
+      accessToken: TOKEN,
+      channelId: CHANNEL,
+      text: "x",
+      assets: [{
+        url: "https://exemplo.supabase.co/storage/v1/object/public/linkedin-artes/post-42.png",
+        altText: "Gráfico de margem de contribuição",
+      }],
+    });
+
+    const body = JSON.parse(
+      (spy.mock.calls[0][1] as { body: string }).body,
+    );
+    expect(body.variables.input.assets).toEqual([{
+      image: {
+        url:
+          "https://exemplo.supabase.co/storage/v1/object/public/linkedin-artes/post-42.png",
+        metadata: { altText: "Gráfico de margem de contribuição" },
+      },
+    }]);
+  });
+
+  it("imagem sem alt text não manda metadata — o schema não exige e não há o que inventar", async () => {
+    const spy = stubFetch(() => ({
+      json: { data: { createPost: postActionSuccess() } },
+    }));
+
+    await publishViaBuffer({
+      accessToken: TOKEN,
+      channelId: CHANNEL,
+      text: "x",
+      assets: [{ url: "https://exemplo.supabase.co/post-42.png" }],
+    });
+
+    const body = JSON.parse(
+      (spy.mock.calls[0][1] as { body: string }).body,
+    );
+    expect(body.variables.input.assets).toEqual([{
+      image: { url: "https://exemplo.supabase.co/post-42.png" },
+    }]);
+  });
+
   it("verificação após timeout casa pelo texto exato", async () => {
     stubFetch(() => ({
       json: {

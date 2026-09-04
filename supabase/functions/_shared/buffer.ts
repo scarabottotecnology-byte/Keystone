@@ -287,10 +287,23 @@ interface CreatePostResponse {
   post?: BufferPost;
 }
 
+/** Uma imagem a anexar ao post. `altText` ausente é aceitável — `metadata` é opcional no schema. */
+export interface BufferImageAsset {
+  url: string;
+  altText?: string | null;
+}
+
 export async function publishViaBuffer(input: {
   accessToken: string;
   channelId: string;
   text: string;
+  /**
+   * `[]`/ausente quando a peça não tem arte — nunca inventado. `assets: []`
+   * fixo aqui foi o segundo defeito descoberto junto com o da union: a peça
+   * chegava com `content_assets.media` preenchido e saía sem imagem mesmo
+   * assim, porque nada neste módulo aceitava recebê-la.
+   */
+  assets?: BufferImageAsset[];
   timeoutMs?: number;
 }): Promise<BufferPublishResult> {
   const data = await graphql<{ createPost: CreatePostResponse }>({
@@ -301,7 +314,14 @@ export async function publishViaBuffer(input: {
       input: {
         channelId: input.channelId,
         text: input.text,
-        assets: [],
+        assets: (input.assets ?? []).map((asset) => ({
+          image: {
+            url: asset.url,
+            ...(asset.altText
+              ? { metadata: { altText: asset.altText } }
+              : {}),
+          },
+        })),
         mode: "shareNow",
         schedulingType: "automatic",
         needsApproval: false,

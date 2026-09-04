@@ -44,6 +44,7 @@ import {
   publishTextPost,
 } from "../_shared/linkedin.ts";
 import {
+  type BufferImageAsset,
   findRecentBufferPostByText,
   publishViaBuffer,
   resolveBufferOrganizationId,
@@ -66,6 +67,8 @@ const CORS_HEADERS: Record<string, string> = {
 const BATCH_SIZE = 5;
 /** Marca a conta como `expiring` quando falta menos que isto (subtarefa 8). */
 const EXPIRY_WARNING_DAYS = 7;
+/** Bucket público onde a arte da peça é gravada (docs/14). */
+const ART_BUCKET = "linkedin-artes";
 
 function requiredEnv(name: string): string {
   const value = Deno.env.get(name);
@@ -201,6 +204,29 @@ async function assertAccountUsable(
 }
 
 /**
+ * `content_assets.media[0].path` é a chave do objeto dentro de `ART_BUCKET`,
+ * relativa à raiz do bucket — não um caminho de arquivo local nem uma URL.
+ * O bucket é público (docs/14): a URL pública do Storage basta, sem
+ * assinatura.
+ */
+function mediaToAssets(
+  media: unknown,
+  supabaseUrl: string,
+): BufferImageAsset[] {
+  if (!Array.isArray(media)) return [];
+  return media
+    .filter((item): item is { path?: unknown; alt?: unknown } =>
+      typeof item === "object" && item !== null
+    )
+    .filter((item) => typeof item.path === "string" && item.path.length > 0)
+    .map((item) => ({
+      url:
+        `${supabaseUrl}/storage/v1/object/public/${ART_BUCKET}/${item.path}`,
+      altText: typeof item.alt === "string" ? item.alt : undefined,
+    }));
+}
+
+/**
  * Uma via de publicação, com os dois verbos que o worker precisa.
  *
  * Existe para que o tratamento de timeout seja o mesmo nos dois caminhos.
@@ -210,7 +236,7 @@ async function assertAccountUsable(
  */
 interface Publisher {
   /** Publica. Lança `timeout` quando não dá para saber se saiu. */
-  publish(text: string): Promise<{
+  publish(text: string, assets: BufferImageAsset[]): Promise<{
     externalPostId: string;
     permalink: string | null;
   }>;
@@ -247,7 +273,8 @@ async function resolvePublisher(
     );
 
     return {
-      publish: (text) => publishViaBuffer({ accessToken, channelId, text }),
+      publish: (text, assets) =>
+        publishViaBuffer({ accessToken, channelId, text, assets }),
       verify: (text) =>
         findRecentBufferPostByText({
           accessToken,
@@ -279,7 +306,12 @@ async function resolvePublisher(
   const authorUrn = account.external_account_id;
 
   return {
-    publish: async (text) => {
+    // O caminho direto do LinkedIn ainda não sabe anexar imagem — a API de
+    // upload de mídia é um fluxo à parte (asset registrado antes do post),
+    // não implementado nesta fase. Nenhuma conta usa este caminho hoje
+    // (todas são `buffer`); registrado aqui para não silenciar a lacuna
+    // quando/se uma conta `direct` voltar a existir.
+    publish: async (text, _assets) => {
       const published = await publishTextPost({
         accessToken,
         authorUrn,
@@ -345,7 +377,7 @@ async function processJob(
 
   const { data: asset, error: assetError } = await publicDb
     .from("content_assets")
-    .select("headline, hook, body, cta, hashtags, status")
+    .select("headline, hook, body, cta, hashtags, status, media")
     .eq("id", job.asset_id)
     .maybeSingle();
   if (assetError || !asset) {
@@ -425,9 +457,10 @@ async function processJob(
     publicDb,
     privateDb,
   );
+  const assets = mediaToAssets(asset.media, requiredEnv("SUPABASE_URL"));
 
   try {
-    const published = await publisher.publish(commentary);
+    const published = await publisher.publish(commentary, assets);
 
     await publicDb.from("social_posts").update({
       external_post_id: published.externalPostId,
