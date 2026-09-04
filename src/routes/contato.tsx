@@ -1,9 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Mail, Phone, MapPin, Clock } from "lucide-react";
+import { Mail, MapPin, Clock, MessageSquare } from "lucide-react";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
 import { supabase } from "@/integrations/supabase/client";
+
+/**
+ * Deixe vazio enquanto a caixa de entrada do domínio não existir de verdade.
+ * Publicar um endereço que devolve erro é pior do que não publicar nenhum —
+ * era esse o bug: o site anunciava contato@keystonecontroladoria.com.br,
+ * num domínio que nunca foi registrado.
+ * Assim que o Zoho estiver ativo em verticebooks.com.br, basta preencher aqui.
+ */
+const EMAIL_CONTATO = "";
 
 export const Route = createFileRoute("/contato")({
   ssr: false,
@@ -43,16 +52,25 @@ function ContatoPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setStatus("loading");
-    const { error } = await supabase.from("leads").insert({
-      nome: form.nome,
-      email: form.email,
-      empresa: form.empresa || null,
-      telefone: form.telefone || null,
-      mensagem: form.mensagem || null,
-      origem: "Site — Página de Contato",
-      track: "geral",
-    });
-    setStatus(error ? "error" : "done");
+    // Sem o try/catch, qualquer exceção (Supabase fora do ar, variável de ambiente
+    // faltando, rede caída) deixava o botão preso em "Enviando..." para sempre,
+    // sem erro visível — o visitante achava que tinha enviado e ia embora.
+    try {
+      const { error } = await supabase.from("leads").insert({
+        nome: form.nome,
+        email: form.email,
+        empresa: form.empresa || null,
+        telefone: form.telefone || null,
+        mensagem: form.mensagem || null,
+        origem: "Site — Página de Contato",
+        track: "geral",
+      });
+      if (error) throw error;
+      setStatus("done");
+    } catch (err) {
+      console.error("Falha ao gravar lead:", err);
+      setStatus("error");
+    }
   }
 
   return (
@@ -76,12 +94,17 @@ function ContatoPage() {
             <div>
               <div className="space-y-8">
                 <ContactInfo
-                  Icon={Mail}
-                  title="E-mail"
-                  lines={["contato@keystonecontroladoria.com.br"]}
+                  Icon={MessageSquare}
+                  title="Como falamos com você"
+                  lines={[
+                    "Preencha o formulário ao lado",
+                    "Retornamos pelo e-mail informado",
+                  ]}
                 />
-                <ContactInfo Icon={Phone} title="Telefone" lines={["(11) 3000-0000"]} />
-                <ContactInfo Icon={MapPin} title="Escritório" lines={["São Paulo, SP — Brasil"]} />
+                {EMAIL_CONTATO && (
+                  <ContactInfo Icon={Mail} title="E-mail" lines={[EMAIL_CONTATO]} />
+                )}
+                <ContactInfo Icon={MapPin} title="Atendimento" lines={["Remoto — todo o Brasil"]} />
                 <ContactInfo
                   Icon={Clock}
                   title="Horário de atendimento"
