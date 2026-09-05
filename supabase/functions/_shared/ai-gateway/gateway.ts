@@ -27,6 +27,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { AppError, toAppError } from "../errors.ts";
 import { createLogger, type Logger } from "../log.ts";
 import { createAnthropicProvider } from "./providers/anthropic.ts";
+import { createOpenAIProvider } from "./providers/openai.ts";
 import { estimateCostUsd, type ModelPricing } from "./pricing.ts";
 import { renderTemplate } from "./template.ts";
 import { validateOutput } from "./validate.ts";
@@ -67,7 +68,13 @@ const PROVIDER_FACTORIES: Record<string, () => AIProvider | null> = {
     const key = Deno.env.get("ANTHROPIC_API_KEY");
     return key ? createAnthropicProvider(key) : null;
   },
+  openai: () => {
+    const key = Deno.env.get("OPENAI_API_KEY");
+    return key ? createOpenAIProvider(key) : null;
+  },
 };
+
+export type ProviderFactories = Record<string, () => AIProvider | null>;
 
 interface PromptRow {
   id: string;
@@ -250,7 +257,18 @@ async function recordInvocation(
 
 export async function invoke<T = unknown>(
   input: AIInvokeInput,
-  deps: { db?: SupabaseClient; log?: Logger } = {},
+  deps: {
+    db?: SupabaseClient;
+    log?: Logger;
+    /**
+     * Só para teste. A cadeia de fallback é a única parte do gateway que
+     * depende de *dois* provedores falharem em ordem — exercitá-la com as
+     * fábricas reais exigiria chaves de API verdadeiras e uma falha de rede
+     * combinada. Injetar aqui é o que torna o critério de aceite
+     * "fallback comprovado por teste" verificável.
+     */
+    providerFactories?: ProviderFactories;
+  } = {},
 ): Promise<AIInvokeResult<T>> {
   const db = deps.db ?? serviceRoleClient();
   const log = deps.log ?? createLogger({
@@ -313,8 +331,9 @@ export async function invoke<T = unknown>(
     };
   }
 
+  const factories = deps.providerFactories ?? PROVIDER_FACTORIES;
   const active = providers
-    .map((row) => ({ row, provider: PROVIDER_FACTORIES[row.key]?.() ?? null }))
+    .map((row) => ({ row, provider: factories[row.key]?.() ?? null }))
     .filter((entry): entry is { row: ProviderRow; provider: AIProvider } =>
       entry.provider !== null
     );

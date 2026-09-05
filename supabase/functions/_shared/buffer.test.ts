@@ -218,7 +218,8 @@ describe("cliente do Buffer", () => {
       channelId: CHANNEL,
       text: "x",
       assets: [{
-        url: "https://exemplo.supabase.co/storage/v1/object/public/linkedin-artes/post-42.png",
+        url:
+          "https://exemplo.supabase.co/storage/v1/object/public/linkedin-artes/post-42.png",
         altText: "Gráfico de margem de contribuição",
       }],
     });

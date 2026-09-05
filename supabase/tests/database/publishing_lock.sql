@@ -36,6 +36,18 @@ select
   (select id from asset)   as asset_id,
   (select id from account) as account_id;
 
+-- A conta nasce com `integration` no default `direct`, e desde
+-- `20260822130000_claim_skips_unconfigured_accounts.sql` o `claim` só
+-- reivindica job cuja conta tenha credencial — para `direct`, uma linha em
+-- `private.oauth_tokens` casando por `token_ref`. Sem ela a conta é pulada,
+-- e este arquivo, que existe para provar o lock, nunca chegava a exercitar
+-- lock nenhum: as asserções de `count = 0` passavam por vacuidade.
+insert into private.oauth_tokens (
+  ref, organization_id, provider, access_token, expires_at
+)
+select 'ref-pgtap', org_id, 'linkedin', 'token-pgtap', now() + interval '1 day'
+  from fixture;
+
 insert into publishing_jobs (organization_id, asset_id, social_account_id, run_at)
 select org_id, asset_id, account_id, now() - interval '5 minutes' from fixture;
 
