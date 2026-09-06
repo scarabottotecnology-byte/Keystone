@@ -21,6 +21,7 @@ import {
   correlationIdFrom,
 } from "../_shared/correlation.ts";
 import { createLogger } from "../_shared/log.ts";
+import { isAutomationSecretValid } from "../_shared/secrets.ts";
 import { extractPlainText, truncate } from "../_shared/sourceContent.ts";
 
 const CORS_HEADERS: Record<string, string> = {
@@ -59,10 +60,24 @@ function jsonResponse(
   });
 }
 
-function verifyAutomationSecret(request: Request): void {
-  const expected = requiredEnv("AUTOMATION_WEBHOOK_SECRET");
+/**
+ * Confere o segredo de automação — ambiente primeiro, Vault depois.
+ *
+ * Antes exigia `AUTOMATION_WEBHOOK_SECRET` no ambiente e falhava com
+ * `misconfigured` quando ele não existia. Como a migração para o Vault moveu
+ * o segredo para dentro do banco, esta função passou a recusar **toda**
+ * execução do cron: A1 nunca rodou uma única vez desde então, e por isso
+ * `ai_insights` está vazia e nenhuma pauta nova foi gerada. O `social-publish`
+ * já tinha sido migrado; este ficou para trás e ninguém notou, porque o cron
+ * registra `succeeded` (a chamada HTTP saiu) mesmo quando a função devolve
+ * 500 — o erro só aparece no corpo da resposta.
+ */
+async function verifyAutomationSecret(
+  request: Request,
+  db: SupabaseClient,
+): Promise<void> {
   const provided = request.headers.get("x-automation-secret");
-  if (!provided || provided !== expected) {
+  if (!await isAutomationSecretValid(db, provided)) {
     throw new AppError(
       "unauthorized",
       "Segredo de automação ausente ou inválido",
@@ -126,7 +141,7 @@ Deno.serve(async (request) => {
     if (request.method !== "POST") {
       throw new AppError("bad_request", "Método não suportado — use POST");
     }
-    verifyAutomationSecret(request);
+    await verifyAutomationSecret(request, db);
 
     // ADR-014: ferramenta interna, uma organização só. Se isso mudar, o
     // payload do webhook precisa trazer organization_id — não adivinhar.

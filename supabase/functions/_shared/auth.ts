@@ -55,19 +55,39 @@ function bearerFrom(request: Request): string {
 }
 
 /**
- * Identifica quem está chamando e em nome de qual organização.
+ * A chave pública do projeto, sob qualquer um dos dois nomes.
  *
- * Lança `unauthorized` se o token não for válido, e `forbidden` se o usuário
- * for válido mas não tiver vínculo ativo com organização nenhuma — são
- * situações diferentes e merecem respostas diferentes.
+ * O Supabase renomeou `anon key` para `publishable key`, mas só
+ * `SUPABASE_ANON_KEY` é injetada automaticamente no runtime das Edge
+ * Functions — `SUPABASE_PUBLISHABLE_KEY` teria que ser cadastrada à mão no
+ * painel. Exigir só o nome novo derrubava **toda** função interativa com
+ * `misconfigured`: era a causa do "Failed to send a request to the Edge
+ * Function" que aparecia ao gerar peça na tela. O 500 acontece antes de os
+ * cabeçalhos de CORS entrarem na resposta, então o navegador reporta como
+ * falha de rede em vez de mostrar o erro real do servidor — por isso o
+ * sintoma não parecia com o que era.
  *
- * ⚠️ Depende da tabela `memberships`, que nasce na FASE 2. Até lá este módulo
- * não tem como ser exercido de ponta a ponta.
+ * Isto não é o `no-masking-fallback` que o projeto proíbe: os dois nomes
+ * apontam para a mesma credencial, e a ausência dos dois continua sendo erro
+ * explícito. Mesma classe de interop entre runtimes já registrada em
+ * `ai-gateway/validate.ts` para o `ajv`.
  */
+function publishableKeyFromEnv(): string {
+  const value = Deno.env.get("SUPABASE_PUBLISHABLE_KEY") ??
+    Deno.env.get("SUPABASE_ANON_KEY");
+  if (!value) {
+    throw new AppError(
+      "misconfigured",
+      "Variável de ambiente ausente: SUPABASE_PUBLISHABLE_KEY (ou SUPABASE_ANON_KEY)",
+    );
+  }
+  return value;
+}
+
 export async function authenticate(request: Request): Promise<Caller> {
   const token = bearerFrom(request);
   const url = requiredEnv("SUPABASE_URL");
-  const publishableKey = requiredEnv("SUPABASE_PUBLISHABLE_KEY");
+  const publishableKey = publishableKeyFromEnv();
 
   const db = createClient(url, publishableKey, {
     global: { headers: { Authorization: `Bearer ${token}` } },
