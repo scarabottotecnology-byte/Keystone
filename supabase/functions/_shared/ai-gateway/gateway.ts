@@ -26,6 +26,7 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { AppError, toAppError } from "../errors.ts";
 import { createLogger, type Logger } from "../log.ts";
+import { findSecret } from "../secrets.ts";
 import { createAnthropicProvider } from "./providers/anthropic.ts";
 import { estimateCostUsd, type ModelPricing } from "./pricing.ts";
 import { renderTemplate } from "./template.ts";
@@ -59,12 +60,20 @@ function serviceRoleClient(): SupabaseClient {
 /**
  * Fábrica por `key` de `ai_providers`. Devolve `null` quando o segredo do
  * provedor não está configurado — permite que `ai_providers` liste um
- * provedor sem derrubar o gateway inteiro antes de alguém rodar
- * `supabase secrets set`.
+ * provedor sem derrubar o gateway inteiro antes de alguém cadastrar a chave.
+ *
+ * A credencial vem por `findSecret`: ambiente primeiro, Vault depois. Ler só
+ * `Deno.env` (como era antes) ignorava a chave cadastrada no Vault e fazia o
+ * gateway concluir "nenhum provedor ativo" mesmo com `ai_providers` correto e
+ * a chave gravada — falha que aponta para o lugar errado, porque a mensagem
+ * fala de provedor e o que faltava era só o caminho de leitura da chave.
  */
-const PROVIDER_FACTORIES: Record<string, () => AIProvider | null> = {
-  anthropic: () => {
-    const key = Deno.env.get("ANTHROPIC_API_KEY");
+const PROVIDER_FACTORIES: Record<
+  string,
+  (db: SupabaseClient) => Promise<AIProvider | null>
+> = {
+  anthropic: async (db) => {
+    const key = await findSecret(db, "anthropic_api_key");
     return key ? createAnthropicProvider(key) : null;
   },
 };
@@ -85,13 +94,26 @@ async function loadPrompt(
   organizationId: string,
   version?: number,
 ): Promise<PromptRow | null> {
-  const base = db.from("ai_prompts").select("*").eq("key", key).eq(
-    "is_active",
-    true,
-  );
+  /**
+   * Um builder novo por consulta — **não** uma constante reaproveitada.
+   *
+   * O `PostgrestFilterBuilder` do supabase-js é mutável: cada `.eq()`/`.is()`
+   * acumula na mesma instância em vez de devolver uma cópia. Guardar a parte
+   * comum numa variável e encadear duas vezes fazia a segunda consulta herdar
+   * o filtro da primeira — `organization_id = <org> AND organization_id IS
+   * NULL`, condição impossível, resultado sempre vazio.
+   *
+   * O efeito era total e silencioso: como todo prompt semeado é global
+   * (`organization_id null`), **nenhum** dos quatro agentes (A1, A2, A3, A4)
+   * conseguia carregar prompt nenhum. Todos falhavam com `prompt_not_found`,
+   * que parece "falta semear o prompt" e não "o carregador está quebrado" —
+   * e os prompts estavam lá desde o começo.
+   */
+  const baseQuery = () =>
+    db.from("ai_prompts").select("*").eq("key", key).eq("is_active", true);
 
   if (version !== undefined) {
-    const { data, error } = await base
+    const { data, error } = await baseQuery()
       .eq("version", version)
       .or(`organization_id.eq.${organizationId},organization_id.is.null`)
       .order("organization_id", { ascending: false, nullsFirst: false })
@@ -106,7 +128,7 @@ async function loadPrompt(
 
   // Prefere a versão da própria organização sobre a global — duas consultas
   // simples em vez de um OR com ORDER BY frágil sobre coluna nula.
-  const { data: orgSpecific, error: orgError } = await base
+  const { data: orgSpecific, error: orgError } = await baseQuery()
     .eq("organization_id", organizationId)
     .order("version", { ascending: false })
     .limit(1);
@@ -117,7 +139,7 @@ async function loadPrompt(
   }
   if (orgSpecific && orgSpecific.length > 0) return orgSpecific[0] as PromptRow;
 
-  const { data: global, error: globalError } = await base
+  const { data: global, error: globalError } = await baseQuery()
     .is("organization_id", null)
     .order("version", { ascending: false })
     .limit(1);
@@ -313,8 +335,13 @@ export async function invoke<T = unknown>(
     };
   }
 
-  const active = providers
-    .map((row) => ({ row, provider: PROVIDER_FACTORIES[row.key]?.() ?? null }))
+  const resolved = await Promise.all(
+    providers.map(async (row) => ({
+      row,
+      provider: (await PROVIDER_FACTORIES[row.key]?.(db)) ?? null,
+    })),
+  );
+  const active = resolved
     .filter((entry): entry is { row: ProviderRow; provider: AIProvider } =>
       entry.provider !== null
     );

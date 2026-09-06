@@ -20,6 +20,7 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { AppError, toAppError } from "../errors.ts";
 import { createLogger, type Logger } from "../log.ts";
+import { findSecret } from "../secrets.ts";
 import { estimateCostUsd, type ModelPricing } from "./pricing.ts";
 
 const OPENAI_EMBEDDINGS_URL = "https://api.openai.com/v1/embeddings";
@@ -144,13 +145,17 @@ export async function embed(
     organizationId: input.organizationId,
   });
 
-  const apiKey = Deno.env.get("OPENAI_API_KEY");
+  // Ambiente primeiro, Vault depois — mesmo caminho de `gateway.ts`. Ler só
+  // `Deno.env` ignorava a chave cadastrada no Vault e degradava o RAG para
+  // "sem contexto" sem que nada estivesse de fato faltando.
+  const apiKey = await findSecret(db, "openai_api_key");
   if (!apiKey) {
     return {
       ok: false,
       error: {
         code: "misconfigured",
-        message: "OPENAI_API_KEY não configurada",
+        message:
+          "Chave da OpenAI não configurada (nem no ambiente, nem no Vault)",
       },
       invocationId: null,
     };
