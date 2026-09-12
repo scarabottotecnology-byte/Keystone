@@ -1,4 +1,5 @@
 import { Award, RefreshCw } from "lucide-react";
+import { Reveal, RevealGroup, RevealItem } from "@/components/site/reveal";
 
 const phases = [
   { letter: "Ó", name: "Objetivos", desc: "Metas financeiras alinhadas à estratégia do negócio." },
@@ -21,7 +22,7 @@ export function MetodologiaOrbita() {
     <section id="orbita" className="border-b border-border-sub bg-navy py-24 lg:py-28">
       <div className="mx-auto max-w-[1400px] px-8">
         <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
-          <div>
+          <Reveal>
             <span className="eyebrow">Metodologia Proprietária</span>
             <div className="mt-6 flex items-center gap-3">
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-gold/50 text-gold">
@@ -39,18 +40,18 @@ export function MetodologiaOrbita() {
               que transforma orçamento corporativo em ferramenta de decisão e instala uma
               cultura de gestão baseada em indicadores, não em intuição.
             </p>
-          </div>
+          </Reveal>
 
           <div>
-            <div className="grid grid-cols-2 gap-px border border-border-sub bg-border-sub sm:grid-cols-3">
+            <RevealGroup className="grid grid-cols-2 gap-px border border-border-sub bg-border-sub sm:grid-cols-3">
               {phases.map((phase) => (
-                <div key={phase.letter} className="bg-navy-card p-6">
+                <RevealItem key={phase.letter} className="bg-navy-card p-6">
                   <div className="font-display text-3xl italic text-gold">{phase.letter}</div>
                   <div className="mt-2 text-sm font-semibold text-cream">{phase.name}</div>
                   <p className="mt-1.5 text-[12.5px] leading-relaxed text-cream-mute">{phase.desc}</p>
-                </div>
+                </RevealItem>
               ))}
-            </div>
+            </RevealGroup>
             <div className="mt-5 flex items-center gap-2.5 text-[11px] uppercase tracking-[0.18em] text-cream-mute">
               <RefreshCw className="h-3.5 w-3.5 text-gold" strokeWidth={2} />
               Ciclo contínuo — recomeça a cada trimestre
@@ -58,7 +59,7 @@ export function MetodologiaOrbita() {
           </div>
         </div>
 
-        <div className="mt-16 border-t border-border-sub pt-12">
+        <Reveal className="mt-16 border-t border-border-sub pt-12">
           <span className="text-[11px] uppercase tracking-[0.2em] text-cream-mute">Como funciona</span>
           <div className="mt-6 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {steps.map((s) => (
@@ -69,7 +70,7 @@ export function MetodologiaOrbita() {
               </div>
             ))}
           </div>
-        </div>
+        </Reveal>
       </div>
     </section>
   );

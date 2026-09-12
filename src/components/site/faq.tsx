@@ -4,6 +4,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Reveal } from "@/components/site/reveal";
 
 const faqs = [
   {
@@ -36,29 +37,31 @@ export function Faq() {
   return (
     <section id="faq" className="border-t border-border-sub py-28">
       <div className="mx-auto max-w-3xl px-8">
-        <div className="text-center">
+        <Reveal className="text-center">
           <span className="eyebrow">Dúvidas frequentes</span>
           <h2 className="section-title mt-6">
             O que <em>perguntam</em> antes de contratar
           </h2>
-        </div>
+        </Reveal>
 
-        <Accordion type="single" collapsible className="mt-14 w-full">
-          {faqs.map((item, i) => (
-            <AccordionItem
-              key={item.q}
-              value={`item-${i}`}
-              className="border-b border-border-sub"
-            >
-              <AccordionTrigger className="py-6 text-left font-display text-lg font-medium text-cream hover:text-gold-light hover:no-underline">
-                {item.q}
-              </AccordionTrigger>
-              <AccordionContent className="pb-6 text-[14px] font-light leading-relaxed text-cream-dim">
-                {item.a}
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
+        <Reveal delay={0.1}>
+          <Accordion type="single" collapsible className="mt-14 w-full">
+            {faqs.map((item, i) => (
+              <AccordionItem
+                key={item.q}
+                value={`item-${i}`}
+                className="border-b border-border-sub"
+              >
+                <AccordionTrigger className="py-6 text-left font-display text-lg font-medium text-cream hover:text-gold-light hover:no-underline">
+                  {item.q}
+                </AccordionTrigger>
+                <AccordionContent className="pb-6 text-[14px] font-light leading-relaxed text-cream-dim">
+                  {item.a}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </Reveal>
       </div>
     </section>
   );

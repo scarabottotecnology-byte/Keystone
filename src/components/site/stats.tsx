@@ -1,3 +1,5 @@
+import { RevealGroup, RevealItem } from "@/components/site/reveal";
+
 const stats = [
   { num: "15", suffix: "+", label: "Anos em Controladoria e FP&A", desc: "Controladoria e FP&A em grupos empresariais de grande porte" },
   { num: "R$", suffix: "bi+", label: "em Consolidações Analisadas", desc: "Consolidações financeiras de grupos multisegmento" },
@@ -8,9 +10,9 @@ const stats = [
 export function Stats() {
   return (
     <section className="border-y border-border-sub bg-navy">
-      <div className="mx-auto grid max-w-[1400px] grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+      <RevealGroup className="mx-auto grid max-w-[1400px] grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
         {stats.map((s, i) => (
-          <div
+          <RevealItem
             key={s.label}
             className={`group relative overflow-hidden p-11 transition-colors hover:bg-white/[0.02] ${
               i < stats.length - 1 ? "border-b border-border-sub lg:border-b-0 lg:border-r" : ""
@@ -34,9 +36,9 @@ export function Stats() {
             <p className="mt-2.5 text-[13px] font-light leading-relaxed text-cream-dim">
               {s.desc}
             </p>
-          </div>
+          </RevealItem>
         ))}
-      </div>
+      </RevealGroup>
     </section>
   );
 }

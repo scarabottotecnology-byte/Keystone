@@ -1,4 +1,5 @@
 import { Orbit, Layers3, Calculator, Scale } from "lucide-react";
+import { Reveal, RevealGroup, RevealItem } from "@/components/site/reveal";
 
 const trilhas = [
   {
@@ -59,7 +60,7 @@ export function Trilhas() {
   return (
     <section id="trilhas" className="bg-background py-24 lg:py-32">
       <div className="mx-auto max-w-7xl px-6">
-        <div className="mx-auto max-w-2xl text-center">
+        <Reveal className="mx-auto max-w-2xl text-center">
           <span className="inline-flex items-center gap-2 rounded-sm border border-secondary/40 bg-secondary/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-secondary">
             Nossas trilhas
           </span>
@@ -69,11 +70,11 @@ export function Trilhas() {
           <p className="mt-5 text-pretty text-base leading-relaxed text-muted-foreground md:text-lg">
             Cada trilha resolve uma dor concreta da gestão financeira — isoladas ou combinadas.
           </p>
-        </div>
+        </Reveal>
 
-        <div className="mt-16 grid gap-6 md:grid-cols-2">
+        <RevealGroup className="mt-16 grid gap-6 md:grid-cols-2">
           {trilhas.map(({ id, icon: Icon, code, name, tagline, desc, bullets }) => (
-            <article
+            <RevealItem
               key={id}
               className="group relative flex flex-col rounded-sm border border-border border-t-2 border-gold/60 bg-card p-8 transition-all hover:border-gold/60 hover:shadow-[0_-2px_20px_rgba(166,25,46,0.12)]"
             >
@@ -119,9 +120,9 @@ export function Trilhas() {
               >
                 Saber mais sobre {name}
               </a>
-            </article>
+            </RevealItem>
           ))}
-        </div>
+        </RevealGroup>
       </div>
     </section>
   );

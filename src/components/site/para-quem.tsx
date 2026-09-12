@@ -1,3 +1,5 @@
+import { Reveal, RevealGroup, RevealItem } from "@/components/site/reveal";
+
 const audience = [
   {
     role: "CEO",
@@ -23,17 +25,18 @@ export function ParaQuem() {
   return (
     <section id="sobre" className="py-28">
       <div className="mx-auto max-w-[1400px] px-8">
-        <span className="eyebrow">Para quem é</span>
-        <h2 className="section-title mt-6">
-          Construído para quem
-          <br />
-          <em>responde pelos números</em>
-        </h2>
+        <Reveal>
+          <span className="eyebrow">Para quem é</span>
+          <h2 className="section-title mt-6">
+            Construído para quem
+            <br />
+            <em>responde pelos números</em>
+          </h2>
+        </Reveal>
 
-
-        <div className="mt-14 grid gap-6 md:grid-cols-3">
+        <RevealGroup className="mt-14 grid gap-6 md:grid-cols-3">
           {audience.map((a) => (
-            <article
+            <RevealItem
               key={a.role}
               className="border border-border-sub p-10 transition-colors hover:border-border hover:bg-gold/[0.02]"
             >
@@ -47,9 +50,9 @@ export function ParaQuem() {
               <p className="mt-5 border-t border-border-sub pt-5 font-accent text-[15px] italic leading-snug text-gold-light">
                 {a.quote}
               </p>
-            </article>
+            </RevealItem>
           ))}
-        </div>
+        </RevealGroup>
       </div>
     </section>
   );

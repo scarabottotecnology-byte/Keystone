@@ -20,7 +20,6 @@ export function ServiceHero({
 }) {
   return (
     <section className="relative overflow-hidden bg-navy px-8 pb-16 pt-36 lg:pt-44">
-      <div aria-hidden className="grid-texture pointer-events-none absolute inset-0 opacity-50" />
       <div className="relative z-10 mx-auto max-w-[1400px]">
         <span className="eyebrow">{kicker}</span>
         <h1

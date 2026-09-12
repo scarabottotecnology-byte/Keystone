@@ -8,6 +8,7 @@ import {
   Radio,
   ArrowRight,
 } from "lucide-react";
+import { Reveal, RevealGroup, RevealItem } from "@/components/site/reveal";
 
 const services = [
   {
@@ -52,7 +53,7 @@ export function ServicesPreview() {
   return (
     <section id="servicos" className="py-28">
       <div className="mx-auto max-w-[1400px] px-8">
-        <div className="grid items-end gap-12 lg:grid-cols-2 lg:gap-20">
+        <Reveal className="grid items-end gap-12 lg:grid-cols-2 lg:gap-20">
           <div>
             <span className="eyebrow">Nossos serviços</span>
             <h2 className="section-title mt-6">
@@ -71,11 +72,11 @@ export function ServicesPreview() {
               <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
-        </div>
+        </Reveal>
 
-        <div className="mt-16 grid gap-px bg-border-sub lg:grid-cols-3">
+        <RevealGroup className="mt-16 grid gap-px bg-border-sub lg:grid-cols-3">
           {services.map(({ n, Icon, name, desc }) => (
-            <div
+            <RevealItem
               key={n}
               className="group relative overflow-hidden bg-navy-card p-10 transition-colors hover:bg-navy-light"
             >
@@ -91,9 +92,9 @@ export function ServicesPreview() {
                 aria-hidden
                 className="absolute inset-x-0 bottom-0 h-0.5 w-0 bg-gold transition-all duration-500 group-hover:w-full"
               />
-            </div>
+            </RevealItem>
           ))}
-        </div>
+        </RevealGroup>
       </div>
     </section>
   );

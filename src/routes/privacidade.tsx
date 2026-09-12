@@ -24,10 +24,6 @@ function PrivacidadePage() {
       <SiteHeader />
       <main>
         <section className="relative overflow-hidden px-8 pb-16 pt-36 lg:pt-44">
-          <div
-            aria-hidden
-            className="grid-texture pointer-events-none absolute inset-0 opacity-50"
-          />
           <div className="relative z-10 mx-auto max-w-3xl">
             <span className="eyebrow">Privacidade</span>
             <h1 className="section-title mt-7">

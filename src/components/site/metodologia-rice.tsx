@@ -1,4 +1,5 @@
 import { Award } from "lucide-react";
+import { Reveal, RevealGroup, RevealItem } from "@/components/site/reveal";
 
 const pillars = [
   { letter: "R", name: "Reclassificação", desc: "Estruturação de centros de custo e reclassificação de despesas por natureza." },
@@ -19,7 +20,7 @@ export function MetodologiaRice() {
     <section id="rice" className="border-b border-border-sub bg-navy-mid py-24 lg:py-28">
       <div className="mx-auto max-w-[1400px] px-8">
         <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
-          <div>
+          <Reveal>
             <span className="eyebrow">Metodologia Proprietária</span>
             <div className="mt-6 flex items-center gap-3">
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-gold/50 text-gold">
@@ -37,22 +38,22 @@ export function MetodologiaRice() {
               identifica desperdícios, mapeia direcionadores e revela a rentabilidade real
               do negócio — por produto, canal, cliente e unidade.
             </p>
-          </div>
+          </Reveal>
 
-          <div className="space-y-px border border-border-sub bg-border-sub">
+          <RevealGroup className="space-y-px border border-border-sub bg-border-sub">
             {pillars.map((pillar) => (
-              <div key={pillar.letter} className="flex items-start gap-6 bg-navy-card p-6">
+              <RevealItem key={pillar.letter} className="flex items-start gap-6 bg-navy-card p-6">
                 <span className="font-display text-3xl italic text-gold">{pillar.letter}</span>
                 <div>
                   <div className="text-sm font-semibold text-cream">{pillar.name}</div>
                   <p className="mt-1 text-[13px] leading-relaxed text-cream-mute">{pillar.desc}</p>
                 </div>
-              </div>
+              </RevealItem>
             ))}
-          </div>
+          </RevealGroup>
         </div>
 
-        <div className="mt-16 border-t border-border-sub pt-12">
+        <Reveal className="mt-16 border-t border-border-sub pt-12">
           <span className="text-[11px] uppercase tracking-[0.2em] text-cream-mute">Como funciona</span>
           <div className="mt-6 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {steps.map((s) => (
@@ -63,7 +64,7 @@ export function MetodologiaRice() {
               </div>
             ))}
           </div>
-        </div>
+        </Reveal>
       </div>
     </section>
   );

@@ -253,13 +253,6 @@
 .post-body strong { color: var(--gold); font-weight: 600; }
 .post-body a { color: var(--gold); text-decoration: underline; text-underline-offset: 4px; }
 
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(24px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes fadeIn {
-  from { opacity: 0; } to { opacity: 1; }
-}
 @keyframes rotSlow {
   from { transform: rotate(0); } to { transform: rotate(360deg); }
 }
@@ -273,9 +266,6 @@
 @keyframes pulseDot {
   0%, 100% { opacity: 1; } 50% { opacity: 0.35; }
 }
-
-.anim-fade-up { animation: fadeUp 0.8s ease forwards; opacity: 0; }
-.anim-fade-in { animation: fadeIn 1s ease forwards; opacity: 0; }
 
 /* HubSpot embedded form — light theme */
 .hubspot-form-dark .hs-form fieldset {
@@ -319,11 +309,4 @@
   font-size: 11px !important;
   list-style: none !important;
   padding-left: 0 !important;
-}
-
-.grid-texture {
-  background-image:
-    linear-gradient(rgba(242, 239, 233, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(242, 239, 233, 0.05) 1px, transparent 1px);
-  background-size: 44px 44px;
 }
