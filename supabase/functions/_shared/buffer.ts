@@ -317,9 +317,7 @@ export async function publishViaBuffer(input: {
         assets: (input.assets ?? []).map((asset) => ({
           image: {
             url: asset.url,
-            ...(asset.altText
-              ? { metadata: { altText: asset.altText } }
-              : {}),
+            ...(asset.altText ? { metadata: { altText: asset.altText } } : {}),
           },
         })),
         mode: "shareNow",

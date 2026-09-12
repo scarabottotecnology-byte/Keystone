@@ -220,8 +220,7 @@ function mediaToAssets(
     )
     .filter((item) => typeof item.path === "string" && item.path.length > 0)
     .map((item) => ({
-      url:
-        `${supabaseUrl}/storage/v1/object/public/${ART_BUCKET}/${item.path}`,
+      url: `${supabaseUrl}/storage/v1/object/public/${ART_BUCKET}/${item.path}`,
       altText: typeof item.alt === "string" ? item.alt : undefined,
     }));
 }
