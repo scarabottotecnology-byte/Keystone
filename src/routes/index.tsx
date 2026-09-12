@@ -19,28 +19,27 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       {
-        title:
-          "Keystone | Controladoria Terceirizada, FP&A e Contabilidade Gerencial",
+        title: "Keystone | Controladoria Estratégica, FP&A e Due Diligence",
       },
       {
         name: "description",
         content:
-          "Controladoria terceirizada com contabilidade gerencial, contabilidade de custos, planejamento financeiro corporativo, FP&A e due diligence para empresas em crescimento.",
+          "Controladoria estratégica, FP&A, gestão de custos e due diligence para empresas que decidem com o rigor de um conselho. Metodologia proprietária ÓRBITA™ e RICE™.",
       },
       {
         property: "og:title",
-        content: "Keystone — Controladoria Terceirizada e FP&A",
+        content: "Keystone — Controladoria Estratégica e FP&A",
       },
       {
         property: "og:description",
         content:
-          "Fechamento mensal no prazo, indicadores confiáveis, custos sob controle e orçamento vivo para empresas em crescimento.",
+          "Clareza financeira para decisões que importam: controladoria estratégica, FP&A e gestão de custos para empresas em crescimento.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://story-reader-pal.lovable.app/" },
+      { property: "og:url", content: "https://keystone-phi.vercel.app/" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: "https://story-reader-pal.lovable.app/" }],
+    links: [{ rel: "canonical", href: "https://keystone-phi.vercel.app/" }],
 
   }),
   component: Landing,
