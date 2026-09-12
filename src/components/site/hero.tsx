@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, ArrowDown, Shield, Award, Sparkles } from "lucide-react";
+import { ArrowRight, Calendar, Shield, Award, Sparkles } from "lucide-react";
+import { CalendlyButton } from "@/components/site/calendly-button";
 
 export function Hero() {
   return (
@@ -50,10 +51,10 @@ export function Hero() {
               Solicitar Diagnóstico Financeiro
               <ArrowRight className="h-3.5 w-3.5" strokeWidth={2} />
             </Link>
-            <a href="#contato" className="btn-ghost">
-              Falar com um Sócio
-              <ArrowDown className="h-3.5 w-3.5" strokeWidth={2} />
-            </a>
+            <CalendlyButton className="btn-ghost">
+              Agendar uma Conversa
+              <Calendar className="h-3.5 w-3.5" strokeWidth={2} />
+            </CalendlyButton>
           </div>
 
           <p className="anim-fade-up mt-4 text-xs text-cream-mute [animation-delay:.7s]">

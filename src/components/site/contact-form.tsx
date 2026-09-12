@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { Calendar } from "lucide-react";
 import { saveLead } from "@/lib/leads";
+import { CalendlyButton } from "@/components/site/calendly-button";
 
 export function ContactForm() {
   const [form, setForm] = useState({
@@ -49,6 +51,23 @@ export function ContactForm() {
             30 minutos. Sem compromisso. Com análise real do seu momento
             financeiro.
           </p>
+
+          <div className="mt-8 flex justify-center">
+            <CalendlyButton className="btn-gold">
+              Agendar uma Conversa Agora
+              <Calendar className="h-3.5 w-3.5" strokeWidth={2} />
+            </CalendlyButton>
+          </div>
+
+          <p className="mt-5 text-[11px] uppercase tracking-[0.2em] text-cream-mute">
+            Escolha o horário direto na nossa agenda — confirmação automática
+          </p>
+
+          <div className="mx-auto mt-9 flex max-w-xs items-center gap-4 text-[10px] uppercase tracking-[0.2em] text-cream-mute">
+            <span className="h-px flex-1 bg-border-sub" />
+            ou deixe seu contato
+            <span className="h-px flex-1 bg-border-sub" />
+          </div>
         </div>
 
         {status === "done" ? (
