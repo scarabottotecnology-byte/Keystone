@@ -17,7 +17,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 
 /**
- * Registro único de navegação do Keystone Growth OS.
+ * Registro único de navegação do Sextante.
  *
  * A sidebar, o roteador e as telas de módulo não implementado leem daqui —
  * não existe lista de destinos duplicada em outro lugar. Adicionar um módulo

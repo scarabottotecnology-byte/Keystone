@@ -1,4 +1,6 @@
-# Keystone Growth OS
+# Sextante · Keystone
+
+> Plataforma de prospecção e crescimento comercial da Keystone. Até outubro de 2026 se chamava **Growth OS**; nomes técnicos (pacote, branch, projeto) mantêm o nome antigo.
 
 O motor de marketing e prospecção da própria Keystone Controladoria.
 
@@ -119,4 +121,4 @@ A Keystone tem outros produtos, e nenhum deles entra aqui:
 - **Portal Crimson** e a **Controladoria da Oficial Farma** — produtos de outra
   empresa, sem relação alguma com este.
 
-Este repositório é só o Growth OS.
+Este repositório é só o Sextante.
