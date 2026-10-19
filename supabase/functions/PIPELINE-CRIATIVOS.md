@@ -43,9 +43,12 @@ Comparando este branch com o que está publicado:
 - `market-intelligence`, `oauth-start` e `oauth-callback`: publicadas depois do
   último commit de cada uma, compatível com estarem em dia.
 - `content-strategist`, `content-factory`, `knowledge-ingest` e `invite-member`:
-  **o repositório está à frente de produção**. O commit `03d9ebf` ("quatro
-  defeitos latentes que o CI nunca pegou", 19/08) mexe nas quatro e veio depois
-  do último deploy de cada uma; as correções não foram publicadas.
+  o commit `03d9ebf` ("quatro defeitos latentes que o CI nunca pegou", 19/08)
+  estava só no repositório. **Publicadas em 19/10/2026** (versão 2 de cada uma,
+  `verify_jwt = true`), a partir deste branch em `f3cdfd2`. Conferido em
+  produção: sem `Authorization` o gateway devolve 401, e com um JWT que não é
+  de usuário a própria função responde `unauthorized` ("Token inválido ou
+  expirado"), ou seja, sobe e executa o `authenticate()` novo.
 - `render-asset` existe aqui, mas não está publicada.
 - `cleanup-extra-reels`, `gen-photo` e `patch-image` estão publicadas como stubs
   desativados e não entram no repositório (remoção na issue #9 do
