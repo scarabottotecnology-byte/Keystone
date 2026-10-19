@@ -2,7 +2,7 @@ import { ThemeProvider as NextThemesProvider } from "next-themes";
 import type { ReactNode } from "react";
 
 /**
- * Provedor de tema do Sextante.
+ * Provedor de tema do Growth OS.
  *
  * Três estados, não dois: claro, escuro e "sistema" — que acompanha a
  * preferência do sistema operacional e é o que a maioria das pessoas espera

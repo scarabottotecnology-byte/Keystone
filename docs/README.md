@@ -1,4 +1,4 @@
-# SEXTANTE (antigo Keystone Growth OS) — Documentação de Arquitetura
+# KEYSTONE GROWTH OS — Documentação de Arquitetura
 
 **Status:** FASE 0 — Discovery e Arquitetura · **CONCLUÍDA**
 **Próximo comando esperado:** `EXECUTE FASE 1`

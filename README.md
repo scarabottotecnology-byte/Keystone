@@ -1,6 +1,4 @@
-# Sextante · Keystone
-
-> Plataforma de prospecção e crescimento comercial da Keystone. Até outubro de 2026 se chamava **Growth OS**; nomes técnicos (pacote, branch, projeto) mantêm o nome antigo.
+# Keystone Growth OS
 
 O motor de marketing e prospecção da própria Keystone Controladoria.
 
@@ -118,7 +116,14 @@ A Keystone tem outros produtos, e nenhum deles entra aqui:
 
 - **Centro de Custos Inteligente** — ferramenta de controladoria, repositório e
   banco próprios. Não é módulo deste sistema.
+- **Sextante** — o robô de prospecção (Receita Federal, enriquecimento,
+  cadência de e-mail). Vive hoje na pasta `prospeccao/` do repositório
+  `centro-de-custos-inteligente` e roda na máquina local. O nome é dele, não
+  deste repositório. O esquema já segue o contrato de
+  `docs/02-MODELO-DE-DADOS.md` §4.5–4.6 para que, na FASE 2, as tabelas migrem
+  para o Supabase `keystone-growth-os` e o Sextante passe a ser o módulo de
+  prospecção do Growth OS, mantendo o nome.
 - **Portal Crimson** e a **Controladoria da Oficial Farma** — produtos de outra
   empresa, sem relação alguma com este.
 
-Este repositório é só o Sextante.
+Este repositório é só o Growth OS.

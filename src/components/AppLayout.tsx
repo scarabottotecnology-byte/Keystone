@@ -18,7 +18,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             <SidebarTrigger />
             <div className="flex min-w-0 items-baseline gap-2">
               <span className="truncate text-sm font-medium">
-                {current?.label ?? "Sextante"}
+                {current?.label ?? "Keystone Growth OS"}
               </span>
               {current?.status === "planned" && (
                 <span className="shrink-0 rounded border border-border px-1.5 py-px font-mono text-[0.62rem] tabular-nums text-muted-foreground">
