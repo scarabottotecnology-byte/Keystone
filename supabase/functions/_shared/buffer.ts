@@ -417,3 +417,86 @@ export async function findRecentBufferPostByText(input: {
     status: found.status,
   };
 }
+
+export interface BufferMetric {
+  type: string;
+  value: number | null;
+}
+
+export interface BufferSentPost {
+  id: string;
+  channelId: string;
+  channelService: string;
+  text: string;
+  dueAt: string | null;
+  sentAt: string | null;
+  assets: { type: string }[];
+  metrics: BufferMetric[] | null;
+  metricsUpdatedAt: string | null;
+}
+
+/**
+ * Posts publicados desde `since`, com as métricas que o Buffer já coletou.
+ *
+ * O Buffer atualiza as métricas uma vez por dia, com até ~24h de atraso; um
+ * post publicado hoje pode vir sem métrica ainda, e isso não é zero.
+ */
+export async function listSentBufferPostsWithMetrics(input: {
+  accessToken: string;
+  organizationId: string;
+  since: Date;
+  maxPages?: number;
+}): Promise<BufferSentPost[]> {
+  const posts: BufferSentPost[] = [];
+  let after: string | null = null;
+
+  for (let page = 0; page < (input.maxPages ?? 10); page++) {
+    const data: {
+      posts: {
+        edges?: { node: BufferSentPost }[];
+        pageInfo: { hasNextPage: boolean; endCursor: string | null };
+      };
+    } = await graphql({
+      accessToken: input.accessToken,
+      label: "métricas dos posts",
+      timeoutMs: 30_000,
+      variables: {
+        first: 100,
+        after,
+        input: {
+          organizationId: input.organizationId,
+          filter: {
+            status: ["sent"],
+            dueAt: { start: input.since.toISOString() },
+          },
+          sort: [{ field: "dueAt", direction: "desc" }],
+        },
+      },
+      query:
+        `query SentPosts($input: PostsInput!, $first: Int, $after: String) {
+        posts(input: $input, first: $first, after: $after) {
+          edges {
+            node {
+              id
+              channelId
+              channelService
+              text
+              dueAt
+              sentAt
+              assets { type }
+              metrics { type value }
+              metricsUpdatedAt
+            }
+          }
+          pageInfo { hasNextPage endCursor }
+        }
+      }`,
+    });
+
+    posts.push(...(data.posts.edges ?? []).map((edge) => edge.node));
+    if (!data.posts.pageInfo.hasNextPage) break;
+    after = data.posts.pageInfo.endCursor;
+  }
+
+  return posts;
+}
