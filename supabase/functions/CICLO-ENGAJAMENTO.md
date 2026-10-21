@@ -12,6 +12,8 @@ sem IA paga. Em produção desde 20/10/2026 no projeto `rplnjrqpzqznbxfascqs`.
 | `content_check(canal, texto, formato, n_artes, alt)` | Nota de 0 a 100 antes de publicar: formato recomendado, imagem, gancho, tamanho, hashtags, chamada para interação, palavras-chave, link no corpo, texto alternativo. Aprova a partir de 70. | Antes de cada post |
 | `content_experiments` / `content_experiment_results` | Testes A/B por canal (infográfico x imagem no LinkedIn, carrossel x imagem no Instagram, manhã x noite, pergunta x número). O post entra no braço pelo próprio atributo, sem etiqueta manual. | Contínuo |
 | `content_weekly_plan` | Por canal: formato principal, horários, testes que faltam, aprendizados ativos e as tendências da semana. | Consulta |
+| `compose-pdf` | Junta artes PNG/JPG do bucket `linkedin-artes` num PDF (`{dst, paths, title}`), para o documento-carrossel do LinkedIn. | Ao montar um post |
+| `contact-sheet` | Folha de contato: miniaturas de várias artes numa imagem só (`{paths, cols?, tw?, th?}`), para revisar o lote antes de publicar. | Ao revisar um lote |
 
 ## Engajamento
 
@@ -35,6 +37,11 @@ select content_check('linkedin', '<texto>', 'documento', 1, '<alt>');
 ```bash
 supabase functions deploy social-metrics-sync --project-ref rplnjrqpzqznbxfascqs --no-verify-jwt
 supabase functions deploy trend-radar --project-ref rplnjrqpzqznbxfascqs --no-verify-jwt
+supabase functions deploy compose-pdf --project-ref rplnjrqpzqznbxfascqs --no-verify-jwt
+supabase functions deploy contact-sheet --project-ref rplnjrqpzqznbxfascqs --no-verify-jwt
 ```
 
-Ambas exigem `x-automation-secret`, como as demais automações.
+O robô antigo de inteligência de mercado (`keystone-market-intelligence`) está
+pausado: dependia de crédito de IA e o `trend-radar` cobre a mesma função.
+
+Todas exigem `x-automation-secret`, como as demais automações.
