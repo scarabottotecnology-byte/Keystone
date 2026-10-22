@@ -15,6 +15,27 @@ sem IA paga. Em produção desde 20/10/2026 no projeto `rplnjrqpzqznbxfascqs`.
 | `compose-pdf` | Junta artes PNG/JPG do bucket `linkedin-artes` num PDF (`{dst, paths, title}`), para o documento-carrossel do LinkedIn. | Ao montar um post |
 | `contact-sheet` | Folha de contato: miniaturas de várias artes numa imagem só (`{paths, cols?, tw?, th?}`), para revisar o lote antes de publicar. | Ao revisar um lote |
 
+## Regras de publicação (desde 22/10/2026)
+
+- **Frequência: um dia sim, um dia não**, um post por rede em cada dia de
+  publicação. O plano gratuito do Buffer aceita 10 agendados por rede, então a
+  fila cobre 10 dias de publicação (cerca de 20 dias de calendário).
+- **Sempre com foto e no modelo do `render-post`** (1080×1350, faixa
+  "Keystone Controladoria", fundo azul-marinho e dourado). Nada de cartão só com
+  frase nem arte quadrada: a grade do Instagram mostra cada post em 3:4 e corta
+  as laterais de uma arte 1:1. A fila antiga desses cartões no
+  `content_calendar` foi cancelada (migração `cancel_legacy_text_cards`); os
+  temas continuam em `content_assets` para voltar como carrossel.
+- **Formato por rede:** carrossel no Instagram, documento (PDF do
+  `compose-pdf`) no LinkedIn e imagem única no Facebook.
+- **Reels:** a cada dois carrosséis, um vira Reel 1080×1920 com
+  `scripts/mkreel.sh` (ffmpeg). É o único formato que o Instagram mostra para
+  quem ainda não segue a conta. O vídeo vai para o ramo `claude/midia-reels` e
+  a `import-asset` copia para o bucket a partir do link `raw.githubusercontent`.
+- **Tema não se repete** em menos de duas semanas, e nenhum tema domina a fila.
+- Link do diagnóstico só no texto do LinkedIn e do Facebook. No Instagram,
+  "link na bio".
+
 ## Engajamento
 
 `engagement_points = reações + 2×comentários + 3×compartilhamentos +
