@@ -36,6 +36,31 @@ sem IA paga. Em produção desde 20/10/2026 no projeto `rplnjrqpzqznbxfascqs`.
 - Link do diagnóstico só no texto do LinkedIn e do Facebook. No Instagram,
   "link na bio".
 
+## Revisão técnica (desde 29/10/2026)
+
+O público do LinkedIn inclui controllers e CFOs. Post que ensina um método é
+lido por quem faz aquilo todo dia, e a lacuna aparece nos comentários. Foi o
+caso do post de orçamento sazonalizado (20/10): o passo "calcule o peso de cada
+mês" não tratava mês atípico na base, e o "projete o caixa" ignorava que caixa
+não é competência. Antes de agendar qualquer post com passo a passo, número ou
+regra prática, confira:
+
+- **Exceção da regra:** o que quebra o método? Base com mês fora da curva
+  (venda extraordinária, parada, reajuste no meio do ano) pede mediana ou
+  exclusão do mês, não média.
+- **Competência x caixa:** se o post fala de caixa, considere prazo de
+  recebimento e pagamento, cartão parcelado e o mês em que o imposto é
+  recolhido, que nem sempre é o mês da venda.
+- **Premissas da conta:** todo número de exemplo diz de onde vem (folha,
+  alíquota, prazo) e o que deixou de fora ("antes de férias e encargos").
+- **Fonte e data:** lei, prazo legal ou estatística citada com a fonte e
+  conferida na data da publicação.
+- **Uma ressalva honesta** quando o método é simplificado: "o caminho mais
+  simples" precisa dizer onde ele deixa de servir.
+
+Quem comentar com um complemento técnico recebe resposta no mesmo dia,
+agradecendo e somando um ponto, nunca na defensiva.
+
 ## Engajamento
 
 `engagement_points = reações + 2×comentários + 3×compartilhamentos +
