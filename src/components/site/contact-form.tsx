@@ -22,7 +22,7 @@ export function ContactForm() {
       empresa: form.empresa,
       telefone: form.telefone,
       mensagem: form.mensagem,
-      origem: "Site — Agendar Diagnóstico",
+      origem: "Site — Pedir proposta",
       track: "geral",
     });
     setStatus(result.ok ? "done" : "error");
@@ -43,29 +43,26 @@ export function ContactForm() {
       />
       <div className="relative z-10 mx-auto max-w-3xl px-8">
         <div className="mb-12 text-center">
-          <span className="eyebrow">Contato</span>
-          <h2 className="section-title mt-6">
-            Agendar <em>Diagnóstico Estratégico</em>
-          </h2>
+          <h2 className="section-title">Peça sua proposta de contabilidade</h2>
           <p className="mt-5 text-[15px] font-light text-cream-dim">
-            30 minutos. Sem compromisso. Com análise real do seu momento
-            financeiro.
+            Conte o regime, o número de funcionários e o faturamento médio. Respondemos em até
+            1 dia útil, sem compromisso.
           </p>
 
           <div className="mt-8 flex justify-center">
             <CalendlyButton className="btn-gold">
-              Agendar uma Conversa Agora
+              Agendar uma conversa
               <Calendar className="h-3.5 w-3.5" strokeWidth={2} />
             </CalendlyButton>
           </div>
 
           <p className="mt-5 text-[11px] uppercase tracking-[0.2em] text-cream-mute">
-            Escolha o horário direto na nossa agenda — confirmação automática
+            Escolha o horário direto na agenda, com confirmação automática
           </p>
 
           <div className="mx-auto mt-9 flex max-w-xs items-center gap-4 text-[10px] uppercase tracking-[0.2em] text-cream-mute">
             <span className="h-px flex-1 bg-border-sub" />
-            ou deixe seu contato
+            ou envie seus dados
             <span className="h-px flex-1 bg-border-sub" />
           </div>
         </div>
@@ -85,7 +82,7 @@ export function ContactForm() {
             {(
               [
                 { name: "nome", label: "Nome completo", type: "text", required: true },
-                { name: "email", label: "E-mail corporativo", type: "email", required: true },
+                { name: "email", label: "E-mail", type: "email", required: true },
                 { name: "empresa", label: "Empresa", type: "text", required: true },
                 { name: "telefone", label: "Telefone / WhatsApp", type: "tel", required: false },
               ] as const
@@ -107,13 +104,13 @@ export function ContactForm() {
 
             <label className="block">
               <span className="text-[11px] uppercase tracking-[0.2em] text-cream-dim">
-                Mensagem / Contexto
+                Mensagem
               </span>
               <textarea
                 rows={4}
                 value={form.mensagem}
                 onChange={(e) => setForm((f) => ({ ...f, mensagem: e.target.value }))}
-                placeholder="Descreva brevemente o momento da empresa: expansão, captação, M&A, reestruturação..."
+                placeholder="Ex.: Simples Nacional, 6 funcionários, faturamento de R$ 80 mil por mês. Quero trocar de contador."
                 className="mt-2 w-full border border-border-sub bg-navy px-4 py-3 text-cream outline-none transition-colors focus:border-gold placeholder:text-cream-mute/40 resize-none"
               />
             </label>
@@ -129,11 +126,11 @@ export function ContactForm() {
               disabled={status === "loading"}
               className="btn-gold w-full justify-center disabled:opacity-60"
             >
-              {status === "loading" ? "Enviando..." : "Agendar Diagnóstico →"}
+              {status === "loading" ? "Enviando..." : "Pedir proposta"}
             </button>
 
             <p className="text-center text-[10px] uppercase tracking-[0.15em] text-cream-mute">
-              Confidencialidade total · NDA disponível antes do primeiro compartilhamento
+              Seus dados ficam em sigilo. NDA disponível se você quiser.
             </p>
           </form>
         )}

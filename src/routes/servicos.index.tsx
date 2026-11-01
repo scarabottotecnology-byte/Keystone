@@ -1,11 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
-  BarChart3,
+  BookOpenCheck,
   Building2,
-  Calculator,
-  Radio,
-  Scale,
-  FileStack,
+  DoorClosed,
+  Wallet,
+  Landmark,
+  Users,
+  ShieldCheck,
+  UserRound,
+  LineChart,
   ArrowRight,
 } from "lucide-react";
 import { SiteHeader } from "@/components/site/site-header";
@@ -14,17 +17,16 @@ import { SiteFooter } from "@/components/site/site-footer";
 export const Route = createFileRoute("/servicos/")({
   head: () => ({
     meta: [
-      { title: "Serviços — Controladoria, FP&A, Custos e Valuation | Keystone" },
+      { title: "Serviços de Contabilidade, Abertura de Empresas e BPO Financeiro | Keystone" },
       {
         name: "description",
         content:
-          "Controladoria estratégica, FP&A, gestão de custos, BI financeiro, valuation & M&A e planejamento tributário — metodologia proprietária, equipe sênior, entrega board-ready.",
+          "Contabilidade mensal, abertura e encerramento de empresas, BPO financeiro, fiscal, departamento pessoal, regularização e imposto de renda dos sócios.",
       },
-      { property: "og:title", content: "Serviços — Keystone" },
+      { property: "og:title", content: "Serviços | Keystone Contabilidade" },
       {
         property: "og:description",
-        content:
-          "Seis frentes de controladoria e finanças corporativas para empresas em crescimento.",
+        content: "Nove serviços de contabilidade para empresas do Simples Nacional e Lucro Presumido.",
       },
     ],
     links: [{ rel: "canonical", href: "/servicos" }],
@@ -33,53 +35,15 @@ export const Route = createFileRoute("/servicos/")({
 });
 
 const services = [
-  {
-    slug: "controladoria-estrategica",
-    Icon: Building2,
-    name: "Controladoria Estratégica",
-    desc: "Estruturação de processos de controladoria, compliance, governança financeira e controles internos para empresas que exigem excelência operacional.",
-    tags: ["Controles internos", "Compliance", "Governança", "Fechamento contábil"],
-  },
-  {
-    slug: "fpa-planejamento-financeiro",
-    Icon: BarChart3,
-    name: "FP&A e Planejamento Financeiro",
-    desc: "Budget, forecast e acompanhamento gerencial com o Método ÓRBITA™ — conectando estratégia e execução financeira em ciclo trimestral.",
-    tags: ["Budget corporativo", "Forecast rolling", "Realizado vs. orçado", "Planos de ação"],
-  },
-  {
-    slug: "gestao-estrategica-custos",
-    Icon: Calculator,
-    name: "Gestão Estratégica de Custos",
-    desc: "Mapeamento de direcionadores, centros de custo, custeio por atividade e análise de rentabilidade com o Método RICE™.",
-    tags: ["Direcionadores de custo", "Custeio ABC/ABM", "Rentabilidade", "Precificação"],
-  },
-  {
-    slug: "business-intelligence",
-    Icon: Radio,
-    name: "Business Intelligence",
-    desc: "Dashboards financeiros e operacionais com visualização de dados em tempo real para decisão ágil e baseada em evidências.",
-    tags: [
-      "Dashboards em tempo real",
-      "KPIs financeiros",
-      "Relatórios automatizados",
-      "Data warehouse",
-    ],
-  },
-  {
-    slug: "valuation-ma",
-    Icon: Scale,
-    name: "Valuation & M&A",
-    desc: "Avaliação de empresas, due diligence financeira e estruturação de operações societárias com rigor técnico.",
-    tags: ["Valuation DCF", "Due diligence", "M&A advisory", "Estruturação de capital"],
-  },
-  {
-    slug: "planejamento-tributario",
-    Icon: FileStack,
-    name: "Planejamento Tributário",
-    desc: "Otimização da carga tributária com legalidade, eficiência e visão estratégica. Análise de regimes e estruturas societárias.",
-    tags: ["Regime tributário", "Elisão fiscal", "Transfer pricing", "Benefícios fiscais"],
-  },
+  { slug: "contabilidade-mensal", Icon: BookOpenCheck, name: "Contabilidade mensal", desc: "Escrituração, balancete, demonstrações e obrigações acessórias.", tags: ["Balancete", "DRE", "ECD e ECF", "DEFIS"] },
+  { slug: "abertura-de-empresas", Icon: Building2, name: "Abertura de empresas", desc: "Escolha do regime e do CNAE, contrato social, CNPJ, inscrições e alvarás.", tags: ["CNPJ", "Contrato social", "Alvará", "Conselhos"] },
+  { slug: "alteracao-e-encerramento", Icon: DoorClosed, name: "Alteração e encerramento", desc: "Entrada e saída de sócios, mudanças cadastrais e baixa sem pendências.", tags: ["Alteração contratual", "Distrato", "Baixa"] },
+  { slug: "bpo-financeiro", Icon: Wallet, name: "BPO financeiro", desc: "Contas a pagar e a receber, conciliação, fluxo de caixa e DRE gerencial.", tags: ["Contas a pagar", "Conciliação", "Fluxo de caixa"] },
+  { slug: "fiscal-e-tributario", Icon: Landmark, name: "Fiscal e planejamento tributário", desc: "Apuração do Simples e do Presumido, retenções e comparação de regimes.", tags: ["DAS", "IRPJ e CSLL", "Reforma tributária"] },
+  { slug: "departamento-pessoal", Icon: Users, name: "Departamento pessoal e folha", desc: "Admissão, folha, férias, 13º, rescisão e eSocial.", tags: ["Folha", "eSocial", "Rescisão"] },
+  { slug: "regularizacao-fiscal", Icon: ShieldCheck, name: "Regularização e parcelamentos", desc: "Declarações em atraso, intimações, malha fina, certidões e parcelamentos.", tags: ["Intimações", "Certidões", "Parcelamento"] },
+  { slug: "imposto-de-renda", Icon: UserRound, name: "Imposto de renda dos sócios", desc: "IRPF, carnê-leão e ganho de capital, alinhados aos lucros da empresa.", tags: ["IRPF", "Carnê-leão", "Ganho de capital"] },
+  { slug: "gestao-e-indicadores", Icon: LineChart, name: "Gestão e indicadores", desc: "Precificação, ponto de equilíbrio, orçamento e painel mensal.", tags: ["Precificação", "Orçamento", "Indicadores"] },
 ];
 
 function ServicosIndex() {
@@ -89,14 +53,12 @@ function ServicosIndex() {
       <main>
         <section className="relative overflow-hidden px-8 pb-16 pt-36 lg:pt-44">
           <div className="relative z-10 mx-auto max-w-[1400px] text-center">
-            <span className="eyebrow mx-auto">Nossas soluções</span>
-            <h1 className="section-title mx-auto mt-7 max-w-3xl">
-              Serviços de <em>alto impacto</em> para decisões de capital.
+            <h1 className="section-title mx-auto max-w-3xl">
+              Serviços de contabilidade para a rotina inteira da sua empresa.
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-cream-dim">
-              Cada entrega combina metodologia proprietária, equipe sênior e foco absoluto em
-              geração de valor econômico — no formato que um conselho leva para a mesa sem
-              reformatar nada.
+              Contrate um serviço ou deixe a rotina fiscal, contábil, de pessoal e financeira com
+              a mesma equipe.
             </p>
           </div>
         </section>
@@ -131,7 +93,7 @@ function ServicosIndex() {
                     ))}
                   </div>
                   <div className="mt-7 flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.2em] text-gold">
-                    Conhecer serviço
+                    Ver detalhes
                     <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
                   </div>
                 </Link>

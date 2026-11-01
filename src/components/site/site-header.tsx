@@ -5,8 +5,6 @@ import { KeystoneMonogram } from "@/components/site/keystone-monogram";
 
 const navItems = [
   { label: "Serviços", to: "/servicos" as const },
-  { label: "Metodologias", to: "/metodologias" as const },
-  { label: "Cases", to: "/cases" as const },
   { label: "Ferramentas", to: "/ferramentas" as const },
   { label: "Diagnóstico", to: "/diagnostico" as const },
   { label: "Contato", to: "/contato" as const },
@@ -46,7 +44,7 @@ export function SiteHeader() {
               Keystone
             </div>
             <div className="mt-1 text-[9px] uppercase tracking-[0.25em] text-cream-mute">
-              Capital Advisory
+              Contabilidade
             </div>
           </div>
         </Link>
@@ -66,8 +64,8 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <Link to="/diagnostico" className="btn-gold hidden md:inline-flex">
-          Diagnóstico Gratuito
+        <Link to="/contato" className="btn-gold hidden md:inline-flex">
+          Pedir proposta
         </Link>
 
         <button
@@ -96,11 +94,11 @@ export function SiteHeader() {
               </Link>
             ))}
             <Link
-              to="/diagnostico"
+              to="/contato"
               onClick={() => setOpen(false)}
               className="btn-gold mt-6 justify-center"
             >
-              Diagnóstico Gratuito
+              Pedir proposta
             </Link>
           </nav>
         </div>

@@ -1,54 +1,63 @@
 import { Reveal, RevealGroup, RevealItem } from "@/components/site/reveal";
 
-const audience = [
+const segments = [
   {
-    role: "CEO",
-    title: "Chief Executive Officer",
-    pain: "O fechamento sai tarde e cada área apresenta um número diferente. Você decide contratação, preço e investimento sem enxergar o resultado real do mês.",
-    quote: "“Preciso de números que contem a história, não que escondam ela.”",
+    name: "Empresas do Simples Nacional",
+    pain: "Você paga o DAS todo mês, mas não sabe se o anexo, o fator R e o limite de faturamento estão sendo bem aproveitados.",
+    help: "Apuração correta, acompanhamento do teto e aviso antes de o regime deixar de compensar.",
   },
   {
-    role: "CFO",
-    title: "Chief Financial Officer",
-    pain: "O time financeiro está consumido pela operação: conciliação, lançamento, planilha. Falta contabilidade gerencial e planejamento financeiro corporativo de verdade — budget, forecast e análise de variação.",
-    quote: "“Quero subir o nível da minha controladoria sem aumentar headcount.”",
+    name: "Empresas do Lucro Presumido",
+    pain: "Imposto trimestral, retenções em notas e muitas obrigações acessórias, com risco de erro em cada uma.",
+    help: "Apuração de IRPJ, CSLL, PIS, COFINS e ISS, com conferência das retenções e prazos.",
   },
   {
-    role: "Sócio / Diretor",
-    title: "Acionista ou Conselho",
-    pain: "Os processos existem, mas vivem em planilhas frágeis. O caixa surpreende, o custo por produto é estimativa e o orçamento envelhece no primeiro trimestre.",
-    quote: "Precisamos de governança financeira real antes do próximo salto de crescimento.",
+    name: "Agências de emprego",
+    pain: "Alta rotatividade, muitas admissões e rescisões, encargos e retenções sobre contratos com empresas clientes.",
+    help: "Folha e eSocial em volume, conferência de encargos e controle financeiro por contrato.",
+  },
+  {
+    name: "Agências de marketing",
+    pain: "Faturamento bom, caixa irregular, receita por cliente misturada e dúvida entre Simples e Presumido.",
+    help: "Planejamento tributário, BPO financeiro e DRE gerencial por cliente e por projeto.",
+  },
+  {
+    name: "Escritórios de engenharia",
+    pain: "Receitas por obra ou projeto, registro em conselho, ART, retenções em contratos e fluxo de caixa irregular.",
+    help: "Contabilidade por projeto, retenções corretas e fluxo de caixa projetado por contrato.",
+  },
+  {
+    name: "Escritórios de advocacia",
+    pain: "Sociedade de advogados, distribuição entre sócios, honorários de êxito e repasses a correspondentes.",
+    help: "Estrutura societária e tributária adequada, folha, pró-labore e organização dos honorários.",
   },
 ];
 
 export function ParaQuem() {
   return (
-    <section id="sobre" className="py-28">
+    <section id="para-quem" className="py-28">
+      <span id="sobre" aria-hidden className="block" />
       <div className="mx-auto max-w-[1400px] px-8">
         <Reveal>
-          <span className="eyebrow">Para quem é</span>
-          <h2 className="section-title mt-6">
-            Construído para quem
-            <br />
-            <em>responde pelos números</em>
+          <h2 className="section-title max-w-3xl">
+            Atendemos de perto quem tem rotina fiscal e financeira própria
           </h2>
+          <p className="mt-5 max-w-2xl text-[15px] font-light leading-relaxed text-cream-dim">
+            Cada setor tem seus próprios impostos, contratos e vícios de gestão. Entendemos o seu
+            antes de montar a proposta.
+          </p>
         </Reveal>
 
-        <RevealGroup className="mt-14 grid gap-6 md:grid-cols-3">
-          {audience.map((a) => (
+        <RevealGroup className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {segments.map((s) => (
             <RevealItem
-              key={a.role}
-              className="border border-border-sub p-10 transition-colors hover:border-border hover:bg-gold/[0.02]"
+              key={s.name}
+              className="border border-border-sub p-10 transition-colors hover:border-border"
             >
-              <div className="font-display text-3xl font-medium text-cream">{a.role}</div>
-              <div className="mt-1.5 text-[10px] uppercase tracking-[0.18em] text-gold">
-                {a.title}
-              </div>
-              <p className="mt-5 text-[13px] font-light leading-relaxed text-cream-dim">
-                {a.pain}
-              </p>
-              <p className="mt-5 border-t border-border-sub pt-5 font-accent text-[15px] italic leading-snug text-gold-light">
-                {a.quote}
+              <h3 className="font-display text-2xl font-medium text-cream">{s.name}</h3>
+              <p className="mt-4 text-[13px] font-light leading-relaxed text-cream-dim">{s.pain}</p>
+              <p className="mt-5 border-t border-border-sub pt-5 text-[13px] leading-relaxed text-cream">
+                {s.help}
               </p>
             </RevealItem>
           ))}
