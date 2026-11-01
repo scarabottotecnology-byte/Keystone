@@ -55,7 +55,7 @@ export function Hero() {
           <ul className="mt-12 grid gap-4">
             <TrustItem icon={Monitor} text="Atendimento 100% digital" />
             <TrustItem icon={Shield} text="Sigilo contábil e LGPD" />
-            <TrustItem icon={Award} text="Contador responsável com registro no CRC" />
+            <TrustItem icon={Award} text="Um responsável fixo pela sua conta" />
           </ul>
         </div>
 

@@ -129,7 +129,7 @@ export const services: ServiceContent[] = [
     titlePrefix: "Contabilidade",
     titleAccent: "mensal",
     heroDescription:
-      "Escrituração, balancete, demonstrações e obrigações acessórias em dia, com um contador responsável e relatórios que você consegue ler. Para empresas do Simples Nacional e do Lucro Presumido.",
+      "Escrituração, balancete, demonstrações e obrigações acessórias em dia e relatórios que você consegue ler. Para empresas do Simples Nacional e do Lucro Presumido.",
     problems: [
       "Você só fala com o contador quando há problema ou multa.",
       "Não sabe se o lucro que aparece no extrato é o lucro real da empresa.",
@@ -140,7 +140,7 @@ export const services: ServiceContent[] = [
       { title: "Escrituração contábil", desc: "Lançamentos, conciliações e plano de contas adequado à sua atividade." },
       { title: "Balancete e demonstrações", desc: "Balancete mensal, balanço patrimonial e DRE, com leitura em linguagem simples." },
       { title: "Obrigações acessórias", desc: "ECD, ECF, DEFIS ou DASN conforme o regime, além de declarações municipais e estaduais." },
-      { title: "Contador responsável", desc: "Profissional com registro no CRC acompanhando a empresa e assinando as demonstrações." },
+      { title: "Responsável pela conta", desc: "Um ponto de contato fixo acompanhando a empresa mês a mês." },
       { title: "Portal e atendimento digital", desc: "Envio de documentos e acompanhamento online, com resposta em até 1 dia útil." },
       { title: "Reunião de resultado", desc: "Conversa periódica para explicar o mês e apontar o que exige decisão." },
     ],

@@ -1,5 +1,5 @@
 const items = [
-  { title: "Contador responsável de verdade", desc: "Um profissional com registro no CRC acompanha a sua empresa e responde pelas demonstrações." },
+  { title: "Um responsável pela sua conta", desc: "Você tem um ponto de contato fixo, que conhece a sua empresa e acompanha o mês do começo ao fim." },
   { title: "Atendimento digital, resposta em 1 dia útil", desc: "Documentos, dúvidas e relatórios em um só canal, sem precisar ir ao escritório." },
   { title: "Contabilidade que explica", desc: "Todo mês você recebe os números e uma conversa sobre o que eles significam para o seu caixa." },
   { title: "Sigilo e LGPD", desc: "NDA se você quiser, acesso restrito e armazenamento seguro das informações da empresa e dos sócios." },

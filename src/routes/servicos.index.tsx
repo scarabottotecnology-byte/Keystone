@@ -35,7 +35,7 @@ export const Route = createFileRoute("/servicos/")({
 });
 
 const services = [
-  { slug: "contabilidade-mensal", Icon: BookOpenCheck, name: "Contabilidade mensal", desc: "Escrituração, balancete, demonstrações e obrigações acessórias, com contador responsável.", tags: ["Balancete", "DRE", "ECD e ECF", "DEFIS"] },
+  { slug: "contabilidade-mensal", Icon: BookOpenCheck, name: "Contabilidade mensal", desc: "Escrituração, balancete, demonstrações e obrigações acessórias.", tags: ["Balancete", "DRE", "ECD e ECF", "DEFIS"] },
   { slug: "abertura-de-empresas", Icon: Building2, name: "Abertura de empresas", desc: "Escolha do regime e do CNAE, contrato social, CNPJ, inscrições e alvarás.", tags: ["CNPJ", "Contrato social", "Alvará", "Conselhos"] },
   { slug: "alteracao-e-encerramento", Icon: DoorClosed, name: "Alteração e encerramento", desc: "Entrada e saída de sócios, mudanças cadastrais e baixa sem pendências.", tags: ["Alteração contratual", "Distrato", "Baixa"] },
   { slug: "bpo-financeiro", Icon: Wallet, name: "BPO financeiro", desc: "Contas a pagar e a receber, conciliação, fluxo de caixa e DRE gerencial.", tags: ["Contas a pagar", "Conciliação", "Fluxo de caixa"] },
