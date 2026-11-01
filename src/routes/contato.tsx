@@ -22,7 +22,7 @@ export const Route = createFileRoute("/contato")({
       {
         name: "description",
         content:
-          "Fale com a Keystone. Nossa equipe está pronta para entender seu desafio e apresentar a solução certa em controladoria, FP&A e finanças corporativas.",
+          "Peça sua proposta de contabilidade. Respondemos em até 1 dia útil.",
       },
       { property: "og:title", content: "Contato — Keystone" },
     ],

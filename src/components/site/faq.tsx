@@ -8,28 +8,28 @@ import { Reveal } from "@/components/site/reveal";
 
 const faqs = [
   {
-    q: "Para quais empresas o serviço é indicado?",
-    a: "Empresas em crescimento que já sentem a complexidade financeira aumentar: fechamento gerencial demorado, custos sem rateio claro, orçamento só no Excel e diretoria sem indicadores confiáveis. Atendemos indústrias, varejo, saúde, tecnologia, serviços, agro e franquias — de empresas em estruturação a grupos multisegmento.",
+    q: "Vocês atendem quais tipos de empresa?",
+    a: "Empresas do Simples Nacional e do Lucro Presumido, com foco em agências de emprego, agências de marketing, escritórios de engenharia e de advocacia. Atendemos outros segmentos de serviços sob consulta.",
   },
   {
-    q: "Vocês substituem meu contador?",
-    a: "Não. A controladoria é complementar à contabilidade. O contador cuida do fiscal e societário; nós traduzimos os números em informação gerencial e ajudamos o C-Level a decidir.",
+    q: "Posso trocar de contador sem problemas?",
+    a: "Sim. Cuidamos da troca: solicitamos os arquivos ao contador anterior, assumimos as obrigações e conferimos pendências antes da primeira entrega.",
   },
   {
-    q: "Quanto tempo leva para ver resultado?",
-    a: "Diagnóstico estruturado em até 48h após onboarding. Nos primeiros 30 dias entregamos modelo e cadência. A partir do 2º mês, rotina de fechamento e reuniões de resultado em pé.",
+    q: "Como funciona o atendimento?",
+    a: "Digital. Você envia documentos e tira dúvidas pelos nossos canais e recebe resposta em até 1 dia útil. Reuniões por videochamada quando necessário.",
   },
   {
-    q: "Como funciona a contratação?",
-    a: "Começa com uma conversa inicial sem custo para entender seu contexto. Se houver fit, propomos um diagnóstico estruturado — engajamento pago, com escopo, prazo e entregáveis definidos. A partir dele, definimos a trilha adequada: controladoria mensal recorrente (retainer) ou projeto pontual.",
+    q: "Quanto custa?",
+    a: "Depende do regime, do número de notas e de funcionários e dos serviços contratados. Mande os dados básicos e respondemos com proposta em até 1 dia útil.",
   },
   {
-    q: "Vocês atendem presencialmente ou remoto?",
-    a: "Padrão remoto, com reuniões executivas por videoconferência. Encontros presenciais combinados conforme localização e necessidade do projeto.",
+    q: "Vocês fazem só contabilidade ou também o financeiro?",
+    a: "Os dois. Você pode contratar só a contabilidade, só o BPO financeiro ou os serviços juntos, com a mesma equipe e os mesmos dados.",
   },
   {
     q: "Os dados da minha empresa ficam seguros?",
-    a: "Sim. NDA antes de qualquer compartilhamento, boas práticas de LGPD e ambientes controlados para armazenamento de informações sensíveis.",
+    a: "Sim. Acesso restrito, boas práticas de LGPD e NDA quando você quiser formalizar o sigilo.",
   },
 ];
 
@@ -38,10 +38,7 @@ export function Faq() {
     <section id="faq" className="border-t border-border-sub py-28">
       <div className="mx-auto max-w-3xl px-8">
         <Reveal className="text-center">
-          <span className="eyebrow">Dúvidas frequentes</span>
-          <h2 className="section-title mt-6">
-            O que <em>perguntam</em> antes de contratar
-          </h2>
+          <h2 className="section-title">Dúvidas frequentes</h2>
         </Reveal>
 
         <Reveal delay={0.1}>
