@@ -19,6 +19,7 @@ import { Route as FerramentasRouteImport } from './routes/ferramentas'
 import { Route as IndicadoresRouteImport } from './routes/indicadores'
 import { Route as MetodologiasRouteImport } from './routes/metodologias'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as FerramentasIndexRouteImport } from './routes/ferramentas.index'
@@ -77,6 +78,11 @@ const PrivacidadeRoute = PrivacidadeRouteImport.update({
   path: '/privacidade',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BlogIndexRoute = BlogIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -124,6 +130,7 @@ export interface FileRoutesByFullPath {
   '/indicadores': typeof IndicadoresRoute
   '/metodologias': typeof MetodologiasRoute
   '/privacidade': typeof PrivacidadeRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/ferramentas/login': typeof FerramentasLoginRoute
   '/ferramentas/social': typeof FerramentasSocialRoute
@@ -141,6 +148,7 @@ export interface FileRoutesByTo {
   '/indicadores': typeof IndicadoresRoute
   '/metodologias': typeof MetodologiasRoute
   '/privacidade': typeof PrivacidadeRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/ferramentas/login': typeof FerramentasLoginRoute
   '/ferramentas/social': typeof FerramentasSocialRoute
@@ -161,6 +169,7 @@ export interface FileRoutesById {
   '/indicadores': typeof IndicadoresRoute
   '/metodologias': typeof MetodologiasRoute
   '/privacidade': typeof PrivacidadeRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/ferramentas/login': typeof FerramentasLoginRoute
   '/ferramentas/social': typeof FerramentasSocialRoute
@@ -182,6 +191,7 @@ export interface FileRouteTypes {
     | '/indicadores'
     | '/metodologias'
     | '/privacidade'
+    | '/sitemap.xml'
     | '/blog/$slug'
     | '/ferramentas/login'
     | '/ferramentas/social'
@@ -199,6 +209,7 @@ export interface FileRouteTypes {
     | '/indicadores'
     | '/metodologias'
     | '/privacidade'
+    | '/sitemap.xml'
     | '/blog/$slug'
     | '/ferramentas/login'
     | '/ferramentas/social'
@@ -218,6 +229,7 @@ export interface FileRouteTypes {
     | '/indicadores'
     | '/metodologias'
     | '/privacidade'
+    | '/sitemap.xml'
     | '/blog/$slug'
     | '/ferramentas/login'
     | '/ferramentas/social'
@@ -238,6 +250,7 @@ export interface RootRouteChildren {
   IndicadoresRoute: typeof IndicadoresRoute
   MetodologiasRoute: typeof MetodologiasRoute
   PrivacidadeRoute: typeof PrivacidadeRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ServicosSlugRoute: typeof ServicosSlugRoute
   ServicosIndexRoute: typeof ServicosIndexRoute
 }
@@ -312,6 +325,13 @@ declare module '@tanstack/react-router' {
       path: '/privacidade'
       fullPath: '/privacidade'
       preLoaderRoute: typeof PrivacidadeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blog/': {
@@ -405,6 +425,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndicadoresRoute: IndicadoresRoute,
   MetodologiasRoute: MetodologiasRoute,
   PrivacidadeRoute: PrivacidadeRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   ServicosSlugRoute: ServicosSlugRoute,
   ServicosIndexRoute: ServicosIndexRoute,
 }

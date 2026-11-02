@@ -2,6 +2,7 @@ import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
+import { REDIRECT_HOSTS, SITE_URL } from "./lib/site";
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
@@ -37,8 +38,22 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
   });
 }
 
+// O mesmo código roda no endereço antigo da Vercel e no www. Sem o 301, o
+// Google vê três cópias do site e divide a relevância entre elas.
+function redirectToCanonicalHost(request: Request): Response | undefined {
+  const url = new URL(request.url);
+  const host = (request.headers.get("x-forwarded-host") ?? url.host)
+    .split(",")[0]
+    .trim()
+    .toLowerCase();
+  if (!REDIRECT_HOSTS.includes(host)) return undefined;
+  return Response.redirect(`${SITE_URL}${url.pathname}${url.search}`, 301);
+}
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
+    const redirect = redirectToCanonicalHost(request);
+    if (redirect) return redirect;
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);

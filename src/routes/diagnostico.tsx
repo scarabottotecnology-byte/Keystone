@@ -3,6 +3,8 @@ import { useState } from "react";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
 import { saveLead } from "@/lib/leads";
+import { canonical, absoluteUrl } from "@/lib/site";
+import { HUBSPOT_FIELD } from "@/lib/hubspot-fields";
 
 export const Route = createFileRoute("/diagnostico")({
   head: () => ({
@@ -15,9 +17,9 @@ export const Route = createFileRoute("/diagnostico")({
       },
       { property: "og:title", content: "Diagnóstico de Maturidade Financeira — Keystone" },
       { property: "og:description", content: "Avalie em 3 minutos o grau de maturidade financeira da sua empresa." },
-      { property: "og:url", content: "/diagnostico" },
+      { property: "og:url", content: absoluteUrl("/diagnostico") },
     ],
-    links: [{ rel: "canonical", href: "/diagnostico" }],
+    links: [canonical("/diagnostico")],
   }),
   component: DiagnosticoPage,
 });
@@ -510,6 +512,7 @@ function Result({
                     {label} *
                   </span>
                   <input
+                    name={HUBSPOT_FIELD[name]}
                     type={type}
                     required
                     value={form[name]}

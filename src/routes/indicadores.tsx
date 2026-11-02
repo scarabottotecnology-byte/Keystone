@@ -3,6 +3,7 @@ import { ArrowUp, ArrowDown } from "lucide-react";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
 import { Marquee } from "@/components/ui/marquee";
+import { canonical } from "@/lib/site";
 
 export const Route = createFileRoute("/indicadores")({
   head: () => ({
@@ -15,7 +16,7 @@ export const Route = createFileRoute("/indicadores")({
       },
       { property: "og:title", content: "Indicadores Econômicos — Keystone" },
     ],
-    links: [{ rel: "canonical", href: "/indicadores" }],
+    links: [canonical("/indicadores")],
   }),
   component: IndicadoresPage,
 });

@@ -14,6 +14,7 @@ import {
   ServiceFaqList,
   ServiceCTA,
 } from "@/components/site/service-page";
+import { canonical } from "@/lib/site";
 
 export const Route = createFileRoute("/servicos/$slug")({
   loader: ({ params }) => {
@@ -30,7 +31,7 @@ export const Route = createFileRoute("/servicos/$slug")({
           { property: "og:description", content: loaderData.heroDescription },
         ]
       : [],
-    links: [{ rel: "canonical", href: `/servicos/${loaderData?.slug ?? ""}` }],
+    links: loaderData ? [canonical(`/servicos/${loaderData.slug}`)] : [],
   }),
   notFoundComponent: ServiceNotFound,
   component: ServiceDetail,

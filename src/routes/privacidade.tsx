@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
+import { canonical } from "@/lib/site";
 
 export const Route = createFileRoute("/privacidade")({
   head: () => ({
@@ -13,7 +14,7 @@ export const Route = createFileRoute("/privacidade")({
       },
       { name: "robots", content: "noindex" },
     ],
-    links: [{ rel: "canonical", href: "/privacidade" }],
+    links: [canonical("/privacidade")],
   }),
   component: PrivacidadePage,
 });
@@ -40,54 +41,64 @@ function PrivacidadePage() {
             <div>
               <h2 className="font-display text-xl font-medium text-cream">1. Introdução</h2>
               <p className="mt-3">
-                A Keystone valoriza a privacidade e a proteção de dados pessoais de seus
-                visitantes e clientes. Esta política explica, de forma simples, quais dados
-                coletamos neste site, como usamos cookies e outras tecnologias de navegação, e
-                quais são os seus direitos, em conformidade com a Lei Geral de Proteção de Dados
-                (Lei nº 13.709/2018 — LGPD).
+                A Keystone valoriza a privacidade e a proteção de dados pessoais de seus visitantes
+                e clientes. Esta política explica, de forma simples, quais dados coletamos neste
+                site, como usamos cookies e outras tecnologias de navegação, e quais são os seus
+                direitos, em conformidade com a Lei Geral de Proteção de Dados (Lei nº 13.709/2018 —
+                LGPD).
               </p>
             </div>
 
             <div>
-              <h2 className="font-display text-xl font-medium text-cream">2. Quais dados coletamos</h2>
+              <h2 className="font-display text-xl font-medium text-cream">
+                2. Quais dados coletamos
+              </h2>
               <p className="mt-3">
-                Podemos coletar dados fornecidos voluntariamente por você em formulários de
-                contato e diagnóstico (como nome, e-mail, telefone e informações sobre sua
-                empresa), além de dados de navegação coletados automaticamente por meio de
-                cookies e tecnologias semelhantes, como endereço IP, tipo de dispositivo,
-                navegador e páginas visitadas.
+                Podemos coletar dados fornecidos voluntariamente por você em formulários de contato
+                e diagnóstico (como nome, e-mail, telefone e informações sobre sua empresa), além de
+                dados de navegação coletados automaticamente por meio de cookies e tecnologias
+                semelhantes, como endereço IP, tipo de dispositivo, navegador e páginas visitadas.
               </p>
             </div>
 
             <div>
               <h2 className="font-display text-xl font-medium text-cream">3. Uso de cookies</h2>
               <p className="mt-3">
-                Cookies são pequenos arquivos armazenados no seu navegador que nos ajudam a
-                entender como o site é utilizado, lembrar suas preferências e melhorar sua
-                experiência de navegação. Utilizamos cookies essenciais ao funcionamento do site
-                e, quando aplicável, cookies analíticos para medir audiência e desempenho das
-                páginas. Você pode gerenciar ou desativar cookies diretamente nas configurações
-                do seu navegador, ciente de que isso pode afetar algumas funcionalidades do site.
+                Cookies são pequenos arquivos armazenados no seu navegador que nos ajudam a entender
+                como o site é utilizado, lembrar suas preferências e melhorar sua experiência de
+                navegação. Utilizamos cookies essenciais ao funcionamento do site e, se você aceitar
+                no aviso de cookies, cookies analíticos do HubSpot para medir audiência, entender
+                quais páginas foram visitadas e associar essa navegação ao contato quando você
+                preenche um formulário, e o pixel do Meta (Facebook e Instagram) para medir o
+                resultado dos nossos anúncios e mostrar anúncios a quem já visitou o site. Se você
+                recusar, nenhum desses cookies é carregado. Você também pode apagar ou bloquear
+                cookies nas configurações do seu navegador, ciente de que isso pode afetar algumas
+                funcionalidades do site.
               </p>
             </div>
 
             <div>
-              <h2 className="font-display text-xl font-medium text-cream">4. Finalidade do tratamento</h2>
+              <h2 className="font-display text-xl font-medium text-cream">
+                4. Finalidade do tratamento
+              </h2>
               <p className="mt-3">
                 Os dados coletados são utilizados para responder a solicitações de contato e
-                diagnóstico, aprimorar o conteúdo e a experiência do site, cumprir obrigações
-                legais e regulatórias, e, quando autorizado, enviar comunicações sobre os
-                serviços da Keystone.
+                diagnóstico, aprimorar o conteúdo e a experiência do site, cumprir obrigações legais
+                e regulatórias, e, quando autorizado, enviar comunicações sobre os serviços da
+                Keystone.
               </p>
             </div>
 
             <div>
-              <h2 className="font-display text-xl font-medium text-cream">5. Compartilhamento de dados</h2>
+              <h2 className="font-display text-xl font-medium text-cream">
+                5. Compartilhamento de dados
+              </h2>
               <p className="mt-3">
                 Não vendemos seus dados pessoais. Eventuais compartilhamentos ocorrem apenas com
-                prestadores de serviço que apoiam a operação do site (como provedores de
-                hospedagem e ferramentas de análise), sempre sob obrigações de confidencialidade
-                e segurança, ou quando exigido por lei.
+                prestadores de serviço que apoiam a operação do site (como a Hostinger, que hospeda
+                o site, o Supabase, que armazena os formulários, o HubSpot, nosso CRM e ferramenta
+                de análise, e o Meta, plataforma dos nossos anúncios), sempre sob obrigações de
+                confidencialidade e segurança, ou quando exigido por lei.
               </p>
             </div>
 
@@ -96,9 +107,9 @@ function PrivacidadePage() {
               <p className="mt-3">
                 Nos termos da LGPD, você tem direito a confirmar a existência de tratamento,
                 acessar, corrigir ou solicitar a exclusão dos seus dados pessoais, revogar
-                consentimentos e obter informações sobre com quem compartilhamos suas
-                informações. Para exercer esses direitos, entre em contato conosco pelos canais
-                disponíveis na página de{" "}
+                consentimentos e obter informações sobre com quem compartilhamos suas informações.
+                Para exercer esses direitos, entre em contato conosco pelos canais disponíveis na
+                página de{" "}
                 <a href="/contato" className="text-gold hover:underline">
                   Contato
                 </a>
@@ -116,19 +127,20 @@ function PrivacidadePage() {
             </div>
 
             <div>
-              <h2 className="font-display text-xl font-medium text-cream">8. Alterações desta política</h2>
+              <h2 className="font-display text-xl font-medium text-cream">
+                8. Alterações desta política
+              </h2>
               <p className="mt-3">
-                Esta política pode ser atualizada periodicamente para refletir melhorias no site
-                ou mudanças na legislação aplicável. Recomendamos revisar esta página
-                ocasionalmente.
+                Esta política pode ser atualizada periodicamente para refletir melhorias no site ou
+                mudanças na legislação aplicável. Recomendamos revisar esta página ocasionalmente.
               </p>
             </div>
 
             <div>
               <h2 className="font-display text-xl font-medium text-cream">9. Contato</h2>
               <p className="mt-3">
-                Em caso de dúvidas sobre esta política ou sobre o tratamento de seus dados
-                pessoais, entre em contato pela nossa página de{" "}
+                Em caso de dúvidas sobre esta política ou sobre o tratamento de seus dados pessoais,
+                entre em contato pela nossa página de{" "}
                 <a href="/contato" className="text-gold hover:underline">
                   Contato
                 </a>

@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
 import { getPost, posts } from "@/content/posts";
+import { absoluteUrl, canonical, SITE_URL } from "@/lib/site";
 
 export const Route = createFileRoute("/blog/$slug")({
   loader: ({ params }) => {
@@ -18,6 +19,25 @@ export const Route = createFileRoute("/blog/$slug")({
             { property: "og:title", content: loaderData.meta.title },
             { property: "og:description", content: loaderData.meta.description },
             { property: "og:type", content: "article" },
+            { property: "og:url", content: absoluteUrl(`/blog/${loaderData.meta.slug}`) },
+            { property: "article:published_time", content: loaderData.meta.date },
+          ],
+          links: [canonical(`/blog/${loaderData.meta.slug}`)],
+          scripts: [
+            {
+              type: "application/ld+json",
+              children: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "BlogPosting",
+                headline: loaderData.meta.title,
+                description: loaderData.meta.description,
+                datePublished: loaderData.meta.date,
+                author: { "@type": "Person", name: loaderData.meta.author },
+                publisher: { "@id": `${SITE_URL}/#organizacao` },
+                mainEntityOfPage: absoluteUrl(`/blog/${loaderData.meta.slug}`),
+                inLanguage: "pt-BR",
+              }),
+            },
           ],
         }
       : {},
@@ -39,7 +59,9 @@ function NotFound() {
     <div className="min-h-screen bg-navy text-cream">
       <SiteHeader />
       <main className="mx-auto max-w-3xl px-8 py-40 text-center">
-        <h1 className="section-title">Artigo <em>não encontrado</em></h1>
+        <h1 className="section-title">
+          Artigo <em>não encontrado</em>
+        </h1>
         <p className="mt-4 text-cream-dim">
           Esse conteúdo pode ter sido movido ou ainda não foi publicado.
         </p>
@@ -120,9 +142,7 @@ function PostPage() {
                     <h3 className="mt-3 font-display text-2xl font-medium text-cream group-hover:text-gold-light">
                       {m.title}
                     </h3>
-                    <p className="mt-3 text-[13px] font-light text-cream-dim">
-                      {m.description}
-                    </p>
+                    <p className="mt-3 text-[13px] font-light text-cream-dim">{m.description}</p>
                   </Link>
                 ))}
               </div>

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Calendar } from "lucide-react";
 import { saveLead } from "@/lib/leads";
 import { CalendlyButton } from "@/components/site/calendly-button";
+import { HUBSPOT_FIELD } from "@/lib/hubspot-fields";
 
 export function ContactForm() {
   const [form, setForm] = useState({
@@ -93,6 +94,7 @@ export function ContactForm() {
                   {required && " *"}
                 </span>
                 <input
+                  name={HUBSPOT_FIELD[name]}
                   type={type}
                   required={required}
                   value={form[name]}
@@ -107,6 +109,7 @@ export function ContactForm() {
                 Mensagem
               </span>
               <textarea
+                name={HUBSPOT_FIELD.mensagem}
                 rows={4}
                 value={form.mensagem}
                 onChange={(e) => setForm((f) => ({ ...f, mensagem: e.target.value }))}

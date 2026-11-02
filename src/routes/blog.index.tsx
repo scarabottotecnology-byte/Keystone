@@ -3,6 +3,7 @@ import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
 import { posts } from "@/content/posts";
 import { ArrowRight } from "lucide-react";
+import { canonical } from "@/lib/site";
 
 export const Route = createFileRoute("/blog/")({
   head: () => ({
@@ -19,6 +20,7 @@ export const Route = createFileRoute("/blog/")({
         content: "Inteligência financeira para líderes que decidem.",
       },
     ],
+    links: [canonical("/blog")],
   }),
   component: BlogIndex,
 });
