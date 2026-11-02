@@ -1,27 +1,16 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-
-const STORAGE_KEY = "keystone-cookie-consent";
+import { readConsent, saveConsent, type Consent } from "@/lib/consent";
 
 export function CookieConsent() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    try {
-      const consent = window.localStorage.getItem(STORAGE_KEY);
-      if (!consent) setVisible(true);
-    } catch {
-      // localStorage unavailable (e.g. blocked) — skip showing the banner
-      // rather than risk throwing during hydration.
-    }
+    if (!readConsent()) setVisible(true);
   }, []);
 
-  function accept() {
-    try {
-      window.localStorage.setItem(STORAGE_KEY, "accepted");
-    } catch {
-      // ignore write failures
-    }
+  function choose(value: Consent) {
+    saveConsent(value);
     setVisible(false);
   }
 
@@ -35,16 +24,29 @@ export function CookieConsent() {
     >
       <div className="mx-auto flex max-w-[1400px] flex-col items-center gap-4 px-6 py-5 text-center md:flex-row md:justify-between md:text-left md:px-8">
         <p className="text-[13px] leading-relaxed text-cream-dim">
-          Usamos cookies e dados de navegação para melhorar sua experiência neste site, em
-          conformidade com a LGPD.{" "}
+          Usamos cookies de análise (HubSpot) para entender quais conteúdos ajudam você e melhorar o
+          site, em conformidade com a LGPD.{" "}
           <Link to="/privacidade" className="text-gold hover:underline">
             Saiba mais
           </Link>
           .
         </p>
-        <button type="button" onClick={accept} className="btn-gold shrink-0 whitespace-nowrap">
-          Aceitar
-        </button>
+        <div className="flex shrink-0 items-center gap-3">
+          <button
+            type="button"
+            onClick={() => choose("declined")}
+            className="whitespace-nowrap text-[13px] text-cream-dim underline-offset-4 hover:underline"
+          >
+            Recusar
+          </button>
+          <button
+            type="button"
+            onClick={() => choose("accepted")}
+            className="btn-gold whitespace-nowrap"
+          >
+            Aceitar
+          </button>
+        </div>
       </div>
     </div>
   );

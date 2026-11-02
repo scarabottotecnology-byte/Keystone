@@ -4,6 +4,7 @@ import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
 import { saveLead } from "@/lib/leads";
 import { canonical, absoluteUrl } from "@/lib/site";
+import { HUBSPOT_FIELD } from "@/lib/hubspot-fields";
 
 export const Route = createFileRoute("/diagnostico")({
   head: () => ({
@@ -511,6 +512,7 @@ function Result({
                     {label} *
                   </span>
                   <input
+                    name={HUBSPOT_FIELD[name]}
                     type={type}
                     required
                     value={form[name]}

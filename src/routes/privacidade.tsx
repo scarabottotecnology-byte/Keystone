@@ -66,9 +66,11 @@ function PrivacidadePage() {
                 Cookies são pequenos arquivos armazenados no seu navegador que nos ajudam a
                 entender como o site é utilizado, lembrar suas preferências e melhorar sua
                 experiência de navegação. Utilizamos cookies essenciais ao funcionamento do site
-                e, quando aplicável, cookies analíticos para medir audiência e desempenho das
-                páginas. Você pode gerenciar ou desativar cookies diretamente nas configurações
-                do seu navegador, ciente de que isso pode afetar algumas funcionalidades do site.
+                e, se você aceitar no aviso de cookies, cookies analíticos do HubSpot para medir
+                audiência, entender quais páginas foram visitadas e associar essa navegação ao
+                contato quando você preenche um formulário. Se você recusar, esses cookies não são
+                carregados. Você também pode apagar ou bloquear cookies nas configurações do seu
+                navegador, ciente de que isso pode afetar algumas funcionalidades do site.
               </p>
             </div>
 
@@ -86,8 +88,9 @@ function PrivacidadePage() {
               <h2 className="font-display text-xl font-medium text-cream">5. Compartilhamento de dados</h2>
               <p className="mt-3">
                 Não vendemos seus dados pessoais. Eventuais compartilhamentos ocorrem apenas com
-                prestadores de serviço que apoiam a operação do site (como provedores de
-                hospedagem e ferramentas de análise), sempre sob obrigações de confidencialidade
+                prestadores de serviço que apoiam a operação do site (como a Hostinger, que
+                hospeda o site, o Supabase, que armazena os formulários, e o HubSpot, nosso CRM
+                e ferramenta de análise), sempre sob obrigações de confidencialidade
                 e segurança, ou quando exigido por lei.
               </p>
             </div>

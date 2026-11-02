@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { CookieConsent } from "@/components/site/cookie-consent";
+import { HubspotTracking } from "@/components/site/hubspot-tracking";
 import { captureUtm } from "@/lib/leads";
 import { OG_IMAGE, SITE_URL } from "@/lib/site";
 
@@ -175,6 +176,7 @@ function RootComponent() {
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
       <CookieConsent />
+      <HubspotTracking />
     </QueryClientProvider>
   );
 }

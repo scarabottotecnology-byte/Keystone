@@ -5,6 +5,7 @@ import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
 import { saveLead } from "@/lib/leads";
 import { canonical } from "@/lib/site";
+import { HUBSPOT_FIELD } from "@/lib/hubspot-fields";
 
 /**
  * Deixe vazio enquanto a caixa de entrada do domínio não existir de verdade.
@@ -140,6 +141,7 @@ function ContatoPage() {
                         {required && " *"}
                       </span>
                       <input
+                        name={HUBSPOT_FIELD[name]}
                         type={type}
                         required={required}
                         value={form[name]}
@@ -154,6 +156,7 @@ function ContatoPage() {
                       Mensagem *
                     </span>
                     <textarea
+                      name={HUBSPOT_FIELD.mensagem}
                       required
                       rows={4}
                       value={form.mensagem}
