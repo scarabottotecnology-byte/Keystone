@@ -36,7 +36,6 @@ const segments = [
 export function ParaQuem() {
   return (
     <section id="para-quem" className="py-28">
-      <span id="sobre" aria-hidden className="block" />
       <div className="mx-auto max-w-[1400px] px-8">
         <Reveal>
           <h2 className="section-title max-w-3xl">

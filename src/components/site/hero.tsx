@@ -31,13 +31,14 @@ export function Hero() {
               letterSpacing: "-0.01em",
             }}
           >
-            Contabilidade em dia, impostos sob controle e você livre para tocar a empresa.
+            Contabilidade que fecha o mês no prazo e mostra quanto sua empresa{" "}
+            <em className="italic text-gold">realmente ganhou</em>.
           </h1>
 
           <p className="mt-6 max-w-xl text-base leading-relaxed text-cream-dim">
-            A Keystone cuida da contabilidade, do fiscal, da folha e do financeiro de empresas do
-            Simples Nacional e do Lucro Presumido. Abrimos sua empresa, fechamos o mês no prazo e
-            mostramos o que sobrou no caixa.
+            A Keystone une a rotina de um escritório de contabilidade (fiscal, folha e BPO
+            financeiro) à controladoria praticada em grandes grupos. Você deixa de só pagar imposto
+            e passa a decidir preço, contratação e investimento com números confiáveis.
           </p>
 
           <div className="mt-10 flex flex-wrap items-center gap-5">
@@ -53,9 +54,9 @@ export function Hero() {
           <p className="mt-4 text-xs text-cream-mute">Resposta em até 1 dia útil. Sem compromisso.</p>
 
           <ul className="mt-12 grid gap-4">
-            <TrustItem icon={Monitor} text="Atendimento 100% digital" />
+            <TrustItem icon={Monitor} text="Atendimento 100% digital, com um responsável fixo" />
             <TrustItem icon={Shield} text="Sigilo contábil e LGPD" />
-            <TrustItem icon={Award} text="Um responsável fixo pela sua conta" />
+            <TrustItem icon={Award} text="14 anos de controladoria em indústria e varejo" />
           </ul>
         </div>
 
@@ -75,7 +76,7 @@ export function Hero() {
             {obligations.map((o) => (
               <li
                 key={o.what}
-                className="grid grid-cols-[7.5rem_1fr_auto] items-center gap-4 px-6 py-4 text-[13px]"
+                className="grid grid-cols-[5.5rem_1fr_auto] items-center gap-3 px-5 py-4 sm:grid-cols-[7.5rem_1fr_auto] sm:gap-4 sm:px-6 text-[13px]"
               >
                 <span className="text-cream-mute">{o.when}</span>
                 <span className="text-cream">{o.what}</span>
