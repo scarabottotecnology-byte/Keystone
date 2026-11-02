@@ -13,6 +13,8 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { CookieConsent } from "@/components/site/cookie-consent";
 import { HubspotTracking } from "@/components/site/hubspot-tracking";
+import { MetaPixel } from "@/components/site/meta-pixel";
+import { META_DOMAIN_VERIFICATION } from "@/lib/meta-pixel";
 import { captureUtm } from "@/lib/leads";
 import { OG_IMAGE, SITE_URL } from "@/lib/site";
 
@@ -108,10 +110,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Keystone | Escritório de Contabilidade" },
-      { name: "description", content: "Contabilidade, abertura de empresas, BPO financeiro, fiscal e departamento pessoal para empresas do Simples Nacional e Lucro Presumido." },
+      {
+        name: "description",
+        content:
+          "Contabilidade, abertura de empresas, BPO financeiro, fiscal e departamento pessoal para empresas do Simples Nacional e Lucro Presumido.",
+      },
       { name: "author", content: "Keystone" },
       { property: "og:title", content: "Keystone" },
-      { property: "og:description", content: "Contabilidade em dia, impostos sob controle e atendimento digital." },
+      {
+        property: "og:description",
+        content: "Contabilidade em dia, impostos sob controle e atendimento digital.",
+      },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "Keystone" },
       { property: "og:locale", content: "pt_BR" },
@@ -121,6 +130,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:image:alt", content: "Keystone: contabilidade e controladoria para PMEs" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:image", content: OG_IMAGE },
+      ...(META_DOMAIN_VERIFICATION
+        ? [{ name: "facebook-domain-verification", content: META_DOMAIN_VERIFICATION }]
+        : []),
     ],
     links: [
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
@@ -177,6 +189,7 @@ function RootComponent() {
       <Outlet />
       <CookieConsent />
       <HubspotTracking />
+      <MetaPixel />
     </QueryClientProvider>
   );
 }

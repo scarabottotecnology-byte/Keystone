@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { trackMetaLead } from "@/lib/meta-pixel";
 
 /**
  * Ponto único de captura de lead do site.
@@ -79,9 +80,7 @@ function storedUtm(): Utm {
   }
 }
 
-export async function saveLead(
-  input: LeadInput,
-): Promise<{ ok: boolean; error: string | null }> {
+export async function saveLead(input: LeadInput): Promise<{ ok: boolean; error: string | null }> {
   const utm = storedUtm();
 
   try {
@@ -103,6 +102,7 @@ export async function saveLead(
 
   // A partir daqui o lead já está salvo. O HubSpot é espelho, não gargalo.
   void mirrorToHubspot(input);
+  trackMetaLead(input.origem);
 
   return { ok: true, error: null };
 }
