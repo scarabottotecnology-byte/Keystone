@@ -24,8 +24,8 @@ export function CookieConsent() {
     >
       <div className="mx-auto flex max-w-[1400px] flex-col items-center gap-4 px-6 py-5 text-center md:flex-row md:justify-between md:text-left md:px-8">
         <p className="text-[13px] leading-relaxed text-cream-dim">
-          Usamos cookies de análise (HubSpot) para entender quais conteúdos ajudam você e melhorar o
-          site, em conformidade com a LGPD.{" "}
+          Usamos cookies de análise e marketing (HubSpot e Meta) para entender quais conteúdos
+          ajudam você, medir nossos anúncios e melhorar o site, em conformidade com a LGPD.{" "}
           <Link to="/privacidade" className="text-gold hover:underline">
             Saiba mais
           </Link>
