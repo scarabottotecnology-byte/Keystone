@@ -44,7 +44,7 @@ export function SiteHeader() {
               Keystone
             </div>
             <div className="mt-1 text-[9px] uppercase tracking-[0.25em] text-cream-mute">
-              Contabilidade
+              Contabilidade &amp; Controladoria
             </div>
           </div>
         </Link>

@@ -1,10 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/site-header";
 import { Hero } from "@/components/site/hero";
-import { ServicesPreview } from "@/components/site/services-preview";
+import { Credenciais } from "@/components/site/credenciais";
+import { Ganhos } from "@/components/site/ganhos";
+import { Frentes } from "@/components/site/frentes";
+import { Fundador } from "@/components/site/fundador";
 import { ContactForm } from "@/components/site/contact-form";
 import { ParaQuem } from "@/components/site/para-quem";
-import { Diferenciais } from "@/components/site/diferenciais";
 import { Metodologia } from "@/components/site/metodologia";
 import { Faq } from "@/components/site/faq";
 import { SiteFooter } from "@/components/site/site-footer";
@@ -12,17 +14,17 @@ import { SiteFooter } from "@/components/site/site-footer";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Keystone | Escritório de Contabilidade para Simples Nacional e Lucro Presumido" },
+      { title: "Keystone | Contabilidade, BPO financeiro e Controladoria para PMEs" },
       {
         name: "description",
         content:
-          "Contabilidade, abertura e encerramento de empresas, BPO financeiro, fiscal e departamento pessoal para empresas do Simples Nacional e Lucro Presumido, agências e escritórios de engenharia e advocacia.",
+          "Contabilidade, fiscal, folha e BPO financeiro com a controladoria de grandes grupos: DRE gerencial, orçamento e consultoria para empresas do Simples Nacional e do Lucro Presumido.",
       },
-      { property: "og:title", content: "Keystone | Escritório de Contabilidade" },
+      { property: "og:title", content: "Keystone | Contabilidade e Controladoria" },
       {
         property: "og:description",
         content:
-          "Contabilidade em dia, impostos sob controle e atendimento digital. Peça sua proposta em até 1 dia útil.",
+          "Contabilidade em dia e números para decidir. Peça sua proposta em até 1 dia útil.",
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://keystone-phi.vercel.app/" },
@@ -39,10 +41,12 @@ function Landing() {
       <SiteHeader />
       <main>
         <Hero />
+        <Credenciais />
+        <Ganhos />
+        <Frentes />
         <ParaQuem />
-        <ServicesPreview />
+        <Fundador />
         <Metodologia />
-        <Diferenciais />
         <ContactForm />
         <Faq />
       </main>
