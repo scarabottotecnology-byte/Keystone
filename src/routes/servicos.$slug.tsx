@@ -14,7 +14,52 @@ import {
   ServiceFaqList,
   ServiceCTA,
 } from "@/components/site/service-page";
-import { canonical } from "@/lib/site";
+import { SITE_URL, absoluteUrl, seo } from "@/lib/site";
+import type { ServiceContent } from "@/content/services";
+
+// Dados estruturados do serviço (schema.org): o Google e as buscas com IA leem
+// o que é o serviço, quem presta e as perguntas frequentes, com a navegação
+// Início > Serviços > serviço.
+function serviceSchema(s: ServiceContent) {
+  const url = absoluteUrl(`/servicos/${s.slug}`);
+  const faq = s.sections.flatMap((sec) => (sec.kind === "faq" ? sec.items : []));
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Service",
+        "@id": `${url}#servico`,
+        name: s.name,
+        serviceType: s.name,
+        description: s.seoDescription,
+        url,
+        provider: { "@id": `${SITE_URL}/#organizacao` },
+        areaServed: { "@type": "Country", name: "Brasil" },
+        inLanguage: "pt-BR",
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Início", item: absoluteUrl("/") },
+          { "@type": "ListItem", position: 2, name: "Serviços", item: absoluteUrl("/servicos") },
+          { "@type": "ListItem", position: 3, name: s.name, item: url },
+        ],
+      },
+      ...(faq.length
+        ? [
+            {
+              "@type": "FAQPage",
+              mainEntity: faq.map((f) => ({
+                "@type": "Question",
+                name: f.q,
+                acceptedAnswer: { "@type": "Answer", text: f.a },
+              })),
+            },
+          ]
+        : []),
+    ],
+  };
+}
 
 export const Route = createFileRoute("/servicos/$slug")({
   loader: ({ params }) => {
@@ -22,17 +67,18 @@ export const Route = createFileRoute("/servicos/$slug")({
     if (!service) throw notFound();
     return service;
   },
-  head: ({ loaderData }) => ({
-    meta: loaderData
-      ? [
-          { title: `${loaderData.name} — Keystone` },
-          { name: "description", content: loaderData.heroDescription },
-          { property: "og:title", content: `${loaderData.name} — Keystone` },
-          { property: "og:description", content: loaderData.heroDescription },
-        ]
-      : [],
-    links: loaderData ? [canonical(`/servicos/${loaderData.slug}`)] : [],
-  }),
+  head: ({ loaderData }) =>
+    loaderData
+      ? {
+          ...seo(`/servicos/${loaderData.slug}`, {
+            title: loaderData.seoTitle,
+            description: loaderData.seoDescription,
+          }),
+          scripts: [
+            { type: "application/ld+json", children: JSON.stringify(serviceSchema(loaderData)) },
+          ],
+        }
+      : {},
   notFoundComponent: ServiceNotFound,
   component: ServiceDetail,
 });

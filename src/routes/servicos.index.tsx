@@ -13,38 +13,85 @@ import {
 } from "lucide-react";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
-import { canonical } from "@/lib/site";
+import { seo } from "@/lib/site";
 
 export const Route = createFileRoute("/servicos/")({
-  head: () => ({
-    meta: [
-      { title: "Serviços de Contabilidade, Abertura de Empresas e BPO Financeiro | Keystone" },
-      {
-        name: "description",
-        content:
-          "Contabilidade mensal, abertura e encerramento de empresas, BPO financeiro, fiscal, departamento pessoal, regularização e imposto de renda dos sócios.",
-      },
-      { property: "og:title", content: "Serviços | Keystone Contabilidade" },
-      {
-        property: "og:description",
-        content: "Nove serviços de contabilidade para empresas do Simples Nacional e Lucro Presumido.",
-      },
-    ],
-    links: [canonical("/servicos")],
-  }),
+  head: () =>
+    seo("/servicos", {
+      title: "Serviços de Contabilidade e BPO Financeiro | Keystone",
+      description:
+        "Contabilidade mensal, abertura e encerramento de empresas, BPO financeiro, fiscal, departamento pessoal, regularização e imposto de renda dos sócios.",
+      ogTitle: "Serviços | Keystone Contabilidade",
+      ogDescription:
+        "Nove serviços de contabilidade para empresas do Simples Nacional e Lucro Presumido.",
+    }),
   component: ServicosIndex,
 });
 
 const services = [
-  { slug: "contabilidade-mensal", Icon: BookOpenCheck, name: "Contabilidade mensal", desc: "Escrituração, balancete, demonstrações e obrigações acessórias.", tags: ["Balancete", "DRE", "ECD e ECF", "DEFIS"] },
-  { slug: "abertura-de-empresas", Icon: Building2, name: "Abertura de empresas", desc: "Escolha do regime e do CNAE, contrato social, CNPJ, inscrições e alvarás.", tags: ["CNPJ", "Contrato social", "Alvará", "Conselhos"] },
-  { slug: "alteracao-e-encerramento", Icon: DoorClosed, name: "Alteração e encerramento", desc: "Entrada e saída de sócios, mudanças cadastrais e baixa sem pendências.", tags: ["Alteração contratual", "Distrato", "Baixa"] },
-  { slug: "bpo-financeiro", Icon: Wallet, name: "BPO financeiro", desc: "Contas a pagar e a receber, conciliação, fluxo de caixa e DRE gerencial.", tags: ["Contas a pagar", "Conciliação", "Fluxo de caixa"] },
-  { slug: "fiscal-e-tributario", Icon: Landmark, name: "Fiscal e planejamento tributário", desc: "Apuração do Simples e do Presumido, retenções e comparação de regimes.", tags: ["DAS", "IRPJ e CSLL", "Reforma tributária"] },
-  { slug: "departamento-pessoal", Icon: Users, name: "Departamento pessoal e folha", desc: "Admissão, folha, férias, 13º, rescisão e eSocial.", tags: ["Folha", "eSocial", "Rescisão"] },
-  { slug: "regularizacao-fiscal", Icon: ShieldCheck, name: "Regularização e parcelamentos", desc: "Declarações em atraso, intimações, malha fina, certidões e parcelamentos.", tags: ["Intimações", "Certidões", "Parcelamento"] },
-  { slug: "imposto-de-renda", Icon: UserRound, name: "Imposto de renda dos sócios", desc: "IRPF, carnê-leão e ganho de capital, alinhados aos lucros da empresa.", tags: ["IRPF", "Carnê-leão", "Ganho de capital"] },
-  { slug: "gestao-e-indicadores", Icon: LineChart, name: "Gestão e indicadores", desc: "Precificação, ponto de equilíbrio, orçamento e painel mensal.", tags: ["Precificação", "Orçamento", "Indicadores"] },
+  {
+    slug: "contabilidade-mensal",
+    Icon: BookOpenCheck,
+    name: "Contabilidade mensal",
+    desc: "Escrituração, balancete, demonstrações e obrigações acessórias.",
+    tags: ["Balancete", "DRE", "ECD e ECF", "DEFIS"],
+  },
+  {
+    slug: "abertura-de-empresas",
+    Icon: Building2,
+    name: "Abertura de empresas",
+    desc: "Escolha do regime e do CNAE, contrato social, CNPJ, inscrições e alvarás.",
+    tags: ["CNPJ", "Contrato social", "Alvará", "Conselhos"],
+  },
+  {
+    slug: "alteracao-e-encerramento",
+    Icon: DoorClosed,
+    name: "Alteração e encerramento",
+    desc: "Entrada e saída de sócios, mudanças cadastrais e baixa sem pendências.",
+    tags: ["Alteração contratual", "Distrato", "Baixa"],
+  },
+  {
+    slug: "bpo-financeiro",
+    Icon: Wallet,
+    name: "BPO financeiro",
+    desc: "Contas a pagar e a receber, conciliação, fluxo de caixa e DRE gerencial.",
+    tags: ["Contas a pagar", "Conciliação", "Fluxo de caixa"],
+  },
+  {
+    slug: "fiscal-e-tributario",
+    Icon: Landmark,
+    name: "Fiscal e planejamento tributário",
+    desc: "Apuração do Simples e do Presumido, retenções e comparação de regimes.",
+    tags: ["DAS", "IRPJ e CSLL", "Reforma tributária"],
+  },
+  {
+    slug: "departamento-pessoal",
+    Icon: Users,
+    name: "Departamento pessoal e folha",
+    desc: "Admissão, folha, férias, 13º, rescisão e eSocial.",
+    tags: ["Folha", "eSocial", "Rescisão"],
+  },
+  {
+    slug: "regularizacao-fiscal",
+    Icon: ShieldCheck,
+    name: "Regularização e parcelamentos",
+    desc: "Declarações em atraso, intimações, malha fina, certidões e parcelamentos.",
+    tags: ["Intimações", "Certidões", "Parcelamento"],
+  },
+  {
+    slug: "imposto-de-renda",
+    Icon: UserRound,
+    name: "Imposto de renda dos sócios",
+    desc: "IRPF, carnê-leão e ganho de capital, alinhados aos lucros da empresa.",
+    tags: ["IRPF", "Carnê-leão", "Ganho de capital"],
+  },
+  {
+    slug: "gestao-e-indicadores",
+    Icon: LineChart,
+    name: "Gestão e indicadores",
+    desc: "Precificação, ponto de equilíbrio, orçamento e painel mensal.",
+    tags: ["Precificação", "Orçamento", "Indicadores"],
+  },
 ];
 
 function ServicosIndex() {
@@ -58,8 +105,8 @@ function ServicosIndex() {
               Serviços de contabilidade para a rotina inteira da sua empresa.
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-cream-dim">
-              Contrate um serviço ou deixe a rotina fiscal, contábil, de pessoal e financeira com
-              a mesma equipe.
+              Contrate um serviço ou deixe a rotina fiscal, contábil, de pessoal e financeira com a
+              mesma equipe.
             </p>
           </div>
         </section>

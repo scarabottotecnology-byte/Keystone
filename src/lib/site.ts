@@ -16,3 +16,31 @@ export function absoluteUrl(path: string) {
 export function canonical(path: string) {
   return { rel: "canonical", href: absoluteUrl(path) };
 }
+
+type SeoOptions = {
+  title: string;
+  description: string;
+  ogTitle?: string;
+  ogDescription?: string;
+  noindex?: boolean;
+};
+
+/**
+ * Cabeçalho de SEO de uma página: title, description, Open Graph e canonical
+ * saem juntos, para nenhuma página ficar sem og:url ou herdar o og:title
+ * genérico da raiz. Mire em title até 60 caracteres e description entre 120 e
+ * 160: acima disso o Google corta no resultado de busca.
+ */
+export function seo(path: string, o: SeoOptions) {
+  return {
+    meta: [
+      { title: o.title },
+      { name: "description", content: o.description },
+      { property: "og:title", content: o.ogTitle ?? o.title },
+      { property: "og:description", content: o.ogDescription ?? o.description },
+      { property: "og:url", content: absoluteUrl(path) },
+      ...(o.noindex ? [{ name: "robots", content: "noindex" }] : []),
+    ],
+    links: [canonical(path)],
+  };
+}

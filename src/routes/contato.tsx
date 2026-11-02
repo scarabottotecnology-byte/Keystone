@@ -4,7 +4,7 @@ import { Mail, MapPin, Clock, MessageSquare } from "lucide-react";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
 import { saveLead } from "@/lib/leads";
-import { canonical } from "@/lib/site";
+import { seo } from "@/lib/site";
 import { HUBSPOT_FIELD } from "@/lib/hubspot-fields";
 
 /**
@@ -16,18 +16,12 @@ import { HUBSPOT_FIELD } from "@/lib/hubspot-fields";
 const EMAIL_CONTATO = "contato@keystone-contabilidade.com";
 
 export const Route = createFileRoute("/contato")({
-  head: () => ({
-    meta: [
-      { title: "Contato — Keystone" },
-      {
-        name: "description",
-        content:
-          "Peça sua proposta de contabilidade. Respondemos em até 1 dia útil.",
-      },
-      { property: "og:title", content: "Contato — Keystone" },
-    ],
-    links: [canonical("/contato")],
-  }),
+  head: () =>
+    seo("/contato", {
+      title: "Contato e Proposta de Contabilidade | Keystone",
+      description:
+        "Peça uma proposta de contabilidade, BPO financeiro ou controladoria para a sua empresa pelo formulário ou por e-mail. Resposta em até 1 dia útil.",
+    }),
   component: ContatoPage,
 });
 
@@ -87,10 +81,7 @@ function ContatoPage() {
                 <ContactInfo
                   Icon={MessageSquare}
                   title="Como falamos com você"
-                  lines={[
-                    "Preencha o formulário ao lado",
-                    "Retornamos pelo e-mail informado",
-                  ]}
+                  lines={["Preencha o formulário ao lado", "Retornamos pelo e-mail informado"]}
                 />
                 {EMAIL_CONTATO && (
                   <ContactInfo Icon={Mail} title="E-mail" lines={[EMAIL_CONTATO]} />

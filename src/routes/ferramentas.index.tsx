@@ -2,21 +2,15 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
-import { canonical } from "@/lib/site";
+import { seo } from "@/lib/site";
 
 export const Route = createFileRoute("/ferramentas/")({
-  ssr: false,
-  head: () => ({
-    meta: [
-      { title: "Ferramentas de Decisão de Capital — Keystone" },
-      {
-        name: "description",
-        content:
-          "Simule Simples Nacional, Reforma Tributária, ponto de equilíbrio, valuation por EBITDA, capital de giro e VPL/payback para decisões de capital.",
-      },
-    ],
-    links: [canonical("/ferramentas")],
-  }),
+  head: () =>
+    seo("/ferramentas", {
+      title: "Simulador Simples Nacional e Reforma Tributária | Keystone",
+      description:
+        "Simule Simples Nacional, reforma tributária, ponto de equilíbrio, valuation por EBITDA, capital de giro e VPL/payback para decisões de capital.",
+    }),
   component: FerramentasPage,
 });
 

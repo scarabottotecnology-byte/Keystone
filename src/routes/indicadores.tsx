@@ -3,21 +3,15 @@ import { ArrowUp, ArrowDown } from "lucide-react";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
 import { Marquee } from "@/components/ui/marquee";
-import { canonical } from "@/lib/site";
+import { seo } from "@/lib/site";
 
 export const Route = createFileRoute("/indicadores")({
-  head: () => ({
-    meta: [
-      { title: "Indicadores Econômicos — Keystone" },
-      {
-        name: "description",
-        content:
-          "Referência dos principais indicadores macroeconômicos, moedas e índices de mercado usados em modelagem financeira e planejamento corporativo.",
-      },
-      { property: "og:title", content: "Indicadores Econômicos — Keystone" },
-    ],
-    links: [canonical("/indicadores")],
-  }),
+  head: () =>
+    seo("/indicadores", {
+      title: "Indicadores Econômicos: IPCA, CDI e Dólar | Keystone",
+      description:
+        "IPCA, CDI, IGP-M, dólar e outros indicadores econômicos de referência para orçamento, reajustes, modelagem financeira e planejamento da empresa.",
+    }),
   component: IndicadoresPage,
 });
 
@@ -107,7 +101,10 @@ function IndicadoresPage() {
             </p>
           </div>
 
-          <Marquee pauseOnHover className="mt-10 border-y border-border-sub bg-navy-card [--duration:35s]">
+          <Marquee
+            pauseOnHover
+            className="mt-10 border-y border-border-sub bg-navy-card [--duration:35s]"
+          >
             {[...mainIndicators, ...currencies, ...stockIndices].map((ind, i) => (
               <div key={`${ind.name}-${i}`} className="mx-6 flex shrink-0 items-center gap-3">
                 <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-cream-mute">

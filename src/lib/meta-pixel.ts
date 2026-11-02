@@ -2,7 +2,7 @@
 // conta os leads como conversão e alimenta os públicos de remarketing.
 // Vazio = desligado. O ID fica no Gerenciador de Eventos do Meta
 // (Fontes de dados > Pixel). Carrega só depois do "Aceitar" nos cookies.
-export const META_PIXEL_ID = "";
+export const META_PIXEL_ID = "232313492073163";
 
 // Código de verificação do domínio no Gerenciador de Negócios do Meta
 // (Segurança da marca > Domínios > Meta tag). Vazio = sem a tag.

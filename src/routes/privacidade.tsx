@@ -1,21 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
-import { canonical } from "@/lib/site";
+import { seo } from "@/lib/site";
 
 export const Route = createFileRoute("/privacidade")({
-  head: () => ({
-    meta: [
-      { title: "Política de Privacidade — Keystone" },
-      {
-        name: "description",
-        content:
-          "Política de privacidade e uso de cookies da Keystone, em conformidade com a Lei Geral de Proteção de Dados (LGPD).",
-      },
-      { name: "robots", content: "noindex" },
-    ],
-    links: [canonical("/privacidade")],
-  }),
+  head: () =>
+    seo("/privacidade", {
+      title: "Política de Privacidade — Keystone",
+      description:
+        "Política de privacidade e uso de cookies da Keystone, em conformidade com a Lei Geral de Proteção de Dados (LGPD).",
+      noindex: true,
+    }),
   component: PrivacidadePage,
 });
 

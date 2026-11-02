@@ -3,24 +3,17 @@ import { useState } from "react";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
 import { saveLead } from "@/lib/leads";
-import { canonical, absoluteUrl } from "@/lib/site";
+import { seo } from "@/lib/site";
 import { HUBSPOT_FIELD } from "@/lib/hubspot-fields";
 
 export const Route = createFileRoute("/diagnostico")({
-  head: () => ({
-    meta: [
-      { title: "Diagnóstico de Maturidade Financeira — Keystone" },
-      {
-        name: "description",
-        content:
-          "Avalie em 3 minutos o grau de maturidade financeira da sua empresa. Score 0-100 com classificação e recomendações.",
-      },
-      { property: "og:title", content: "Diagnóstico de Maturidade Financeira — Keystone" },
-      { property: "og:description", content: "Avalie em 3 minutos o grau de maturidade financeira da sua empresa." },
-      { property: "og:url", content: absoluteUrl("/diagnostico") },
-    ],
-    links: [canonical("/diagnostico")],
-  }),
+  head: () =>
+    seo("/diagnostico", {
+      title: "Diagnóstico de Maturidade Financeira Grátis | Keystone",
+      description:
+        "Avalie em 3 minutos a maturidade financeira da sua empresa: score de 0 a 100, classificação e recomendações práticas para caixa, custos e gestão.",
+      ogDescription: "Avalie em 3 minutos o grau de maturidade financeira da sua empresa.",
+    }),
   component: DiagnosticoPage,
 });
 
@@ -191,9 +184,7 @@ function DiagnosticoPage() {
     Array(QUESTIONS.length).fill(null),
   );
 
-  const score = Math.round(
-    (answers.reduce<number>((sum, a) => sum + (a ?? 0), 0) * 100) / 30,
-  );
+  const score = Math.round((answers.reduce<number>((sum, a) => sum + (a ?? 0), 0) * 100) / 30);
   const level = getLevel(score);
 
   function select(points: number) {
@@ -226,9 +217,7 @@ function DiagnosticoPage() {
             onBack={() => step > 0 && setStep(step - 1)}
           />
         )}
-        {stage === "result" && (
-          <Result score={score} level={level} onRestart={restart} />
-        )}
+        {stage === "result" && <Result score={score} level={level} onRestart={restart} />}
       </main>
       <SiteFooter />
     </div>
@@ -241,8 +230,8 @@ const PROFILE_COPY: Record<Exclude<Profile, null>, { title: React.ReactNode; sub
   fundador: {
     title: (
       <>
-        Você decide o futuro da empresa com números que <em>resistem</em> — ou com a
-        sensação de que está certo?
+        Você decide o futuro da empresa com números que <em>resistem</em> — ou com a sensação de que
+        está certo?
       </>
     ),
     sub: "10 perguntas, 3 minutos. Descubra se as decisões mais importantes do seu negócio estão apoiadas em dado real ou em intuição — antes que o mercado faça essa pergunta por você.",
@@ -270,12 +259,10 @@ function Intro({ onStart }: { onStart: () => void }) {
         <span className="mr-1 text-[11px] uppercase tracking-[0.2em] text-cream-mute">
           Personalizar para:
         </span>
-        {(
-          [
-            { key: "fundador" as const, label: "Sou fundador/sócio" },
-            { key: "cfo" as const, label: "Sou CFO/controller" },
-          ]
-        ).map((opt) => (
+        {[
+          { key: "fundador" as const, label: "Sou fundador/sócio" },
+          { key: "cfo" as const, label: "Sou CFO/controller" },
+        ].map((opt) => (
           <button
             key={opt.key}
             onClick={() => setProfile((p) => (p === opt.key ? null : opt.key))}
@@ -291,7 +278,9 @@ function Intro({ onStart }: { onStart: () => void }) {
       </div>
 
       <h1 className="section-title mt-6 text-4xl md:text-5xl">
-        {copy ? copy.title : (
+        {copy ? (
+          copy.title
+        ) : (
           <>
             Qual o grau de <em>maturidade financeira</em> da sua empresa?
           </>
@@ -347,9 +336,7 @@ function Quiz({
         </div>
       </div>
 
-      <h2 className="font-display text-2xl md:text-3xl text-cream">
-        {question.q}
-      </h2>
+      <h2 className="font-display text-2xl md:text-3xl text-cream">{question.q}</h2>
 
       <div className="mt-8 space-y-3">
         {question.options.map((opt, i) => {
@@ -370,9 +357,7 @@ function Quiz({
                     isSelected ? "border-gold" : "border-cream-mute/40"
                   }`}
                 >
-                  {isSelected && (
-                    <span className="h-2.5 w-2.5 rounded-full bg-gold" />
-                  )}
+                  {isSelected && <span className="h-2.5 w-2.5 rounded-full bg-gold" />}
                 </span>
                 <span className="text-sm text-cream">{opt.label}</span>
               </div>
@@ -430,9 +415,7 @@ function Result({
           </span>
           <span className="font-display text-2xl text-cream-mute">/100</span>
         </div>
-        <h2 className={`mt-6 font-display text-3xl md:text-4xl ${level.color}`}>
-          {level.name}
-        </h2>
+        <h2 className={`mt-6 font-display text-3xl md:text-4xl ${level.color}`}>{level.name}</h2>
         <p className="mx-auto mt-4 max-w-2xl text-[15px] font-light text-cream-dim">
           {level.description}
         </p>
@@ -481,9 +464,13 @@ function Result({
             </div>
             <p className="font-display text-2xl text-cream">Análise a caminho</p>
             <p className="mt-3 text-sm text-cream-dim">
-              Nossa equipe retornará em até 24 horas úteis com a análise detalhada do seu diagnóstico.
+              Nossa equipe retornará em até 24 horas úteis com a análise detalhada do seu
+              diagnóstico.
             </p>
-            <button onClick={onRestart} className="mt-8 text-[11px] uppercase tracking-[0.2em] text-gold hover:text-gold-light">
+            <button
+              onClick={onRestart}
+              className="mt-8 text-[11px] uppercase tracking-[0.2em] text-gold hover:text-gold-light"
+            >
               Refazer diagnóstico →
             </button>
           </div>
@@ -495,7 +482,8 @@ function Result({
                 Receba a análise completa do seu diagnóstico
               </h3>
               <p className="mt-3 text-sm text-cream-dim">
-                Interpretação personalizada por um especialista + recomendações específicas para o momento da sua empresa.
+                Interpretação personalizada por um especialista + recomendações específicas para o
+                momento da sua empresa.
               </p>
             </div>
             <form onSubmit={submit} className="mt-8 space-y-4">

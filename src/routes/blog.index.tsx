@@ -3,25 +3,17 @@ import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
 import { posts } from "@/content/posts";
 import { ArrowRight } from "lucide-react";
-import { canonical } from "@/lib/site";
+import { seo } from "@/lib/site";
 
 export const Route = createFileRoute("/blog/")({
-  head: () => ({
-    meta: [
-      { title: "Blog — Keystone | FP&A, Controladoria e Finanças" },
-      {
-        name: "description",
-        content:
-          "Artigos sobre FP&A, Controladoria, gestão financeira e estratégia para CEOs e CFOs.",
-      },
-      { property: "og:title", content: "Blog Keystone" },
-      {
-        property: "og:description",
-        content: "Inteligência financeira para líderes que decidem.",
-      },
-    ],
-    links: [canonical("/blog")],
-  }),
+  head: () =>
+    seo("/blog", {
+      title: "Blog de Contabilidade, Controladoria e Finanças | Keystone",
+      description:
+        "Artigos práticos sobre contabilidade, controladoria, custos, precificação e gestão financeira para donos e gestores de pequenas e médias empresas.",
+      ogTitle: "Blog Keystone",
+      ogDescription: "Inteligência financeira para líderes que decidem.",
+    }),
   component: BlogIndex,
 });
 
@@ -32,7 +24,14 @@ function formatDate(iso: string) {
   });
 }
 
-const categories = ["Todos", "Controladoria", "Modelo Financeiro", "Custos", "FP&A", "Tax & Fiscal"];
+const categories = [
+  "Todos",
+  "Controladoria",
+  "Modelo Financeiro",
+  "Custos",
+  "FP&A",
+  "Tax & Fiscal",
+];
 
 function BlogIndex() {
   const [featured, ...rest] = posts;
@@ -58,8 +57,7 @@ function BlogIndex() {
               <em className="italic text-gold-light">líderes financeiros</em>
             </h1>
             <p className="mt-6 max-w-2xl font-accent text-lg italic text-cream-dim">
-              Artigos práticos sobre FP&A, Controladoria e estratégia financeira para
-              quem decide.
+              Artigos práticos sobre FP&A, Controladoria e estratégia financeira para quem decide.
             </p>
           </div>
         </section>
@@ -165,8 +163,8 @@ function BlogIndex() {
                 <em>toda semana</em>
               </h2>
               <p className="mt-5 text-[15px] font-light text-cream-dim">
-                Uma análise por semana sobre FP&A, controladoria e estratégia financeira.
-                Direto no seu e-mail. Sem spam.
+                Uma análise por semana sobre FP&A, controladoria e estratégia financeira. Direto no
+                seu e-mail. Sem spam.
               </p>
             </div>
             <form
@@ -175,9 +173,7 @@ function BlogIndex() {
                 e.preventDefault();
               }}
             >
-              <div className="text-[13px] text-cream-mute">
-                +1.200 CFOs e CEOs já recebem
-              </div>
+              <div className="text-[13px] text-cream-mute">+1.200 CFOs e CEOs já recebem</div>
               <div className="mt-3 flex flex-col gap-3 sm:flex-row">
                 <input
                   type="email"
