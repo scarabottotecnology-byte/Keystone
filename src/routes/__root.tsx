@@ -86,6 +86,7 @@ const ORGANIZACAO = {
   "@id": `${SITE_URL}/#organizacao`,
   name: "Keystone",
   url: SITE_URL,
+  email: "contato@keystone-contabilidade.com",
   logo: `${SITE_URL}/apple-touch-icon.png`,
   image: OG_IMAGE,
   description:

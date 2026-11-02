@@ -8,13 +8,12 @@ import { canonical } from "@/lib/site";
 import { HUBSPOT_FIELD } from "@/lib/hubspot-fields";
 
 /**
- * Deixe vazio enquanto a caixa de entrada do domínio não existir de verdade.
- * Publicar um endereço que devolve erro é pior do que não publicar nenhum —
- * era esse o bug: o site anunciava contato@keystonecontroladoria.com.br,
- * num domínio que nunca foi registrado.
- * Assim que o Zoho estiver ativo em verticebooks.com.br, basta preencher aqui.
+ * Caixa do domínio próprio, hospedada na Hostinger (MX mx1/mx2.hostinger.com).
+ * Só publique aqui um endereço que receba de verdade: o site já anunciou
+ * contato@keystonecontroladoria.com.br, num domínio que nunca foi registrado.
+ * Deixe vazio para esconder o bloco de e-mail.
  */
-const EMAIL_CONTATO = "";
+const EMAIL_CONTATO = "contato@keystone-contabilidade.com";
 
 export const Route = createFileRoute("/contato")({
   head: () => ({
