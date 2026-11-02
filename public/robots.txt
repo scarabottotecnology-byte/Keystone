@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /ferramentas/login
+Disallow: /ferramentas/social
+
+Sitemap: https://keystone-contabilidade.com/sitemap.xml

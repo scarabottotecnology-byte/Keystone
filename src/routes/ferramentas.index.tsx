@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
+import { canonical } from "@/lib/site";
 
 export const Route = createFileRoute("/ferramentas/")({
   ssr: false,
@@ -14,6 +15,7 @@ export const Route = createFileRoute("/ferramentas/")({
           "Simule Simples Nacional, Reforma Tributária, ponto de equilíbrio, valuation por EBITDA, capital de giro e VPL/payback para decisões de capital.",
       },
     ],
+    links: [canonical("/ferramentas")],
   }),
   component: FerramentasPage,
 });

@@ -1,0 +1,46 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { posts } from "@/content/posts";
+import { services } from "@/content/services";
+import { absoluteUrl } from "@/lib/site";
+
+// Gerado a cada pedido a partir do conteúdo: serviço ou artigo novo entra no
+// sitemap sem ninguém lembrar de editar um arquivo. Ferramentas internas
+// (login, calendário de social media) ficam de fora de propósito.
+const PAGINAS = [
+  "/",
+  "/servicos",
+  "/diagnostico",
+  "/calculadoras",
+  "/ferramentas",
+  "/indicadores",
+  "/metodologias",
+  "/cases",
+  "/blog",
+  "/contato",
+  "/privacidade",
+];
+
+function urlEntry(path: string, lastmod?: string) {
+  return `  <url><loc>${absoluteUrl(path)}</loc>${lastmod ? `<lastmod>${lastmod}</lastmod>` : ""}</url>`;
+}
+
+export const Route = createFileRoute("/sitemap.xml")({
+  server: {
+    handlers: {
+      GET: () => {
+        const entries = [
+          ...PAGINAS.map((p) => urlEntry(p)),
+          ...services.map((s) => urlEntry(`/servicos/${s.slug}`)),
+          ...posts.map((p) => urlEntry(`/blog/${p.meta.slug}`, p.meta.date)),
+        ];
+        const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries.join("\n")}\n</urlset>\n`;
+        return new Response(xml, {
+          headers: {
+            "content-type": "application/xml; charset=utf-8",
+            "cache-control": "public, max-age=3600",
+          },
+        });
+      },
+    },
+  },
+});

@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
+import { canonical } from "@/lib/site";
 
 export const Route = createFileRoute("/privacidade")({
   head: () => ({
@@ -13,7 +14,7 @@ export const Route = createFileRoute("/privacidade")({
       },
       { name: "robots", content: "noindex" },
     ],
-    links: [{ rel: "canonical", href: "/privacidade" }],
+    links: [canonical("/privacidade")],
   }),
   component: PrivacidadePage,
 });

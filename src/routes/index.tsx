@@ -10,6 +10,7 @@ import { ParaQuem } from "@/components/site/para-quem";
 import { Metodologia } from "@/components/site/metodologia";
 import { Faq } from "@/components/site/faq";
 import { SiteFooter } from "@/components/site/site-footer";
+import { canonical, absoluteUrl } from "@/lib/site";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -27,10 +28,10 @@ export const Route = createFileRoute("/")({
           "Contabilidade em dia e números para decidir. Peça sua proposta em até 1 dia útil.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://keystone-phi.vercel.app/" },
+      { property: "og:url", content: absoluteUrl("/") },
       { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: "https://keystone-phi.vercel.app/" }],
+    links: [canonical("/")],
   }),
   component: Landing,
 });

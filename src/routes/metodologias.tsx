@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Award, RefreshCw } from "lucide-react";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
+import { canonical } from "@/lib/site";
 
 export const Route = createFileRoute("/metodologias")({
   head: () => ({
@@ -14,7 +15,7 @@ export const Route = createFileRoute("/metodologias")({
       },
       { property: "og:title", content: "Metodologias Proprietárias — Keystone" },
     ],
-    links: [{ rel: "canonical", href: "/metodologias" }],
+    links: [canonical("/metodologias")],
   }),
   component: MetodologiasPage,
 });

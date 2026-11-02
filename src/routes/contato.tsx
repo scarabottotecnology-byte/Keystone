@@ -4,6 +4,7 @@ import { Mail, MapPin, Clock, MessageSquare } from "lucide-react";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
 import { saveLead } from "@/lib/leads";
+import { canonical } from "@/lib/site";
 
 /**
  * Deixe vazio enquanto a caixa de entrada do domínio não existir de verdade.
@@ -15,7 +16,6 @@ import { saveLead } from "@/lib/leads";
 const EMAIL_CONTATO = "";
 
 export const Route = createFileRoute("/contato")({
-  ssr: false,
   head: () => ({
     meta: [
       { title: "Contato — Keystone" },
@@ -26,7 +26,7 @@ export const Route = createFileRoute("/contato")({
       },
       { property: "og:title", content: "Contato — Keystone" },
     ],
-    links: [{ rel: "canonical", href: "/contato" }],
+    links: [canonical("/contato")],
   }),
   component: ContatoPage,
 });

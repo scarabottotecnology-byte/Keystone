@@ -2,9 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
+import { canonical } from "@/lib/site";
 
 export const Route = createFileRoute("/calculadoras")({
-  ssr: false,
   head: () => ({
     meta: [
       { title: "Calculadoras Corporativas — Keystone" },
@@ -15,7 +15,7 @@ export const Route = createFileRoute("/calculadoras")({
       },
       { property: "og:title", content: "Calculadoras Corporativas — Keystone" },
     ],
-    links: [{ rel: "canonical", href: "/calculadoras" }],
+    links: [canonical("/calculadoras")],
   }),
   component: CalculadorasPage,
 });

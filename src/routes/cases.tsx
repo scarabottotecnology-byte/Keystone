@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
+import { canonical } from "@/lib/site";
 
 export const Route = createFileRoute("/cases")({
   head: () => ({
@@ -18,7 +19,7 @@ export const Route = createFileRoute("/cases")({
         content: "Cada projeto gera impacto mensurável em EBITDA, caixa e valuation.",
       },
     ],
-    links: [{ rel: "canonical", href: "/cases" }],
+    links: [canonical("/cases")],
   }),
   component: CasesPage,
 });
