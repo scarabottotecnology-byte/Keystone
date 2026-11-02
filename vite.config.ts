@@ -11,7 +11,8 @@ export default defineConfig({
   // Lovable default (Cloudflare) or auto-detection isn't reliable outside a Lovable build.
   // (Cloudflare was tested too, as a debugging step — same SSR crash there, see
   // project memory / commit history. Not a platform issue either way.)
-  nitro: { preset: "vercel" },
+  // NITRO_PRESET overrides the target for other hosts (e.g. Hostinger: NITRO_PRESET=node-server).
+  nitro: { preset: process.env.NITRO_PRESET || "vercel" },
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
