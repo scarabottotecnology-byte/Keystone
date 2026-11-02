@@ -14,7 +14,13 @@ export const Route = createFileRoute("/blog/$slug")({
     loaderData
       ? {
           meta: [
-            { title: `${loaderData.meta.title} — Blog Keystone` },
+            {
+              // Sufixo da marca só quando cabe nos ~60 caracteres que o Google mostra.
+              title:
+                loaderData.meta.title.length <= 48
+                  ? `${loaderData.meta.title} | Keystone`
+                  : loaderData.meta.title,
+            },
             { name: "description", content: loaderData.meta.description },
             { property: "og:title", content: loaderData.meta.title },
             { property: "og:description", content: loaderData.meta.description },

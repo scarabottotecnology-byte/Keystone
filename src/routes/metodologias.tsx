@@ -2,21 +2,16 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Award, RefreshCw } from "lucide-react";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
-import { canonical } from "@/lib/site";
+import { seo } from "@/lib/site";
 
 export const Route = createFileRoute("/metodologias")({
-  head: () => ({
-    meta: [
-      { title: "Metodologias Proprietárias — ÓRBITA™ e RICE™ | Keystone" },
-      {
-        name: "description",
-        content:
-          "Métodos ÓRBITA™ e RICE™: frameworks proprietários para planejamento financeiro, acompanhamento gerencial e gestão estratégica de custos.",
-      },
-      { property: "og:title", content: "Metodologias Proprietárias — Keystone" },
-    ],
-    links: [canonical("/metodologias")],
-  }),
+  head: () =>
+    seo("/metodologias", {
+      title: "Metodologias Proprietárias — ÓRBITA™ e RICE™ | Keystone",
+      description:
+        "Métodos ÓRBITA™ e RICE™: frameworks proprietários para planejamento financeiro, acompanhamento gerencial e gestão estratégica de custos.",
+      ogTitle: "Metodologias Proprietárias — Keystone",
+    }),
   component: MetodologiasPage,
 });
 
@@ -54,17 +49,49 @@ const orbitaPhases = [
 ];
 
 const orbitaSteps = [
-  { step: "01", title: "Diagnóstico do ciclo atual", desc: "Mapeamento de como orçamento, indicadores e decisão se conectam (ou não) hoje." },
-  { step: "02", title: "Implantação do ciclo ÓRBITA™", desc: "Objetivos, roadmap e budget estruturados e parametrizados por área." },
-  { step: "03", title: "Rotina de tracking", desc: "Acompanhamento mensal do realizado vs. orçado, com leitura de causa raiz." },
-  { step: "04", title: "Ação e recalibragem", desc: "Planos de correção executados e o ciclo reinicia no trimestre seguinte." },
+  {
+    step: "01",
+    title: "Diagnóstico do ciclo atual",
+    desc: "Mapeamento de como orçamento, indicadores e decisão se conectam (ou não) hoje.",
+  },
+  {
+    step: "02",
+    title: "Implantação do ciclo ÓRBITA™",
+    desc: "Objetivos, roadmap e budget estruturados e parametrizados por área.",
+  },
+  {
+    step: "03",
+    title: "Rotina de tracking",
+    desc: "Acompanhamento mensal do realizado vs. orçado, com leitura de causa raiz.",
+  },
+  {
+    step: "04",
+    title: "Ação e recalibragem",
+    desc: "Planos de correção executados e o ciclo reinicia no trimestre seguinte.",
+  },
 ];
 
 const riceSteps = [
-  { step: "01", title: "Levantamento e reclassificação", desc: "Centros de custo estruturados e despesas reclassificadas por natureza real." },
-  { step: "02", title: "Mapeamento de direcionadores", desc: "Identificação de onde a operação desperdiça — muitas vezes sem que ninguém veja." },
-  { step: "03", title: "Custeio multidimensional", desc: "Rentabilidade real calculada por produto, canal, cliente e unidade de negócio." },
-  { step: "04", title: "Decisão estratégica", desc: "Precificação e mix de produtos ajustados para maximizar margem de contribuição." },
+  {
+    step: "01",
+    title: "Levantamento e reclassificação",
+    desc: "Centros de custo estruturados e despesas reclassificadas por natureza real.",
+  },
+  {
+    step: "02",
+    title: "Mapeamento de direcionadores",
+    desc: "Identificação de onde a operação desperdiça — muitas vezes sem que ninguém veja.",
+  },
+  {
+    step: "03",
+    title: "Custeio multidimensional",
+    desc: "Rentabilidade real calculada por produto, canal, cliente e unidade de negócio.",
+  },
+  {
+    step: "04",
+    title: "Decisão estratégica",
+    desc: "Precificação e mix de produtos ajustados para maximizar margem de contribuição.",
+  },
 ];
 
 const ricePillars = [

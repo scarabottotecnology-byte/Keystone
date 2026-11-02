@@ -6,10 +6,7 @@ import { KeystoneMonogram } from "@/components/site/keystone-monogram";
 export const Route = createFileRoute("/ferramentas/login")({
   ssr: false,
   head: () => ({
-    meta: [
-      { title: "Acesso Ferramentas — Keystone" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Acesso Ferramentas — Keystone" }, { name: "robots", content: "noindex" }],
   }),
   component: LoginPage,
 });
@@ -59,9 +56,7 @@ function LoginPage() {
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-5">
             <label className="block">
-              <span className="text-[11px] uppercase tracking-[0.2em] text-cream-dim">
-                E-mail
-              </span>
+              <span className="text-[11px] uppercase tracking-[0.2em] text-cream-dim">E-mail</span>
               <input
                 type="email"
                 required
@@ -71,9 +66,7 @@ function LoginPage() {
               />
             </label>
             <label className="block">
-              <span className="text-[11px] uppercase tracking-[0.2em] text-cream-dim">
-                Senha
-              </span>
+              <span className="text-[11px] uppercase tracking-[0.2em] text-cream-dim">Senha</span>
               <input
                 type="password"
                 required
@@ -83,9 +76,7 @@ function LoginPage() {
               />
             </label>
 
-            {error ? (
-              <p className="text-xs text-red-400">{error}</p>
-            ) : null}
+            {error ? <p className="text-xs text-red-400">{error}</p> : null}
 
             <button
               type="submit"

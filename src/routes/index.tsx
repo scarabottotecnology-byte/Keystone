@@ -10,29 +10,18 @@ import { ParaQuem } from "@/components/site/para-quem";
 import { Metodologia } from "@/components/site/metodologia";
 import { Faq } from "@/components/site/faq";
 import { SiteFooter } from "@/components/site/site-footer";
-import { canonical, absoluteUrl } from "@/lib/site";
+import { seo } from "@/lib/site";
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "Keystone | Contabilidade, BPO financeiro e Controladoria para PMEs" },
-      {
-        name: "description",
-        content:
-          "Contabilidade, fiscal, folha e BPO financeiro com a controladoria de grandes grupos: DRE gerencial, orçamento e consultoria para empresas do Simples Nacional e do Lucro Presumido.",
-      },
-      { property: "og:title", content: "Keystone | Contabilidade e Controladoria" },
-      {
-        property: "og:description",
-        content:
-          "Contabilidade em dia e números para decidir. Peça sua proposta em até 1 dia útil.",
-      },
-      { property: "og:type", content: "website" },
-      { property: "og:url", content: absoluteUrl("/") },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-    links: [canonical("/")],
-  }),
+  head: () =>
+    seo("/", {
+      title: "Keystone | Contabilidade, BPO Financeiro e Controladoria",
+      description:
+        "Contabilidade, fiscal, folha e BPO financeiro com controladoria de verdade: DRE gerencial, custos e orçamento para PMEs do Simples e do Lucro Presumido.",
+      ogTitle: "Keystone | Contabilidade e Controladoria",
+      ogDescription:
+        "Contabilidade em dia e números para decidir. Peça sua proposta em até 1 dia útil.",
+    }),
   component: Landing,
 });
 

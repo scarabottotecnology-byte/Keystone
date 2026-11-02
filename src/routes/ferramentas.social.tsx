@@ -166,8 +166,8 @@ function SocialCalendarPage() {
           <p className="mt-5 max-w-2xl text-[15px] leading-relaxed text-cream-dim">
             Painel somente leitura do motor de conteúdo (content_calendar → content_assets →
             content_ideas → content_pillars). A publicação de fato acontece pelo pipeline de
-            conteúdo — este painel serve apenas para acompanhar data, pilar, texto e status de
-            cada post.
+            conteúdo — este painel serve apenas para acompanhar data, pilar, texto e status de cada
+            post.
           </p>
 
           <div className="mt-8 flex flex-wrap gap-8">

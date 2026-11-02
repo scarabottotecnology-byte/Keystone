@@ -2,25 +2,16 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
-import { canonical } from "@/lib/site";
+import { seo } from "@/lib/site";
 
 export const Route = createFileRoute("/cases")({
-  head: () => ({
-    meta: [
-      { title: "Cases de Sucesso — Keystone" },
-      {
-        name: "description",
-        content:
-          "Resultados comprovados em controladoria, FP&A, gestão de custos e finanças corporativas — impacto mensurável em EBITDA, caixa e valuation.",
-      },
-      { property: "og:title", content: "Cases de Sucesso — Keystone" },
-      {
-        property: "og:description",
-        content: "Cada projeto gera impacto mensurável em EBITDA, caixa e valuation.",
-      },
-    ],
-    links: [canonical("/cases")],
-  }),
+  head: () =>
+    seo("/cases", {
+      title: "Cases de Controladoria e Gestão de Custos | Keystone",
+      description:
+        "Resultados comprovados em controladoria, FP&A, gestão de custos e finanças corporativas, com impacto mensurável em EBITDA, caixa e valuation.",
+      ogDescription: "Cada projeto gera impacto mensurável em EBITDA, caixa e valuation.",
+    }),
   component: CasesPage,
 });
 

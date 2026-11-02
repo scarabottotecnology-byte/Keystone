@@ -5,7 +5,8 @@ import { absoluteUrl } from "@/lib/site";
 
 // Gerado a cada pedido a partir do conteúdo: serviço ou artigo novo entra no
 // sitemap sem ninguém lembrar de editar um arquivo. Ferramentas internas
-// (login, calendário de social media) ficam de fora de propósito.
+// (login, calendário de social media) e a política de privacidade (noindex)
+// ficam de fora de propósito: sitemap só lista o que deve ser indexado.
 const PAGINAS = [
   "/",
   "/servicos",
@@ -17,7 +18,6 @@ const PAGINAS = [
   "/cases",
   "/blog",
   "/contato",
-  "/privacidade",
 ];
 
 function urlEntry(path: string, lastmod?: string) {

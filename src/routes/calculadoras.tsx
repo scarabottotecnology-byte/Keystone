@@ -2,21 +2,15 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
-import { canonical } from "@/lib/site";
+import { seo } from "@/lib/site";
 
 export const Route = createFileRoute("/calculadoras")({
-  head: () => ({
-    meta: [
-      { title: "Calculadoras Corporativas — Keystone" },
-      {
-        name: "description",
-        content:
-          "Ferramentas interativas para simulação financeira: EBITDA, ponto de equilíbrio, ROI, margem, markup, capital de giro, WACC e valuation por múltiplos.",
-      },
-      { property: "og:title", content: "Calculadoras Corporativas — Keystone" },
-    ],
-    links: [canonical("/calculadoras")],
-  }),
+  head: () =>
+    seo("/calculadoras", {
+      title: "Calculadoras Financeiras para Empresas | Keystone",
+      description:
+        "Calculadoras gratuitas de EBITDA, ponto de equilíbrio, ROI, margem, markup, capital de giro, WACC e valuation por múltiplos para a sua empresa.",
+    }),
   component: CalculadorasPage,
 });
 
