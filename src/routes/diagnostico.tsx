@@ -2,9 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
-import { saveLead } from "@/lib/leads";
+import { LeadForm } from "@/components/site/lead-form";
 import { seo } from "@/lib/site";
-import { HUBSPOT_FIELD } from "@/lib/hubspot-fields";
 
 export const Route = createFileRoute("/diagnostico")({
   head: () =>
@@ -388,23 +387,6 @@ function Result({
   level: Level;
   onRestart: () => void;
 }) {
-  const [form, setForm] = useState({ nome: "", email: "", empresa: "", telefone: "" });
-  const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
-
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    setStatus("loading");
-    const res = await saveLead({
-      nome: form.nome,
-      email: form.email,
-      empresa: form.empresa,
-      telefone: form.telefone,
-      origem: `Diagnóstico Maturidade — Score ${score} (${level.name})`,
-      track: "geral",
-    });
-    setStatus(res.ok ? "done" : "error");
-  }
-
   return (
     <section className="mx-auto max-w-3xl px-6">
       <div className="text-center">
@@ -457,25 +439,13 @@ function Result({
 
       {/* Conversão */}
       <div className="mt-10 border border-gold/30 bg-navy-card p-8 md:p-10">
-        {status === "done" ? (
-          <div className="text-center">
-            <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-full border border-gold/40 text-gold text-2xl">
-              ✓
-            </div>
-            <p className="font-display text-2xl text-cream">Análise a caminho</p>
-            <p className="mt-3 text-sm text-cream-dim">
-              Nossa equipe retornará em até 24 horas úteis com a análise detalhada do seu
-              diagnóstico.
-            </p>
-            <button
-              onClick={onRestart}
-              className="mt-8 text-[11px] uppercase tracking-[0.2em] text-gold hover:text-gold-light"
-            >
-              Refazer diagnóstico →
-            </button>
-          </div>
-        ) : (
-          <>
+        <LeadForm
+          bare
+          origem={`Diagnóstico Maturidade — Score ${score} (${level.name})`}
+          submitLabel="Receber análise completa →"
+          successTitle="Análise a caminho"
+          successDescription="Nossa equipe retornará em até 24 horas úteis com a análise detalhada do seu diagnóstico."
+          idleHeader={
             <div className="text-center">
               <span className="eyebrow">Análise completa</span>
               <h3 className="mt-4 font-display text-2xl text-cream">
@@ -486,49 +456,23 @@ function Result({
                 momento da sua empresa.
               </p>
             </div>
-            <form onSubmit={submit} className="mt-8 space-y-4">
-              {(
-                [
-                  { name: "nome", label: "Nome completo", type: "text" },
-                  { name: "email", label: "E-mail corporativo", type: "email" },
-                  { name: "empresa", label: "Empresa", type: "text" },
-                  { name: "telefone", label: "Telefone / WhatsApp", type: "tel" },
-                ] as const
-              ).map(({ name, label, type }) => (
-                <label key={name} className="block">
-                  <span className="text-[11px] uppercase tracking-[0.2em] text-cream-dim">
-                    {label} *
-                  </span>
-                  <input
-                    name={HUBSPOT_FIELD[name]}
-                    type={type}
-                    required
-                    value={form[name]}
-                    onChange={(e) => setForm((f) => ({ ...f, [name]: e.target.value }))}
-                    className="mt-2 w-full border border-border-sub bg-navy px-4 py-3 text-cream outline-none transition-colors focus:border-gold"
-                  />
-                </label>
-              ))}
-              {status === "error" && (
-                <p className="text-xs text-red-400">Erro ao enviar. Tente novamente.</p>
-              )}
-              <button
-                type="submit"
-                disabled={status === "loading"}
-                className="btn-gold w-full justify-center disabled:opacity-60"
-              >
-                {status === "loading" ? "Enviando..." : "Receber análise completa →"}
-              </button>
-              <button
-                type="button"
-                onClick={onRestart}
-                className="mx-auto block text-[11px] uppercase tracking-[0.2em] text-cream-mute hover:text-gold"
-              >
-                Refazer diagnóstico
-              </button>
-            </form>
-          </>
-        )}
+          }
+          footer={
+            <button
+              type="button"
+              onClick={onRestart}
+              className="mx-auto block text-[11px] uppercase tracking-[0.2em] text-cream-mute hover:text-gold"
+            >
+              Refazer diagnóstico
+            </button>
+          }
+          fields={[
+            { name: "nome", label: "Nome completo", type: "text", required: true },
+            { name: "email", label: "E-mail corporativo", type: "email", required: true },
+            { name: "empresa", label: "Empresa", type: "text", required: true },
+            { name: "telefone", label: "Telefone / WhatsApp", type: "tel", required: true },
+          ]}
+        />
       </div>
     </section>
   );

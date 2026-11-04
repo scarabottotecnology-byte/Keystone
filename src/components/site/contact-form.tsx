@@ -1,34 +1,8 @@
-import { useState } from "react";
 import { Calendar } from "lucide-react";
-import { saveLead } from "@/lib/leads";
 import { CalendlyButton } from "@/components/site/calendly-button";
-import { HUBSPOT_FIELD } from "@/lib/hubspot-fields";
+import { LeadForm } from "@/components/site/lead-form";
 
 export function ContactForm() {
-  const [form, setForm] = useState({
-    nome: "",
-    email: "",
-    empresa: "",
-    telefone: "",
-    mensagem: "",
-  });
-  const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setStatus("loading");
-    const result = await saveLead({
-      nome: form.nome,
-      email: form.email,
-      empresa: form.empresa,
-      telefone: form.telefone,
-      mensagem: form.mensagem,
-      origem: "Site — Pedir proposta",
-      track: "geral",
-    });
-    setStatus(result.ok ? "done" : "error");
-  }
-
   return (
     <section
       id="contato"
@@ -68,75 +42,30 @@ export function ContactForm() {
           </div>
         </div>
 
-        {status === "done" ? (
-          <div className="border border-gold/30 bg-navy-card p-10 text-center">
-            <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-full border border-gold/40 text-gold text-2xl">
-              ✓
-            </div>
-            <p className="font-display text-2xl text-cream">Mensagem enviada</p>
-            <p className="mt-3 text-sm text-cream-dim">
-              Recebemos seu contato. Nossa equipe retornará em até 24 horas úteis para confirmar a agenda.
-            </p>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="border border-border-sub bg-navy-card p-8 md:p-10 space-y-5">
-            {(
-              [
-                { name: "nome", label: "Nome completo", type: "text", required: true },
-                { name: "email", label: "E-mail", type: "email", required: true },
-                { name: "empresa", label: "Empresa", type: "text", required: true },
-                { name: "telefone", label: "Telefone / WhatsApp", type: "tel", required: false },
-              ] as const
-            ).map(({ name, label, type, required }) => (
-              <label key={name} className="block">
-                <span className="text-[11px] uppercase tracking-[0.2em] text-cream-dim">
-                  {label}
-                  {required && " *"}
-                </span>
-                <input
-                  name={HUBSPOT_FIELD[name]}
-                  type={type}
-                  required={required}
-                  value={form[name]}
-                  onChange={(e) => setForm((f) => ({ ...f, [name]: e.target.value }))}
-                  className="mt-2 w-full border border-border-sub bg-navy px-4 py-3 text-cream outline-none transition-colors focus:border-gold placeholder:text-cream-mute/40"
-                />
-              </label>
-            ))}
-
-            <label className="block">
-              <span className="text-[11px] uppercase tracking-[0.2em] text-cream-dim">
-                Mensagem
-              </span>
-              <textarea
-                name={HUBSPOT_FIELD.mensagem}
-                rows={4}
-                value={form.mensagem}
-                onChange={(e) => setForm((f) => ({ ...f, mensagem: e.target.value }))}
-                placeholder="Ex.: Simples Nacional, 6 funcionários, faturamento de R$ 80 mil por mês. Quero trocar de contador."
-                className="mt-2 w-full border border-border-sub bg-navy px-4 py-3 text-cream outline-none transition-colors focus:border-gold placeholder:text-cream-mute/40 resize-none"
-              />
-            </label>
-
-            {status === "error" && (
-              <p className="text-xs text-red-400">
-                Erro ao enviar. Verifique os dados e tente novamente.
-              </p>
-            )}
-
-            <button
-              type="submit"
-              disabled={status === "loading"}
-              className="btn-gold w-full justify-center disabled:opacity-60"
-            >
-              {status === "loading" ? "Enviando..." : "Pedir proposta"}
-            </button>
-
+        <LeadForm
+          origem="Site — Pedir proposta"
+          submitLabel="Pedir proposta"
+          successTitle="Mensagem enviada"
+          successDescription="Recebemos seu contato. Nossa equipe retornará em até 24 horas úteis para confirmar a agenda."
+          footer={
             <p className="text-center text-[10px] uppercase tracking-[0.15em] text-cream-mute">
               Seus dados ficam em sigilo. NDA disponível se você quiser.
             </p>
-          </form>
-        )}
+          }
+          fields={[
+            { name: "nome", label: "Nome completo", type: "text", required: true },
+            { name: "email", label: "E-mail", type: "email", required: true },
+            { name: "empresa", label: "Empresa", type: "text", required: true },
+            { name: "telefone", label: "Telefone / WhatsApp", type: "tel" },
+            {
+              name: "mensagem",
+              label: "Mensagem",
+              type: "text",
+              placeholder:
+                "Ex.: Simples Nacional, 6 funcionários, faturamento de R$ 80 mil por mês. Quero trocar de contador.",
+            },
+          ]}
+        />
       </div>
     </section>
   );

@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
 import { posts } from "@/content/posts";
@@ -24,17 +25,14 @@ function formatDate(iso: string) {
   });
 }
 
-const categories = [
-  "Todos",
-  "Controladoria",
-  "Modelo Financeiro",
-  "Custos",
-  "FP&A",
-  "Tax & Fiscal",
-];
+// Derivada dos posts reais: evita mostrar categoria sem nenhum artigo.
+const categories = ["Todos", ...new Set(posts.map((p) => p.meta.category))];
 
 function BlogIndex() {
-  const [featured, ...rest] = posts;
+  const [activeCategory, setActiveCategory] = useState("Todos");
+  const filteredPosts =
+    activeCategory === "Todos" ? posts : posts.filter((p) => p.meta.category === activeCategory);
+  const [featured, ...rest] = filteredPosts;
 
   return (
     <div className="min-h-screen bg-navy text-cream">
@@ -63,13 +61,16 @@ function BlogIndex() {
         </section>
 
         <div className="mx-auto max-w-[1400px] px-8 pb-20">
-          {/* Category filters (visual) */}
+          {/* Category filters */}
           <div className="mb-10 flex flex-wrap gap-3">
-            {categories.map((c, i) => (
+            {categories.map((c) => (
               <button
                 key={c}
+                type="button"
+                aria-pressed={c === activeCategory}
+                onClick={() => setActiveCategory(c)}
                 className={`border px-5 py-2 text-[11px] font-medium uppercase tracking-[0.18em] transition-colors ${
-                  i === 0
+                  c === activeCategory
                     ? "border-gold text-gold-light"
                     : "border-border-sub text-cream-mute hover:border-gold hover:text-gold-light"
                 }`}
@@ -78,6 +79,12 @@ function BlogIndex() {
               </button>
             ))}
           </div>
+
+          {!featured && (
+            <p className="py-16 text-center text-sm text-cream-mute">
+              Nenhum artigo nesta categoria ainda.
+            </p>
+          )}
 
           {/* Featured */}
           {featured && (

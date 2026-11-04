@@ -1,17 +1,19 @@
 import { supabase } from "@/integrations/supabase/client";
 import { trackMetaLead } from "@/lib/meta-pixel";
+import { trackGa4Lead } from "@/lib/ga4";
 
 /**
- * Ponto único de captura de lead do site.
+ * Ponto único de captura de lead do site — grava no Supabase, que é a fonte
+ * de verdade lida pelo gerenciador de leads do Growth OS.
  *
- * Antes cada formulário fazia a sua coisa: /contato gravava no Supabase, o
- * diagnóstico e as ferramentas mandavam pro HubSpot através do gateway da
- * Lovable. Resultado: os leads ficavam espalhados em dois sistemas, e os que
- * dependiam do gateway sumiam quando ele não estava configurado.
- *
- * Agora o Supabase é a fonte de verdade — é dele que o gerenciador de leads do
- * Growth OS lê. O HubSpot continua sendo alimentado quando estiver configurado,
- * mas como efeito colateral: se falhar, o lead já está salvo.
+ * O HubSpot não precisa de código de integração aqui: o script de tracking
+ * (ver hubspot-tracking.tsx, carregado globalmente) usa o recurso nativo de
+ * "formulários coletados" do HubSpot — ele reconhece qualquer <form> da
+ * página pelos atributos `name` dos campos (ver hubspot-fields.ts) e cria o
+ * contato sozinho, sem chave de API. Por isso não existe mais uma chamada de
+ * API para o HubSpot aqui: ela dependia do gateway proprietário da Lovable
+ * (connector-gateway.lovable.dev), que não existe mais desde que o projeto
+ * saiu de lá — e era redundante com o que o script já faz.
  */
 
 export type LeadInput = {
@@ -100,32 +102,8 @@ export async function saveLead(input: LeadInput): Promise<{ ok: boolean; error: 
     return { ok: false, error: "Não foi possível registrar seu contato. Tente novamente." };
   }
 
-  // A partir daqui o lead já está salvo. O HubSpot é espelho, não gargalo.
-  void mirrorToHubspot(input);
   trackMetaLead(input.origem);
+  trackGa4Lead(input.origem);
 
   return { ok: true, error: null };
-}
-
-async function mirrorToHubspot(input: LeadInput): Promise<void> {
-  try {
-    const [firstname, ...rest] = input.nome.trim().split(" ");
-    const { createHubspotLead } = await import("@/lib/hubspot.functions");
-    const result = await createHubspotLead({
-      data: {
-        firstname: firstname || input.nome,
-        lastname: rest.join(" "),
-        email: input.email,
-        company: input.empresa ?? "",
-        phone: input.telefone ?? "",
-        origem: input.origem,
-        ...(input.mensagem ? { mensagem: input.mensagem } : {}),
-      },
-    });
-    if (!result.ok) {
-      console.warn("HubSpot não recebeu o lead (o registro no Supabase está feito):", result.error);
-    }
-  } catch (err) {
-    console.warn("HubSpot indisponível (o registro no Supabase está feito):", err);
-  }
 }

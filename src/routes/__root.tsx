@@ -14,6 +14,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { CookieConsent } from "@/components/site/cookie-consent";
 import { HubspotTracking } from "@/components/site/hubspot-tracking";
 import { MetaPixel } from "@/components/site/meta-pixel";
+import { Ga4 } from "@/components/site/ga4";
 import { META_DOMAIN_VERIFICATION } from "@/lib/meta-pixel";
 import { captureUtm } from "@/lib/leads";
 import { OG_IMAGE, SITE_URL } from "@/lib/site";
@@ -187,6 +188,7 @@ function RootComponent() {
       <CookieConsent />
       <HubspotTracking />
       <MetaPixel />
+      <Ga4 />
     </QueryClientProvider>
   );
 }

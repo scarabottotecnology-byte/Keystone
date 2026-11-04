@@ -1,11 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
 import { Mail, MapPin, Clock, MessageSquare } from "lucide-react";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
-import { saveLead } from "@/lib/leads";
+import { LeadForm } from "@/components/site/lead-form";
 import { seo } from "@/lib/site";
-import { HUBSPOT_FIELD } from "@/lib/hubspot-fields";
 
 /**
  * Caixa do domínio próprio, hospedada na Hostinger (MX mx1/mx2.hostinger.com).
@@ -25,39 +23,7 @@ export const Route = createFileRoute("/contato")({
   component: ContatoPage,
 });
 
-type FormState = {
-  nome: string;
-  email: string;
-  empresa: string;
-  telefone: string;
-  mensagem: string;
-};
-
 function ContatoPage() {
-  const [form, setForm] = useState<FormState>({
-    nome: "",
-    email: "",
-    empresa: "",
-    telefone: "",
-    mensagem: "",
-  });
-  const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setStatus("loading");
-    const result = await saveLead({
-      nome: form.nome,
-      email: form.email,
-      empresa: form.empresa,
-      telefone: form.telefone,
-      mensagem: form.mensagem,
-      origem: "Site — Página de Contato",
-      track: "geral",
-    });
-    setStatus(result.ok ? "done" : "error");
-  }
-
   return (
     <div className="min-h-screen bg-navy text-cream">
       <SiteHeader />
@@ -97,79 +63,19 @@ function ContatoPage() {
 
             {/* Form */}
             <div>
-              {status === "done" ? (
-                <div className="border border-gold/30 bg-navy-card p-10 text-center">
-                  <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-full border border-gold/40 text-2xl text-gold">
-                    ✓
-                  </div>
-                  <p className="font-display text-2xl text-cream">Mensagem enviada</p>
-                  <p className="mt-3 text-sm text-cream-dim">
-                    Nossa equipe retornará em até 24 horas úteis.
-                  </p>
-                </div>
-              ) : (
-                <form
-                  onSubmit={handleSubmit}
-                  className="border border-border-sub bg-navy-card p-8 md:p-10 space-y-5"
-                >
-                  {(
-                    [
-                      { name: "nome", label: "Nome completo", type: "text", required: true },
-                      { name: "email", label: "E-mail corporativo", type: "email", required: true },
-                      { name: "empresa", label: "Empresa", type: "text", required: false },
-                      {
-                        name: "telefone",
-                        label: "Telefone / WhatsApp",
-                        type: "tel",
-                        required: false,
-                      },
-                    ] as const
-                  ).map(({ name, label, type, required }) => (
-                    <label key={name} className="block">
-                      <span className="text-[11px] uppercase tracking-[0.2em] text-cream-dim">
-                        {label}
-                        {required && " *"}
-                      </span>
-                      <input
-                        name={HUBSPOT_FIELD[name]}
-                        type={type}
-                        required={required}
-                        value={form[name]}
-                        onChange={(e) => setForm((f) => ({ ...f, [name]: e.target.value }))}
-                        className="mt-2 w-full border border-border-sub bg-navy px-4 py-3 text-cream outline-none transition-colors focus:border-gold"
-                      />
-                    </label>
-                  ))}
-
-                  <label className="block">
-                    <span className="text-[11px] uppercase tracking-[0.2em] text-cream-dim">
-                      Mensagem *
-                    </span>
-                    <textarea
-                      name={HUBSPOT_FIELD.mensagem}
-                      required
-                      rows={4}
-                      value={form.mensagem}
-                      onChange={(e) => setForm((f) => ({ ...f, mensagem: e.target.value }))}
-                      className="mt-2 w-full resize-none border border-border-sub bg-navy px-4 py-3 text-cream outline-none transition-colors focus:border-gold"
-                    />
-                  </label>
-
-                  {status === "error" && (
-                    <p className="text-xs text-red-400">
-                      Erro ao enviar. Verifique os dados e tente novamente.
-                    </p>
-                  )}
-
-                  <button
-                    type="submit"
-                    disabled={status === "loading"}
-                    className="btn-gold w-full justify-center disabled:opacity-60"
-                  >
-                    {status === "loading" ? "Enviando..." : "Enviar Mensagem"}
-                  </button>
-                </form>
-              )}
+              <LeadForm
+                origem="Site — Página de Contato"
+                submitLabel="Enviar Mensagem"
+                successTitle="Mensagem enviada"
+                successDescription="Nossa equipe retornará em até 24 horas úteis."
+                fields={[
+                  { name: "nome", label: "Nome completo", type: "text", required: true },
+                  { name: "email", label: "E-mail corporativo", type: "email", required: true },
+                  { name: "empresa", label: "Empresa", type: "text" },
+                  { name: "telefone", label: "Telefone / WhatsApp", type: "tel" },
+                  { name: "mensagem", label: "Mensagem", type: "text", required: true },
+                ]}
+              />
             </div>
           </div>
         </div>
