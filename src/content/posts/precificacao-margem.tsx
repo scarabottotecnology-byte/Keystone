@@ -6,7 +6,7 @@ export const meta: PostMeta = {
   description:
     "Como margem de contribuição por SKU pode revelar que metade do seu mix de produtos está sustentando a outra metade — que dá prejuízo.",
   date: "2026-04-15",
-  readingTime: "4 min de leitura",
+  readingTime: "1 min de leitura",
   category: "Custos",
   author: "Equipe Keystone",
 };

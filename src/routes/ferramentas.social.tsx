@@ -217,7 +217,13 @@ function SocialCalendarPage() {
         </div>
 
         {error ? (
-          <p className="border border-red-500/30 bg-red-500/5 p-6 text-sm text-red-400">{error}</p>
+          <p
+            role="alert"
+            aria-live="assertive"
+            className="border border-red-500/30 bg-red-500/5 p-6 text-sm text-red-400"
+          >
+            {error}
+          </p>
         ) : loading ? (
           <p className="text-sm text-cream-mute">Carregando calendário…</p>
         ) : filtered.length === 0 ? (

@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
 import { LeadForm } from "@/components/site/lead-form";
@@ -318,16 +318,34 @@ function Quiz({
   onBack: () => void;
 }) {
   const progress = ((step + 1) / QUESTIONS.length) * 100;
+  const headingRef = useRef<HTMLHeadingElement>(null);
+
+  // Troca de pergunta não navega para uma nova página — sem isto, o foco do
+  // teclado e do leitor de tela fica preso no botão da pergunta anterior
+  // (que já não existe mais na tela).
+  useEffect(() => {
+    headingRef.current?.focus();
+  }, [step]);
+
   return (
     <section className="mx-auto max-w-3xl px-6">
       <div className="mb-10">
-        <div className="mb-3 flex items-center justify-between text-[11px] uppercase tracking-[0.2em] text-cream-mute">
+        <div
+          aria-live="polite"
+          className="mb-3 flex items-center justify-between text-[11px] uppercase tracking-[0.2em] text-cream-mute"
+        >
           <span>
             Pergunta {step + 1} de {QUESTIONS.length}
           </span>
           <span>{Math.round(progress)}%</span>
         </div>
-        <div className="h-1 w-full bg-navy-card">
+        <div
+          role="progressbar"
+          aria-valuenow={step + 1}
+          aria-valuemin={1}
+          aria-valuemax={QUESTIONS.length}
+          className="h-1 w-full bg-navy-card"
+        >
           <div
             className="h-full bg-gold transition-all duration-300"
             style={{ width: `${progress}%` }}
@@ -335,7 +353,13 @@ function Quiz({
         </div>
       </div>
 
-      <h2 className="font-display text-2xl md:text-3xl text-cream">{question.q}</h2>
+      <h2
+        ref={headingRef}
+        tabIndex={-1}
+        className="font-display text-2xl md:text-3xl text-cream focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold"
+      >
+        {question.q}
+      </h2>
 
       <div className="mt-8 space-y-3">
         {question.options.map((opt, i) => {

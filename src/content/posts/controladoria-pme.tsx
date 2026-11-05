@@ -6,7 +6,7 @@ export const meta: PostMeta = {
   description:
     "Um guia prático para empresários que querem profissionalizar a gestão financeira sem paralisar o dia a dia da operação.",
   date: "2026-06-10",
-  readingTime: "6 min de leitura",
+  readingTime: "1 min de leitura",
   category: "Controladoria",
   author: "Equipe Keystone",
 };

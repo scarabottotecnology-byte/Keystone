@@ -96,7 +96,11 @@
   --gold-dim: rgba(201, 181, 138, 0.08);
   --cream: #f2efe9;          /* warm white — primary text */
   --cream-dim: rgba(242, 239, 233, 0.7);
-  --cream-mute: rgba(242, 239, 233, 0.44);
+  /* 0.55 em vez de 0.44: no tamanho em que é usada (10-11px, eyebrows,
+     rodapé, legendas), a opacidade antiga dava ~3.9:1 de contraste sobre
+     o fundo escuro — abaixo do mínimo de 4.5:1 do WCAG AA para texto
+     pequeno. Em 0.55 o contraste passa de 5:1 em qualquer fundo do site. */
+  --cream-mute: rgba(242, 239, 233, 0.55);
   --border: rgba(242, 239, 233, 0.14);
   --border-sub: rgba(242, 239, 233, 0.08);
   --red: #8e1118;            /* secondary red — signature accent only, max 3-5% */

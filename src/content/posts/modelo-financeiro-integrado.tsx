@@ -6,7 +6,7 @@ export const meta: PostMeta = {
   description:
     "DRE isolado engana. Fluxo de caixa solto também. Entenda como integrar as três peças e enxergar o resultado real da empresa.",
   date: "2026-05-22",
-  readingTime: "5 min de leitura",
+  readingTime: "1 min de leitura",
   category: "Modelo Financeiro",
   author: "Equipe Keystone",
 };

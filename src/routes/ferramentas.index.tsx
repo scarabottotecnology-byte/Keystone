@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
+import { LeadForm } from "@/components/site/lead-form";
 import { seo } from "@/lib/site";
 
 export const Route = createFileRoute("/ferramentas/")({
@@ -620,24 +621,6 @@ function ResultCard({ label, value, hint }: { label: string; value: string; hint
 }
 
 function LeadCapture() {
-  const [form, setForm] = useState({ firstname: "", email: "", company: "", phone: "" });
-  const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setStatus("loading");
-    const { saveLead } = await import("@/lib/leads");
-    const result = await saveLead({
-      nome: form.firstname,
-      email: form.email,
-      empresa: form.company,
-      telefone: form.phone,
-      origem: "Ferramentas Tributárias",
-      track: "geral",
-    });
-    setStatus(result.ok ? "done" : "error");
-  }
-
   return (
     <div className="mt-20 border-t border-border-sub pt-16">
       <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
@@ -668,55 +651,23 @@ function LeadCapture() {
           </ul>
         </div>
 
-        <div className="border border-border-sub bg-navy-card p-8">
-          {status === "done" ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <div className="mb-4 text-3xl">✓</div>
-              <p className="font-display text-xl text-gold">Recebido.</p>
-              <p className="mt-3 text-sm text-cream-dim">
-                Entraremos em contato em até 24 horas úteis com sua análise personalizada.
-              </p>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-5">
-              {(
-                [
-                  { name: "firstname", label: "Nome completo", type: "text", required: true },
-                  { name: "email", label: "E-mail corporativo", type: "email", required: true },
-                  { name: "company", label: "Empresa", type: "text", required: true },
-                  { name: "phone", label: "WhatsApp / Telefone", type: "tel", required: false },
-                ] as const
-              ).map(({ name, label, type, required }) => (
-                <label key={name} className="block">
-                  <span className="text-[11px] uppercase tracking-[0.2em] text-cream-dim">
-                    {label}
-                    {required && " *"}
-                  </span>
-                  <input
-                    type={type}
-                    required={required}
-                    value={form[name]}
-                    onChange={(e) => setForm((f) => ({ ...f, [name]: e.target.value }))}
-                    className="mt-2 w-full border border-border-sub bg-navy px-4 py-3 text-cream outline-none transition-colors focus:border-gold placeholder:text-cream-mute/40"
-                  />
-                </label>
-              ))}
-              {status === "error" && (
-                <p className="text-xs text-red-400">Erro ao enviar. Tente novamente.</p>
-              )}
-              <button
-                type="submit"
-                disabled={status === "loading"}
-                className="btn-gold mt-2 w-full justify-center disabled:opacity-60"
-              >
-                {status === "loading" ? "Enviando..." : "Solicitar Análise Personalizada →"}
-              </button>
-              <p className="text-center text-[10px] uppercase tracking-[0.15em] text-cream-mute">
-                Confidencialidade total · Sem spam
-              </p>
-            </form>
-          )}
-        </div>
+        <LeadForm
+          origem="Ferramentas Tributárias"
+          submitLabel="Solicitar Análise Personalizada →"
+          successTitle="Recebido."
+          successDescription="Entraremos em contato em até 24 horas úteis com sua análise personalizada."
+          footer={
+            <p className="text-center text-[10px] uppercase tracking-[0.15em] text-cream-mute">
+              Confidencialidade total · Sem spam
+            </p>
+          }
+          fields={[
+            { name: "nome", label: "Nome completo", type: "text", required: true },
+            { name: "email", label: "E-mail corporativo", type: "email", required: true },
+            { name: "empresa", label: "Empresa", type: "text", required: true },
+            { name: "telefone", label: "WhatsApp / Telefone", type: "tel" },
+          ]}
+        />
       </div>
     </div>
   );

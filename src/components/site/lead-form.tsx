@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Check } from "lucide-react";
 import { HONEYPOT_FIELD } from "@/lib/lead-schema";
 import { HUBSPOT_FIELD } from "@/lib/hubspot-fields";
 import { useLeadSubmission, type LeadFieldConfig } from "@/hooks/useLeadSubmission";
@@ -42,8 +43,11 @@ export function LeadForm({
       <div
         className={`text-center ${bare ? "" : "border border-gold/30 bg-navy-card p-10"} ${className}`}
       >
-        <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-full border border-gold/40 text-2xl text-gold">
-          ✓
+        <div
+          aria-hidden
+          className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-full border border-gold/40 text-gold"
+        >
+          <Check className="h-5 w-5" strokeWidth={2} />
         </div>
         <p className="font-display text-2xl text-cream">{successTitle}</p>
         <p className="mt-3 text-sm text-cream-dim">{successDescription}</p>

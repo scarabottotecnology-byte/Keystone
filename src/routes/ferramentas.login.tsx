@@ -76,7 +76,11 @@ function LoginPage() {
               />
             </label>
 
-            {error ? <p className="text-xs text-red-400">{error}</p> : null}
+            {error ? (
+              <p role="alert" aria-live="assertive" className="text-xs text-red-400">
+                {error}
+              </p>
+            ) : null}
 
             <button
               type="submit"
