@@ -21,6 +21,7 @@ import { Route as MetodologiasRouteImport } from './routes/metodologias'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TrabalheConoscoRouteImport } from './routes/trabalhe-conosco'
+import { Route as TrocarDeContabilidadeRouteImport } from './routes/trocar-de-contabilidade'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as FerramentasIndexRouteImport } from './routes/ferramentas.index'
@@ -89,6 +90,11 @@ const TrabalheConoscoRoute = TrabalheConoscoRouteImport.update({
   path: '/trabalhe-conosco',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TrocarDeContabilidadeRoute = TrocarDeContabilidadeRouteImport.update({
+  id: '/trocar-de-contabilidade',
+  path: '/trocar-de-contabilidade',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BlogIndexRoute = BlogIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -138,6 +144,7 @@ export interface FileRoutesByFullPath {
   '/privacidade': typeof PrivacidadeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/trabalhe-conosco': typeof TrabalheConoscoRoute
+  '/trocar-de-contabilidade': typeof TrocarDeContabilidadeRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/ferramentas/login': typeof FerramentasLoginRoute
   '/ferramentas/social': typeof FerramentasSocialRoute
@@ -157,6 +164,7 @@ export interface FileRoutesByTo {
   '/privacidade': typeof PrivacidadeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/trabalhe-conosco': typeof TrabalheConoscoRoute
+  '/trocar-de-contabilidade': typeof TrocarDeContabilidadeRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/ferramentas/login': typeof FerramentasLoginRoute
   '/ferramentas/social': typeof FerramentasSocialRoute
@@ -179,6 +187,7 @@ export interface FileRoutesById {
   '/privacidade': typeof PrivacidadeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/trabalhe-conosco': typeof TrabalheConoscoRoute
+  '/trocar-de-contabilidade': typeof TrocarDeContabilidadeRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/ferramentas/login': typeof FerramentasLoginRoute
   '/ferramentas/social': typeof FerramentasSocialRoute
@@ -202,6 +211,7 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/sitemap.xml'
     | '/trabalhe-conosco'
+    | '/trocar-de-contabilidade'
     | '/blog/$slug'
     | '/ferramentas/login'
     | '/ferramentas/social'
@@ -221,6 +231,7 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/sitemap.xml'
     | '/trabalhe-conosco'
+    | '/trocar-de-contabilidade'
     | '/blog/$slug'
     | '/ferramentas/login'
     | '/ferramentas/social'
@@ -242,6 +253,7 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/sitemap.xml'
     | '/trabalhe-conosco'
+    | '/trocar-de-contabilidade'
     | '/blog/$slug'
     | '/ferramentas/login'
     | '/ferramentas/social'
@@ -264,6 +276,7 @@ export interface RootRouteChildren {
   PrivacidadeRoute: typeof PrivacidadeRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TrabalheConoscoRoute: typeof TrabalheConoscoRoute
+  TrocarDeContabilidadeRoute: typeof TrocarDeContabilidadeRoute
   ServicosSlugRoute: typeof ServicosSlugRoute
   ServicosIndexRoute: typeof ServicosIndexRoute
 }
@@ -352,6 +365,13 @@ declare module '@tanstack/react-router' {
       path: '/trabalhe-conosco'
       fullPath: '/trabalhe-conosco'
       preLoaderRoute: typeof TrabalheConoscoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/trocar-de-contabilidade': {
+      id: '/trocar-de-contabilidade'
+      path: '/trocar-de-contabilidade'
+      fullPath: '/trocar-de-contabilidade'
+      preLoaderRoute: typeof TrocarDeContabilidadeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blog/': {
@@ -447,6 +467,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacidadeRoute: PrivacidadeRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TrabalheConoscoRoute: TrabalheConoscoRoute,
+  TrocarDeContabilidadeRoute: TrocarDeContabilidadeRoute,
   ServicosSlugRoute: ServicosSlugRoute,
   ServicosIndexRoute: ServicosIndexRoute,
 }

@@ -149,6 +149,21 @@ function ServicosIndex() {
             </div>
           </div>
         </section>
+
+        <section className="border-t border-border-sub bg-navy-mid py-16">
+          <div className="mx-auto flex max-w-[1400px] flex-col items-center gap-6 px-8 text-center lg:flex-row lg:justify-between lg:text-left">
+            <div>
+              <span className="eyebrow lg:mx-0">Já tem contador?</span>
+              <h2 className="mt-4 font-display text-2xl font-medium text-cream">
+                Dá pra trocar sem perder prazo nem histórico.
+              </h2>
+            </div>
+            <Link to="/trocar-de-contabilidade" className="btn-gold shrink-0">
+              Ver como funciona a troca
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+        </section>
       </main>
       <SiteFooter />
     </div>

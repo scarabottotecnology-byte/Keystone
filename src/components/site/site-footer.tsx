@@ -34,6 +34,9 @@ export function SiteFooter() {
           <Link to="/contato" className="hover:text-gold">
             Contato
           </Link>
+          <Link to="/trocar-de-contabilidade" className="hover:text-gold">
+            Trocar de Contabilidade
+          </Link>
           <Link to="/trabalhe-conosco" className="hover:text-gold">
             Trabalhe Conosco
           </Link>
