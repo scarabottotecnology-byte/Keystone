@@ -34,6 +34,9 @@ export function SiteFooter() {
           <Link to="/contato" className="hover:text-gold">
             Contato
           </Link>
+          <Link to="/trabalhe-conosco" className="hover:text-gold">
+            Trabalhe Conosco
+          </Link>
         </nav>
         <div className="md:text-right">
           <p className="font-accent text-sm italic text-gold-light">
