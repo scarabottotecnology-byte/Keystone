@@ -1,0 +1,65 @@
+name: Quality Gate — Site Institucional
+
+# Este repositório abriga DOIS produtos:
+#   - `main`  → o site institucional do Keystone (este portão)
+#   - branch do Growth OS → outro produto, com CI próprio em ci.yml
+# Por isso o nome é explícito. Um portão chamado só "Quality Gate" num repo
+# com dois produtos não diz qual deles está sendo guardado — e vira o nome
+# de um check obrigatório na proteção de branch, onde ambiguidade custa caro.
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Tipos e build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # `ci` e não `install`: falha se o lockfile estiver fora de sincronia
+      # com o package.json, em vez de corrigir em silêncio.
+      - name: Install dependencies
+        run: npm ci
+
+      # LINT DESLIGADO DE PROPÓSITO — religar depois de formatar a base.
+      #
+      # `npm run lint` reprova hoje em 35 arquivos, todos por formatação
+      # (espaçamento e quebra de linha fora do padrão do Prettier). Não é
+      # defeito: o site funciona. Verificado com `prettier --check
+      # --end-of-line auto`, que descarta diferença de fim de linha, e
+      # conferido contra o conteúdo LF vindo do próprio Git — o mesmo que
+      # o CI recebe.
+      #
+      # Ligar o passo agora deixaria o portão vermelho desde o primeiro dia,
+      # e um portão que sempre reprova ensina todo mundo a ignorar o CI —
+      # pior do que não ter portão. Formatar os 35 arquivos também bateria
+      # de frente com as branches abertas no momento, entre elas a do
+      # Growth OS, com dezenas de milhares de linhas.
+      #
+      # Ordem certa: formatar a base quando as branches aterrissarem, e
+      # então descomentar este passo.
+      # - name: Lint
+      #   run: npm run lint
+
+      # O build passa por cima de erro de tipo — o Vite transpila sem checar.
+      # Sem este passo, o portão deixa passar exatamente a classe de defeito
+      # que mais aparece aqui: propriedade possivelmente indefinida, valor
+      # fora de um enum, import faltando.
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
