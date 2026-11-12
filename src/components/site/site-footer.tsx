@@ -37,6 +37,9 @@ export function SiteFooter() {
           <Link to="/trocar-de-contabilidade" className="hover:text-gold">
             Trocar de Contabilidade
           </Link>
+          <Link to="/contabilidade-santo-andre" className="hover:text-gold">
+            Contabilidade em Santo André
+          </Link>
           <Link to="/trabalhe-conosco" className="hover:text-gold">
             Trabalhe Conosco
           </Link>

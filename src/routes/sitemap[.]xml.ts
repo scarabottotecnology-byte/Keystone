@@ -18,6 +18,8 @@ const PAGINAS = [
   "/cases",
   "/blog",
   "/contato",
+  "/trocar-de-contabilidade",
+  "/contabilidade-santo-andre",
 ];
 
 function urlEntry(path: string, lastmod?: string) {
