@@ -7,6 +7,11 @@ export const SITE_URL = "https://keystone-contabilidade.com";
 // para não haver conteúdo duplicado entre domínios.
 export const REDIRECT_HOSTS = ["keystone-phi.vercel.app", "www.keystone-contabilidade.com"];
 
+// Código da tag HTML do Google Search Console (Configurações > Verificação de
+// propriedade > Tag HTML: só o valor de content="..."). Vazio = sem a tag.
+// Dispensável se a propriedade for verificada por DNS na Hostinger.
+export const GOOGLE_SITE_VERIFICATION = "";
+
 export const OG_IMAGE = `${SITE_URL}/og-image.png`;
 
 export function absoluteUrl(path: string) {

@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as BlogRouteImport } from './routes/blog'
 import { Route as CalculadorasRouteImport } from './routes/calculadoras'
 import { Route as CasesRouteImport } from './routes/cases'
+import { Route as ContabilidadeSantoAndreRouteImport } from './routes/contabilidade-santo-andre'
 import { Route as ContatoRouteImport } from './routes/contato'
 import { Route as DiagnosticoRouteImport } from './routes/diagnostico'
 import { Route as FerramentasRouteImport } from './routes/ferramentas'
@@ -48,6 +49,11 @@ const CalculadorasRoute = CalculadorasRouteImport.update({
 const CasesRoute = CasesRouteImport.update({
   id: '/cases',
   path: '/cases',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContabilidadeSantoAndreRoute = ContabilidadeSantoAndreRouteImport.update({
+  id: '/contabilidade-santo-andre',
+  path: '/contabilidade-santo-andre',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContatoRoute = ContatoRouteImport.update({
@@ -136,6 +142,7 @@ export interface FileRoutesByFullPath {
   '/blog': typeof BlogRouteWithChildren
   '/calculadoras': typeof CalculadorasRoute
   '/cases': typeof CasesRoute
+  '/contabilidade-santo-andre': typeof ContabilidadeSantoAndreRoute
   '/contato': typeof ContatoRoute
   '/diagnostico': typeof DiagnosticoRoute
   '/ferramentas': typeof FerramentasRouteWithChildren
@@ -157,6 +164,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/calculadoras': typeof CalculadorasRoute
   '/cases': typeof CasesRoute
+  '/contabilidade-santo-andre': typeof ContabilidadeSantoAndreRoute
   '/contato': typeof ContatoRoute
   '/diagnostico': typeof DiagnosticoRoute
   '/indicadores': typeof IndicadoresRoute
@@ -179,6 +187,7 @@ export interface FileRoutesById {
   '/blog': typeof BlogRouteWithChildren
   '/calculadoras': typeof CalculadorasRoute
   '/cases': typeof CasesRoute
+  '/contabilidade-santo-andre': typeof ContabilidadeSantoAndreRoute
   '/contato': typeof ContatoRoute
   '/diagnostico': typeof DiagnosticoRoute
   '/ferramentas': typeof FerramentasRouteWithChildren
@@ -203,6 +212,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/calculadoras'
     | '/cases'
+    | '/contabilidade-santo-andre'
     | '/contato'
     | '/diagnostico'
     | '/ferramentas'
@@ -224,6 +234,7 @@ export interface FileRouteTypes {
     | '/'
     | '/calculadoras'
     | '/cases'
+    | '/contabilidade-santo-andre'
     | '/contato'
     | '/diagnostico'
     | '/indicadores'
@@ -245,6 +256,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/calculadoras'
     | '/cases'
+    | '/contabilidade-santo-andre'
     | '/contato'
     | '/diagnostico'
     | '/ferramentas'
@@ -268,6 +280,7 @@ export interface RootRouteChildren {
   BlogRoute: typeof BlogRouteWithChildren
   CalculadorasRoute: typeof CalculadorasRoute
   CasesRoute: typeof CasesRoute
+  ContabilidadeSantoAndreRoute: typeof ContabilidadeSantoAndreRoute
   ContatoRoute: typeof ContatoRoute
   DiagnosticoRoute: typeof DiagnosticoRoute
   FerramentasRoute: typeof FerramentasRouteWithChildren
@@ -309,6 +322,13 @@ declare module '@tanstack/react-router' {
       path: '/cases'
       fullPath: '/cases'
       preLoaderRoute: typeof CasesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contabilidade-santo-andre': {
+      id: '/contabilidade-santo-andre'
+      path: '/contabilidade-santo-andre'
+      fullPath: '/contabilidade-santo-andre'
+      preLoaderRoute: typeof ContabilidadeSantoAndreRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contato': {
@@ -459,6 +479,7 @@ const rootRouteChildren: RootRouteChildren = {
   BlogRoute: BlogRouteWithChildren,
   CalculadorasRoute: CalculadorasRoute,
   CasesRoute: CasesRoute,
+  ContabilidadeSantoAndreRoute: ContabilidadeSantoAndreRoute,
   ContatoRoute: ContatoRoute,
   DiagnosticoRoute: DiagnosticoRoute,
   FerramentasRoute: FerramentasRouteWithChildren,

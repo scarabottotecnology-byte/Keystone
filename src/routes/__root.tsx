@@ -17,7 +17,7 @@ import { MetaPixel } from "@/components/site/meta-pixel";
 import { Ga4 } from "@/components/site/ga4";
 import { META_DOMAIN_VERIFICATION } from "@/lib/meta-pixel";
 import { captureUtm } from "@/lib/leads";
-import { OG_IMAGE, SITE_URL } from "@/lib/site";
+import { GOOGLE_SITE_VERIFICATION, OG_IMAGE, SITE_URL } from "@/lib/site";
 
 function NotFoundComponent() {
   return (
@@ -52,10 +52,10 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          This page didn't load
+          Esta página não carregou
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
+          Algo deu errado do nosso lado. Tente recarregar ou volte para o início.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
@@ -65,13 +65,13 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
             }}
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            Try again
+            Tentar de novo
           </button>
           <a
             href="/"
             className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
           >
-            Go home
+            Ir para o início
           </a>
         </div>
       </div>
@@ -93,7 +93,21 @@ const ORGANIZACAO = {
   description:
     "Contabilidade, fiscal, folha, BPO financeiro e controladoria para empresas do Simples Nacional e do Lucro Presumido.",
   founder: { "@type": "Person", name: "Jefferson Scarabotto" },
-  areaServed: { "@type": "Country", name: "Brasil" },
+  // Cidades primeiro: o Google usa areaServed para associar a empresa às
+  // buscas locais ("contabilidade em Santo André"), que são as alcançáveis.
+  areaServed: [
+    ...[
+      "Santo André",
+      "São Bernardo do Campo",
+      "São Caetano do Sul",
+      "Diadema",
+      "Mauá",
+      "Ribeirão Pires",
+      "Rio Grande da Serra",
+    ].map((name) => ({ "@type": "City", name })),
+    { "@type": "State", name: "São Paulo" },
+    { "@type": "Country", name: "Brasil" },
+  ],
   availableLanguage: "pt-BR",
   knowsAbout: [
     "Contabilidade",
@@ -132,6 +146,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:image:alt", content: "Keystone: contabilidade e controladoria para PMEs" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:image", content: OG_IMAGE },
+      ...(GOOGLE_SITE_VERIFICATION
+        ? [{ name: "google-site-verification", content: GOOGLE_SITE_VERIFICATION }]
+        : []),
       ...(META_DOMAIN_VERIFICATION
         ? [{ name: "facebook-domain-verification", content: META_DOMAIN_VERIFICATION }]
         : []),
