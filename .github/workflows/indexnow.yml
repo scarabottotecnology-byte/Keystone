@@ -1,0 +1,35 @@
+# Avisa Bing, Yandex, Seznam e Naver (protocolo IndexNow) sempre que o site é
+# publicado, para as páginas novas entrarem no índice em horas, não semanas.
+# O Google não participa do IndexNow: lá o caminho é o Search Console.
+# A chave é pública por desenho: o buscador confere que o mesmo valor está em
+# https://keystone-contabilidade.com/dd1d9aec94685b02228b5e7d1de7397a.txt (arquivo em public/).
+name: IndexNow
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Espera o deploy de produção terminar
+        if: github.event_name == 'push'
+        run: sleep 300
+
+      - name: Envia as URLs do sitemap
+        env:
+          HOST: keystone-contabilidade.com
+          KEY: dd1d9aec94685b02228b5e7d1de7397a
+        run: |
+          set -euo pipefail
+          curl -fsS "https://$HOST/$KEY.txt" > /dev/null
+          urls=$(curl -fsS "https://$HOST/sitemap.xml" | grep -o '<loc>[^<]*</loc>' | sed 's/<[^>]*>//g')
+          test -n "$urls"
+          body=$(printf '%s\n' "$urls" | jq -R . | jq -s --arg h "$HOST" --arg k "$KEY" \
+            '{host: $h, key: $k, keyLocation: "https://\($h)/\($k).txt", urlList: .}')
+          code=$(curl -sS -o /dev/null -w '%{http_code}' -X POST https://api.indexnow.org/indexnow \
+            -H 'Content-Type: application/json; charset=utf-8' -d "$body")
+          echo "IndexNow respondeu $code para $(printf '%s\n' "$urls" | wc -l) URLs"
+          test "$code" = 200 -o "$code" = 202

@@ -12,6 +12,11 @@ export const REDIRECT_HOSTS = ["keystone-phi.vercel.app", "www.keystone-contabil
 // Dispensável se a propriedade for verificada por DNS na Hostinger.
 export const GOOGLE_SITE_VERIFICATION = "";
 
+// Código do Bing Webmaster Tools (Adicionar site > Tag HTML: só o valor de
+// content="..."). Vazio = sem a tag. Dispensável se o site for importado do
+// Google Search Console dentro do Bing Webmaster.
+export const BING_SITE_VERIFICATION = "";
+
 export const OG_IMAGE = `${SITE_URL}/og-image.png`;
 
 export function absoluteUrl(path: string) {
