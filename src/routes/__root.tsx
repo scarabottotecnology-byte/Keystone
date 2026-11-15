@@ -17,7 +17,7 @@ import { MetaPixel } from "@/components/site/meta-pixel";
 import { Ga4 } from "@/components/site/ga4";
 import { META_DOMAIN_VERIFICATION } from "@/lib/meta-pixel";
 import { captureUtm } from "@/lib/leads";
-import { GOOGLE_SITE_VERIFICATION, OG_IMAGE, SITE_URL } from "@/lib/site";
+import { BING_SITE_VERIFICATION, GOOGLE_SITE_VERIFICATION, OG_IMAGE, SITE_URL } from "@/lib/site";
 
 function NotFoundComponent() {
   return (
@@ -148,6 +148,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:image", content: OG_IMAGE },
       ...(GOOGLE_SITE_VERIFICATION
         ? [{ name: "google-site-verification", content: GOOGLE_SITE_VERIFICATION }]
+        : []),
+      ...(BING_SITE_VERIFICATION
+        ? [{ name: "msvalidate.01", content: BING_SITE_VERIFICATION }]
         : []),
       ...(META_DOMAIN_VERIFICATION
         ? [{ name: "facebook-domain-verification", content: META_DOMAIN_VERIFICATION }]
