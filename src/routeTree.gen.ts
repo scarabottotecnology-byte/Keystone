@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BlogRouteImport } from './routes/blog'
 import { Route as CalculadorasRouteImport } from './routes/calculadoras'
-import { Route as CasesRouteImport } from './routes/cases'
 import { Route as ContabilidadeSantoAndreRouteImport } from './routes/contabilidade-santo-andre'
 import { Route as ContatoRouteImport } from './routes/contato'
 import { Route as DiagnosticoRouteImport } from './routes/diagnostico'
@@ -25,11 +24,18 @@ import { Route as TrabalheConoscoRouteImport } from './routes/trabalhe-conosco'
 import { Route as TrocarDeContabilidadeRouteImport } from './routes/trocar-de-contabilidade'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
+import { Route as EnIndexRouteImport } from './routes/en.index'
+import { Route as EnContactRouteImport } from './routes/en.contact'
+import { Route as EnMethodologyRouteImport } from './routes/en.methodology'
+import { Route as EnPrivacyRouteImport } from './routes/en.privacy'
+import { Route as EnSwitchingRouteImport } from './routes/en.switching'
 import { Route as FerramentasIndexRouteImport } from './routes/ferramentas.index'
 import { Route as FerramentasLoginRouteImport } from './routes/ferramentas.login'
 import { Route as FerramentasSocialRouteImport } from './routes/ferramentas.social'
 import { Route as ServicosIndexRouteImport } from './routes/servicos.index'
 import { Route as ServicosSlugRouteImport } from './routes/servicos.$slug'
+import { Route as EnServicesIndexRouteImport } from './routes/en.services.index'
+import { Route as EnServicesSlugRouteImport } from './routes/en.services.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -44,11 +50,6 @@ const BlogRoute = BlogRouteImport.update({
 const CalculadorasRoute = CalculadorasRouteImport.update({
   id: '/calculadoras',
   path: '/calculadoras',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CasesRoute = CasesRouteImport.update({
-  id: '/cases',
-  path: '/cases',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContabilidadeSantoAndreRoute = ContabilidadeSantoAndreRouteImport.update({
@@ -111,6 +112,31 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => BlogRoute,
 } as any)
+const EnIndexRoute = EnIndexRouteImport.update({
+  id: '/en/',
+  path: '/en/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EnContactRoute = EnContactRouteImport.update({
+  id: '/en/contact',
+  path: '/en/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EnMethodologyRoute = EnMethodologyRouteImport.update({
+  id: '/en/methodology',
+  path: '/en/methodology',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EnPrivacyRoute = EnPrivacyRouteImport.update({
+  id: '/en/privacy',
+  path: '/en/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EnSwitchingRoute = EnSwitchingRouteImport.update({
+  id: '/en/switching',
+  path: '/en/switching',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FerramentasIndexRoute = FerramentasIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -136,12 +162,21 @@ const ServicosSlugRoute = ServicosSlugRouteImport.update({
   path: '/servicos/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EnServicesIndexRoute = EnServicesIndexRouteImport.update({
+  id: '/en/services/',
+  path: '/en/services/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EnServicesSlugRoute = EnServicesSlugRouteImport.update({
+  id: '/en/services/$slug',
+  path: '/en/services/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/blog': typeof BlogRouteWithChildren
   '/calculadoras': typeof CalculadorasRoute
-  '/cases': typeof CasesRoute
   '/contabilidade-santo-andre': typeof ContabilidadeSantoAndreRoute
   '/contato': typeof ContatoRoute
   '/diagnostico': typeof DiagnosticoRoute
@@ -153,17 +188,23 @@ export interface FileRoutesByFullPath {
   '/trabalhe-conosco': typeof TrabalheConoscoRoute
   '/trocar-de-contabilidade': typeof TrocarDeContabilidadeRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/en/contact': typeof EnContactRoute
+  '/en/methodology': typeof EnMethodologyRoute
+  '/en/privacy': typeof EnPrivacyRoute
+  '/en/switching': typeof EnSwitchingRoute
   '/ferramentas/login': typeof FerramentasLoginRoute
   '/ferramentas/social': typeof FerramentasSocialRoute
   '/servicos/$slug': typeof ServicosSlugRoute
   '/blog/': typeof BlogIndexRoute
+  '/en/': typeof EnIndexRoute
   '/ferramentas/': typeof FerramentasIndexRoute
   '/servicos/': typeof ServicosIndexRoute
+  '/en/services/$slug': typeof EnServicesSlugRoute
+  '/en/services/': typeof EnServicesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/calculadoras': typeof CalculadorasRoute
-  '/cases': typeof CasesRoute
   '/contabilidade-santo-andre': typeof ContabilidadeSantoAndreRoute
   '/contato': typeof ContatoRoute
   '/diagnostico': typeof DiagnosticoRoute
@@ -174,19 +215,25 @@ export interface FileRoutesByTo {
   '/trabalhe-conosco': typeof TrabalheConoscoRoute
   '/trocar-de-contabilidade': typeof TrocarDeContabilidadeRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/en/contact': typeof EnContactRoute
+  '/en/methodology': typeof EnMethodologyRoute
+  '/en/privacy': typeof EnPrivacyRoute
+  '/en/switching': typeof EnSwitchingRoute
   '/ferramentas/login': typeof FerramentasLoginRoute
   '/ferramentas/social': typeof FerramentasSocialRoute
   '/servicos/$slug': typeof ServicosSlugRoute
   '/blog': typeof BlogIndexRoute
+  '/en': typeof EnIndexRoute
   '/ferramentas': typeof FerramentasIndexRoute
   '/servicos': typeof ServicosIndexRoute
+  '/en/services/$slug': typeof EnServicesSlugRoute
+  '/en/services': typeof EnServicesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/blog': typeof BlogRouteWithChildren
   '/calculadoras': typeof CalculadorasRoute
-  '/cases': typeof CasesRoute
   '/contabilidade-santo-andre': typeof ContabilidadeSantoAndreRoute
   '/contato': typeof ContatoRoute
   '/diagnostico': typeof DiagnosticoRoute
@@ -198,12 +245,19 @@ export interface FileRoutesById {
   '/trabalhe-conosco': typeof TrabalheConoscoRoute
   '/trocar-de-contabilidade': typeof TrocarDeContabilidadeRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/en/contact': typeof EnContactRoute
+  '/en/methodology': typeof EnMethodologyRoute
+  '/en/privacy': typeof EnPrivacyRoute
+  '/en/switching': typeof EnSwitchingRoute
   '/ferramentas/login': typeof FerramentasLoginRoute
   '/ferramentas/social': typeof FerramentasSocialRoute
   '/servicos/$slug': typeof ServicosSlugRoute
   '/blog/': typeof BlogIndexRoute
+  '/en/': typeof EnIndexRoute
   '/ferramentas/': typeof FerramentasIndexRoute
   '/servicos/': typeof ServicosIndexRoute
+  '/en/services/$slug': typeof EnServicesSlugRoute
+  '/en/services/': typeof EnServicesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -211,7 +265,6 @@ export interface FileRouteTypes {
     | '/'
     | '/blog'
     | '/calculadoras'
-    | '/cases'
     | '/contabilidade-santo-andre'
     | '/contato'
     | '/diagnostico'
@@ -223,17 +276,23 @@ export interface FileRouteTypes {
     | '/trabalhe-conosco'
     | '/trocar-de-contabilidade'
     | '/blog/$slug'
+    | '/en/contact'
+    | '/en/methodology'
+    | '/en/privacy'
+    | '/en/switching'
     | '/ferramentas/login'
     | '/ferramentas/social'
     | '/servicos/$slug'
     | '/blog/'
+    | '/en/'
     | '/ferramentas/'
     | '/servicos/'
+    | '/en/services/$slug'
+    | '/en/services/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/calculadoras'
-    | '/cases'
     | '/contabilidade-santo-andre'
     | '/contato'
     | '/diagnostico'
@@ -244,18 +303,24 @@ export interface FileRouteTypes {
     | '/trabalhe-conosco'
     | '/trocar-de-contabilidade'
     | '/blog/$slug'
+    | '/en/contact'
+    | '/en/methodology'
+    | '/en/privacy'
+    | '/en/switching'
     | '/ferramentas/login'
     | '/ferramentas/social'
     | '/servicos/$slug'
     | '/blog'
+    | '/en'
     | '/ferramentas'
     | '/servicos'
+    | '/en/services/$slug'
+    | '/en/services'
   id:
     | '__root__'
     | '/'
     | '/blog'
     | '/calculadoras'
-    | '/cases'
     | '/contabilidade-santo-andre'
     | '/contato'
     | '/diagnostico'
@@ -267,19 +332,25 @@ export interface FileRouteTypes {
     | '/trabalhe-conosco'
     | '/trocar-de-contabilidade'
     | '/blog/$slug'
+    | '/en/contact'
+    | '/en/methodology'
+    | '/en/privacy'
+    | '/en/switching'
     | '/ferramentas/login'
     | '/ferramentas/social'
     | '/servicos/$slug'
     | '/blog/'
+    | '/en/'
     | '/ferramentas/'
     | '/servicos/'
+    | '/en/services/$slug'
+    | '/en/services/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BlogRoute: typeof BlogRouteWithChildren
   CalculadorasRoute: typeof CalculadorasRoute
-  CasesRoute: typeof CasesRoute
   ContabilidadeSantoAndreRoute: typeof ContabilidadeSantoAndreRoute
   ContatoRoute: typeof ContatoRoute
   DiagnosticoRoute: typeof DiagnosticoRoute
@@ -290,8 +361,15 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TrabalheConoscoRoute: typeof TrabalheConoscoRoute
   TrocarDeContabilidadeRoute: typeof TrocarDeContabilidadeRoute
+  EnContactRoute: typeof EnContactRoute
+  EnMethodologyRoute: typeof EnMethodologyRoute
+  EnPrivacyRoute: typeof EnPrivacyRoute
+  EnSwitchingRoute: typeof EnSwitchingRoute
   ServicosSlugRoute: typeof ServicosSlugRoute
+  EnIndexRoute: typeof EnIndexRoute
   ServicosIndexRoute: typeof ServicosIndexRoute
+  EnServicesSlugRoute: typeof EnServicesSlugRoute
+  EnServicesIndexRoute: typeof EnServicesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -315,13 +393,6 @@ declare module '@tanstack/react-router' {
       path: '/calculadoras'
       fullPath: '/calculadoras'
       preLoaderRoute: typeof CalculadorasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/cases': {
-      id: '/cases'
-      path: '/cases'
-      fullPath: '/cases'
-      preLoaderRoute: typeof CasesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contabilidade-santo-andre': {
@@ -408,6 +479,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof BlogRoute
     }
+    '/en/': {
+      id: '/en/'
+      path: '/en'
+      fullPath: '/en/'
+      preLoaderRoute: typeof EnIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/en/contact': {
+      id: '/en/contact'
+      path: '/en/contact'
+      fullPath: '/en/contact'
+      preLoaderRoute: typeof EnContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/en/methodology': {
+      id: '/en/methodology'
+      path: '/en/methodology'
+      fullPath: '/en/methodology'
+      preLoaderRoute: typeof EnMethodologyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/en/privacy': {
+      id: '/en/privacy'
+      path: '/en/privacy'
+      fullPath: '/en/privacy'
+      preLoaderRoute: typeof EnPrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/en/switching': {
+      id: '/en/switching'
+      path: '/en/switching'
+      fullPath: '/en/switching'
+      preLoaderRoute: typeof EnSwitchingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/ferramentas/': {
       id: '/ferramentas/'
       path: '/'
@@ -441,6 +547,20 @@ declare module '@tanstack/react-router' {
       path: '/servicos/$slug'
       fullPath: '/servicos/$slug'
       preLoaderRoute: typeof ServicosSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/en/services/': {
+      id: '/en/services/'
+      path: '/en/services'
+      fullPath: '/en/services/'
+      preLoaderRoute: typeof EnServicesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/en/services/$slug': {
+      id: '/en/services/$slug'
+      path: '/en/services/$slug'
+      fullPath: '/en/services/$slug'
+      preLoaderRoute: typeof EnServicesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -478,7 +598,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BlogRoute: BlogRouteWithChildren,
   CalculadorasRoute: CalculadorasRoute,
-  CasesRoute: CasesRoute,
   ContabilidadeSantoAndreRoute: ContabilidadeSantoAndreRoute,
   ContatoRoute: ContatoRoute,
   DiagnosticoRoute: DiagnosticoRoute,
@@ -489,8 +608,15 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TrabalheConoscoRoute: TrabalheConoscoRoute,
   TrocarDeContabilidadeRoute: TrocarDeContabilidadeRoute,
+  EnContactRoute: EnContactRoute,
+  EnMethodologyRoute: EnMethodologyRoute,
+  EnPrivacyRoute: EnPrivacyRoute,
+  EnSwitchingRoute: EnSwitchingRoute,
   ServicosSlugRoute: ServicosSlugRoute,
+  EnIndexRoute: EnIndexRoute,
   ServicosIndexRoute: ServicosIndexRoute,
+  EnServicesSlugRoute: EnServicesSlugRoute,
+  EnServicesIndexRoute: EnServicesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

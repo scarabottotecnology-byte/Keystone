@@ -26,7 +26,7 @@ function PrivacidadePage() {
               Política de <em>Privacidade</em> e Cookies
             </h1>
             <p className="mt-6 text-[13px] uppercase tracking-[0.15em] text-cream-mute">
-              Última atualização: agosto de 2026
+              Última atualização: novembro de 2026
             </p>
           </div>
         </section>
@@ -91,9 +91,10 @@ function PrivacidadePage() {
               <p className="mt-3">
                 Não vendemos seus dados pessoais. Eventuais compartilhamentos ocorrem apenas com
                 prestadores de serviço que apoiam a operação do site (como a Hostinger, que hospeda
-                o site, o Supabase, que armazena os formulários, o HubSpot, nosso CRM e ferramenta
-                de análise, e o Meta, plataforma dos nossos anúncios), sempre sob obrigações de
-                confidencialidade e segurança, ou quando exigido por lei.
+                o site e envia nossas comunicações por e-mail, o Supabase, que armazena os
+                formulários, o HubSpot, nosso CRM e ferramenta de análise, e o Meta, plataforma dos
+                nossos anúncios), sempre sob obrigações de confidencialidade e segurança, ou quando
+                exigido por lei.
               </p>
             </div>
 

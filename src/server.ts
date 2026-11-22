@@ -50,9 +50,21 @@ function redirectToCanonicalHost(request: Request): Response | undefined {
   return Response.redirect(`${SITE_URL}${url.pathname}${url.search}`, 301);
 }
 
+// Páginas removidas que ainda podem estar no Google ou em links antigos: o 301
+// leva para a página mais próxima em vez de um 404.
+const REMOVED_PATHS: Record<string, string> = {
+  "/cases": "/metodologias",
+};
+
+function redirectRemovedPath(request: Request): Response | undefined {
+  const url = new URL(request.url);
+  const target = REMOVED_PATHS[url.pathname.replace(/\/+$/, "") || "/"];
+  return target ? Response.redirect(`${SITE_URL}${target}`, 301) : undefined;
+}
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
-    const redirect = redirectToCanonicalHost(request);
+    const redirect = redirectToCanonicalHost(request) ?? redirectRemovedPath(request);
     if (redirect) return redirect;
     try {
       const handler = await getServerEntry();

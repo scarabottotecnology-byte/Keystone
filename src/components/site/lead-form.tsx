@@ -9,9 +9,10 @@ export function LeadForm({
   fields,
   origem,
   track,
+  locale = "pt",
   submitLabel,
-  loadingLabel = "Enviando...",
-  successTitle = "Mensagem enviada",
+  loadingLabel = locale === "en" ? "Sending..." : "Enviando...",
+  successTitle = locale === "en" ? "Message sent" : "Mensagem enviada",
   successDescription,
   idleHeader,
   footer,
@@ -21,6 +22,7 @@ export function LeadForm({
   fields: LeadFieldConfig[];
   origem: string;
   track?: LeadTrack;
+  locale?: "pt" | "en";
   submitLabel: string;
   loadingLabel?: string;
   successTitle?: string;
@@ -36,6 +38,7 @@ export function LeadForm({
   const { values, setField, status, formError, handleSubmit } = useLeadSubmission(fields, {
     origem,
     track,
+    locale,
   });
 
   if (status === "done") {
