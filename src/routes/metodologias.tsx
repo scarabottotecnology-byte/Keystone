@@ -129,8 +129,8 @@ function MetodologiasPage() {
               Frameworks que transformam <em>complexidade em resultado</em>.
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-cream-dim">
-              Cada metodologia foi desenvolvida a partir de anos de prática em controladoria de
-              empresas de alto desempenho, validada em dezenas de projetos.
+              Cada metodologia nasceu de anos de prática em controladoria de grandes grupos e é
+              adaptada ao porte de cada cliente.
             </p>
           </div>
         </section>

@@ -16,7 +16,6 @@ const PAGINAS = [
   "/ferramentas",
   "/indicadores",
   "/metodologias",
-  "/cases",
   "/blog",
   "/contato",
   "/trocar-de-contabilidade",
