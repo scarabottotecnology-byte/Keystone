@@ -2,18 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
 import { getService } from "@/content/services";
-import {
-  ServiceHero,
-  ServiceSection,
-  ServiceProblemList,
-  ServiceStepGrid,
-  ServiceMethodGrid,
-  ServiceResultsGrid,
-  ServiceFeatureGrid,
-  ServiceChecklist,
-  ServiceFaqList,
-  ServiceCTA,
-} from "@/components/site/service-page";
+import { ServiceHero, ServiceSections, ServiceCTA } from "@/components/site/service-page";
 import { SITE_URL, absoluteUrl, seo } from "@/lib/site";
 import type { ServiceContent } from "@/content/services";
 
@@ -113,111 +102,7 @@ function ServiceDetail() {
           description={service.heroDescription}
         />
 
-        {service.sections.map((section, i) => {
-          const tone = i % 2 === 1 ? "navy-mid" : "navy";
-          if (section.kind === "problems") {
-            return (
-              <ServiceSection
-                key={section.title}
-                eyebrow={section.eyebrow}
-                title={section.title}
-                titleEm={section.titleEm}
-                intro={section.intro}
-                tone={tone}
-              >
-                <ServiceProblemList items={section.items} />
-              </ServiceSection>
-            );
-          }
-          if (section.kind === "steps") {
-            return (
-              <ServiceSection
-                key={section.title}
-                eyebrow={section.eyebrow}
-                title={section.title}
-                titleEm={section.titleEm}
-                intro={section.intro}
-                tone={tone}
-                align="center"
-              >
-                <ServiceStepGrid steps={section.steps} />
-              </ServiceSection>
-            );
-          }
-          if (section.kind === "method") {
-            return (
-              <ServiceSection
-                key={section.title}
-                eyebrow={section.eyebrow}
-                title={section.title}
-                titleEm={section.titleEm}
-                intro={section.intro}
-                tone={tone}
-                align="center"
-              >
-                <ServiceMethodGrid letters={section.letters} />
-              </ServiceSection>
-            );
-          }
-          if (section.kind === "results") {
-            return (
-              <ServiceSection
-                key={section.title}
-                eyebrow={section.eyebrow}
-                title={section.title}
-                titleEm={section.titleEm}
-                intro={section.intro}
-                tone={tone}
-                align="center"
-              >
-                <ServiceResultsGrid results={section.results} />
-              </ServiceSection>
-            );
-          }
-          if (section.kind === "features") {
-            return (
-              <ServiceSection
-                key={section.title}
-                eyebrow={section.eyebrow}
-                title={section.title}
-                titleEm={section.titleEm}
-                intro={section.intro}
-                tone={tone}
-              >
-                <ServiceFeatureGrid items={section.items} />
-              </ServiceSection>
-            );
-          }
-          if (section.kind === "checklist") {
-            return (
-              <ServiceSection
-                key={section.title}
-                eyebrow={section.eyebrow}
-                title={section.title}
-                titleEm={section.titleEm}
-                intro={section.intro}
-                tone={tone}
-              >
-                <ServiceChecklist items={section.items} columns={section.columns} />
-              </ServiceSection>
-            );
-          }
-          if (section.kind === "faq") {
-            return (
-              <ServiceSection
-                key={section.title}
-                eyebrow={section.eyebrow}
-                title={section.title}
-                titleEm={section.titleEm}
-                tone={tone}
-                align="center"
-              >
-                <ServiceFaqList items={section.items} />
-              </ServiceSection>
-            );
-          }
-          return null;
-        })}
+        <ServiceSections sections={service.sections} />
 
         <ServiceCTA title={service.cta.title} description={service.cta.description} />
       </main>

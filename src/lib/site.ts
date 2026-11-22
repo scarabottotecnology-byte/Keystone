@@ -1,3 +1,5 @@
+import { alternatePath, localeFromPath } from "@/lib/i18n";
+
 // Endereço público do site. Canonical, og:url, sitemap e dados estruturados
 // partem daqui: um link relativo ou de outro domínio no canonical faz o Google
 // indexar o endereço errado.
@@ -42,6 +44,8 @@ type SeoOptions = {
  * 160: acima disso o Google corta no resultado de busca.
  */
 export function seo(path: string, o: SeoOptions) {
+  const locale = localeFromPath(path);
+  const alt = alternatePath(path);
   return {
     meta: [
       { title: o.title },
@@ -49,8 +53,20 @@ export function seo(path: string, o: SeoOptions) {
       { property: "og:title", content: o.ogTitle ?? o.title },
       { property: "og:description", content: o.ogDescription ?? o.description },
       { property: "og:url", content: absoluteUrl(path) },
+      { property: "og:locale", content: locale === "en" ? "en_US" : "pt_BR" },
       ...(o.noindex ? [{ name: "robots", content: "noindex" }] : []),
     ],
-    links: [canonical(path)],
+    links: [
+      canonical(path),
+      // hreflang: diz ao Google qual versão mostrar para quem busca em cada
+      // idioma. Só sai quando a página tem par no outro idioma.
+      ...(alt
+        ? [
+            { rel: "alternate", hrefLang: "pt-BR", href: absoluteUrl(alt.pt) },
+            { rel: "alternate", hrefLang: "en", href: absoluteUrl(alt.en) },
+            { rel: "alternate", hrefLang: "x-default", href: absoluteUrl(alt.pt) },
+          ]
+        : []),
+    ],
   };
 }

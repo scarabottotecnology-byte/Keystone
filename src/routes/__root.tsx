@@ -4,6 +4,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -17,6 +18,7 @@ import { MetaPixel } from "@/components/site/meta-pixel";
 import { Ga4 } from "@/components/site/ga4";
 import { META_DOMAIN_VERIFICATION } from "@/lib/meta-pixel";
 import { captureUtm } from "@/lib/leads";
+import { localeFromPath } from "@/lib/i18n";
 import { BING_SITE_VERIFICATION, GOOGLE_SITE_VERIFICATION, OG_IMAGE, SITE_URL } from "@/lib/site";
 
 function NotFoundComponent() {
@@ -108,7 +110,7 @@ const ORGANIZACAO = {
     { "@type": "State", name: "São Paulo" },
     { "@type": "Country", name: "Brasil" },
   ],
-  availableLanguage: "pt-BR",
+  availableLanguage: ["pt-BR", "en"],
   knowsAbout: [
     "Contabilidade",
     "BPO financeiro",
@@ -178,8 +180,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
+  // O idioma da página sai do caminho: /en/* é inglês, o resto é português.
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
-    <html lang="pt-BR">
+    <html lang={localeFromPath(pathname) === "en" ? "en" : "pt-BR"}>
       <head>
         <HeadContent />
       </head>

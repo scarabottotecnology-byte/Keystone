@@ -1,22 +1,29 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Check, AlertCircle } from "lucide-react";
 import type { ReactNode } from "react";
+import type { ServiceSection as ServiceSectionContent } from "@/content/services";
 
 /* Shared building blocks for /servicos/* pages — reuses the Keystone
    Dark Luxury Corporate design system (navy/gold/cream, Cormorant + Manrope,
    eyebrow / section-title utilities) so every service page feels native to
    the rest of the site instead of importing the old Next.js visual style. */
 
+type Cta = { label: string; to: string };
+
+const DEFAULT_CTA: Cta = { label: "Solicitar Diagnóstico", to: "/diagnostico" };
+
 export function ServiceHero({
   kicker,
   title,
   titleAccent,
   description,
+  cta = DEFAULT_CTA,
 }: {
   kicker: string;
   title: string;
   titleAccent: string;
   description: string;
+  cta?: Cta;
 }) {
   return (
     <section className="relative overflow-hidden bg-navy px-8 pb-16 pt-36 lg:pt-44">
@@ -34,8 +41,8 @@ export function ServiceHero({
           {title} <em className="italic text-gold">{titleAccent}</em>
         </h1>
         <p className="mt-6 max-w-2xl text-base leading-relaxed text-cream-dim">{description}</p>
-        <Link to="/diagnostico" className="btn-gold mt-9">
-          Solicitar Diagnóstico
+        <Link to={cta.to} className="btn-gold mt-9">
+          {cta.label}
           <ArrowRight className="h-3.5 w-3.5" strokeWidth={2} />
         </Link>
       </div>
@@ -200,7 +207,15 @@ export function ServiceFaqList({ items }: { items: { q: string; a: string }[] })
   );
 }
 
-export function ServiceCTA({ title, description }: { title: string; description: string }) {
+export function ServiceCTA({
+  title,
+  description,
+  cta = DEFAULT_CTA,
+}: {
+  title: string;
+  description: string;
+  cta?: Cta;
+}) {
   return (
     <section className="border-t border-border-sub bg-navy-mid py-24 text-center">
       <div className="mx-auto max-w-2xl px-8">
@@ -208,11 +223,124 @@ export function ServiceCTA({ title, description }: { title: string; description:
           <em>{title}</em>
         </h2>
         <p className="mt-5 text-[15px] leading-relaxed text-cream-dim">{description}</p>
-        <Link to="/diagnostico" className="btn-gold mt-9 inline-flex">
-          Solicitar Diagnóstico
+        <Link to={cta.to} className="btn-gold mt-9 inline-flex">
+          {cta.label}
           <ArrowRight className="h-3.5 w-3.5" strokeWidth={2} />
         </Link>
       </div>
     </section>
+  );
+}
+
+/** Renderiza as seções de uma página de serviço na ordem em que vêm do conteúdo. */
+export function ServiceSections({ sections }: { sections: ServiceSectionContent[] }) {
+  return (
+    <>
+      {sections.map((section, i) => {
+        const tone = i % 2 === 1 ? "navy-mid" : "navy";
+        if (section.kind === "problems") {
+          return (
+            <ServiceSection
+              key={section.title}
+              eyebrow={section.eyebrow}
+              title={section.title}
+              titleEm={section.titleEm}
+              intro={section.intro}
+              tone={tone}
+            >
+              <ServiceProblemList items={section.items} />
+            </ServiceSection>
+          );
+        }
+        if (section.kind === "steps") {
+          return (
+            <ServiceSection
+              key={section.title}
+              eyebrow={section.eyebrow}
+              title={section.title}
+              titleEm={section.titleEm}
+              intro={section.intro}
+              tone={tone}
+              align="center"
+            >
+              <ServiceStepGrid steps={section.steps} />
+            </ServiceSection>
+          );
+        }
+        if (section.kind === "method") {
+          return (
+            <ServiceSection
+              key={section.title}
+              eyebrow={section.eyebrow}
+              title={section.title}
+              titleEm={section.titleEm}
+              intro={section.intro}
+              tone={tone}
+              align="center"
+            >
+              <ServiceMethodGrid letters={section.letters} />
+            </ServiceSection>
+          );
+        }
+        if (section.kind === "results") {
+          return (
+            <ServiceSection
+              key={section.title}
+              eyebrow={section.eyebrow}
+              title={section.title}
+              titleEm={section.titleEm}
+              intro={section.intro}
+              tone={tone}
+              align="center"
+            >
+              <ServiceResultsGrid results={section.results} />
+            </ServiceSection>
+          );
+        }
+        if (section.kind === "features") {
+          return (
+            <ServiceSection
+              key={section.title}
+              eyebrow={section.eyebrow}
+              title={section.title}
+              titleEm={section.titleEm}
+              intro={section.intro}
+              tone={tone}
+            >
+              <ServiceFeatureGrid items={section.items} />
+            </ServiceSection>
+          );
+        }
+        if (section.kind === "checklist") {
+          return (
+            <ServiceSection
+              key={section.title}
+              eyebrow={section.eyebrow}
+              title={section.title}
+              titleEm={section.titleEm}
+              intro={section.intro}
+              tone={tone}
+            >
+              <ServiceChecklist items={section.items} columns={section.columns} />
+            </ServiceSection>
+          );
+        }
+        if (section.kind === "faq") {
+          return (
+            <ServiceSection
+              key={section.title}
+              eyebrow={section.eyebrow}
+              title={section.title}
+              titleEm={section.titleEm}
+              tone={tone}
+              align="center"
+            >
+              <ServiceFaqList items={section.items} />
+            </ServiceSection>
+          );
+        }
+        return null;
+      })}
+    </>
   );
 }

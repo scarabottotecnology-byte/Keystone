@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { posts } from "@/content/posts";
 import { services } from "@/content/services";
+import { servicesEn } from "@/content/services.en";
 import { absoluteUrl } from "@/lib/site";
 
 // Gerado a cada pedido a partir do conteúdo: serviço ou artigo novo entra no
@@ -20,6 +21,12 @@ const PAGINAS = [
   "/contato",
   "/trocar-de-contabilidade",
   "/contabilidade-santo-andre",
+  // Versão em inglês
+  "/en",
+  "/en/services",
+  "/en/methodology",
+  "/en/switching",
+  "/en/contact",
 ];
 
 function urlEntry(path: string, lastmod?: string) {
@@ -33,6 +40,7 @@ export const Route = createFileRoute("/sitemap.xml")({
         const entries = [
           ...PAGINAS.map((p) => urlEntry(p)),
           ...services.map((s) => urlEntry(`/servicos/${s.slug}`)),
+          ...servicesEn.map((s) => urlEntry(`/en/services/${s.slug}`)),
           ...posts.map((p) => urlEntry(`/blog/${p.meta.slug}`, p.meta.date)),
         ];
         const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries.join("\n")}\n</urlset>\n`;
