@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { trackMetaLead } from "@/lib/meta-pixel";
 import { trackGa4Lead } from "@/lib/ga4";
+import { subscribeLeadToReach } from "@/lib/reach";
 
 /**
  * Ponto único de captura de lead do site — grava no Supabase, que é a fonte
@@ -104,6 +105,17 @@ export async function saveLead(input: LeadInput): Promise<{ ok: boolean; error: 
 
   trackMetaLead(input.origem);
   trackGa4Lead(input.origem);
+
+  // Lista de e-mail marketing no Hostinger Reach. Não bloqueia nem derruba o
+  // envio: o lead já está salvo no Supabase, que é a fonte de verdade.
+  void subscribeLeadToReach({
+    data: {
+      nome: input.nome,
+      email: input.email,
+      telefone: input.telefone,
+      origem: input.origem,
+    },
+  }).catch((err: unknown) => console.error("Falha ao enviar lead ao Reach:", err));
 
   return { ok: true, error: null };
 }
